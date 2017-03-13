@@ -1,0 +1,967 @@
+Tag - Automatic Tag from filename
+=================================
+
+Tag is a small tool to work with tags in various compressed audio formats.
+Main features:
+ * Support for multiple standards:
+   - ID3v1.x
+   - ID3v2.x (reading and removing)
+   - APE v1.0
+   - APE v2.0
+   - Vorbis comments
+   - FLAC comments
+   - Lyrics3 v2.0.
+ * View tags
+ * Generate tags from filenames
+ * Modify tag values manually
+ * Set tag values from the contents of a text file
+ * Tag files with information read from CDDB files
+ * Copy tags from one file to another
+ * Convert tags to different format
+ * Remove tags
+ * Rename files based on tag information
+ * Move files to directories generated from tag values
+ * Generate Winamp playlists (optionally with AlbumList extensions and playing times)
+ * Generate text files with information about tracks and album (format customizable)
+ * Decode files and name output using tag information
+ * Test mode that shows what would happen without actually doing anything to files
+
+Tag is released as freeware. Use at your own risk.
+Copyright (c) 2002-2003 Case, case@mobiili.net, http://www.ca5e.tk/
+ID3v2 support with id3lib, http://id3lib.sourceforge.net/
+--------------------------------------------------------------------------------
+
+
+Installation:
+-------------
+Uncompress Tag to any directory. For easiest use I recommend including that
+directory in PATH or uncompressing Tag to Windows directory.
+
+
+Usage:
+------
+Tag is a command line tool, meaning that you have to type all the commands from
+Command Prompt in Windows. If you are not familiar with Command Prompt you should
+take a look at the great Frontend made by Speek.
+You can download the Frontend from http://home.wanadoo.nl/~w.speek/tag.htm.
+
+To use tag from command line type:
+
+  Tag [options] <filenames / directories / @file_with_parameters>
+
+[] means that options are optional, they are not needed
+<> means that filenames / directories / @file_with_parameters are required
+
+There are several options, to view basic options just execute Tag without any
+parameters:
+
+  Tag
+
+To view every option use parameter --help:
+
+  Tag --help
+
+Different options are explained later in this readme.
+Filenames and directories can contain wildcards '*' and '?'.
+file_with_parameters is a text file that contains all the parameters you would
+pass to Tag from command line.
+For example *.* means every file in current directory, *.mp3 means every .mp3
+file in current directory, a*.* means any file starting with 'a' in current
+directory, a?.* means any file that has two characters in it's name and starts
+with 'a'.
+Tag also supports wildcards in directory names, for example:
+
+  *\*.mp3
+
+means any file with extension .mp3 in all subdirectories of current directory.
+If Tag gets directory name as parameter it will search all files in in.
+Other basic option regarding directories and file searching is --recursive, it
+tells Tag to search files also from all subdirectories. For example command:
+
+  Tag "C:\My Music\*.mp3" --recursive
+
+will search all .mp3 files in "C:\My Music" and in all of it's subdirectories.
+Filename can also be M3U playlist, Tag will then read filenames from it.
+To learn more about features of Tag you can add option --test to command line
+and no files will get modified.
+
+
+Viewing tags:
+-------------
+Default mode of operation is to display contents of tags and with MP3s, MPCs and
+Oggs also some information about the files.
+To view this information simply call Tag with filenames as parameter. For example:
+
+  Tag *.*
+
+will display tags of all supported files in current directory.
+
+
+Tagging:
+--------
+You have five ways to tag your files:
+1. Let Tag guess the values for you from filename
+2. Tell Tag how your files are named and it will generate values
+3. Manually enter tag values
+4. Combination of all of the above
+5. Read tag information from tag.ini file or CDDB file
+
+Method one is easiest but it requires that your files are named using one of the
+standard naming schemes. Currently Tag recognizes about 50 different schemes, so
+most probably it will work.
+You can test if it will work for you by using following command in the directory with
+files to be tagged:
+
+  Tag --auto --test *.*
+
+This will view tag values that would have been guessed by Tag. If you see text
+"generated from name" on the screen and tag values are correct you know that guessing
+works with your filenames.
+To actually write the tags remove the parameter --test and use:
+
+  Tag --auto *.*
+
+If automatic mode didn't view correct information on your files you can manually
+specify the scheme used in your filenames.
+Scheme is the way filenames are constructed, telling which part of the name (or directory)
+corresponds to what information. This is told by using identifiers and separators, possible
+identifiers are:
+ T = Title
+ A = Artist
+ L = Album
+ N = Track number
+ Y = Year
+ G = Genre
+ C = Comment
+ X = text to be disrecarded
+All other text is considered as separator. For example the scheme for file
+
+  Red Hot Chili Peppers - 01 - Around The World.mp3
+
+is
+
+  A - N - T
+
+You don't need to worry about the filename extension, it will be automatically
+ignored.
+Scheme can also be used with directories, for example if our example file was
+
+  Californication\Red Hot Chili Peppers - 01 - Around The World.mp3
+
+we can get the Album name with scheme
+
+  L\A - N - T
+
+If your filenames have more information just add new identifiers and Tag will use
+the text in your tags. If there is some text in the middle of the name that you do
+not want to store in tags you can use identifier X to mark it. For example
+
+  C:\My Music\Rock\Full Albums\The Beatles\White Album\11. Blackbird.mp3
+
+has text "Full Albums" after genre Rock, and we want to ignore that text. Scheme is
+
+  G\X\A\L\N. T
+
+Hopefully you now understand how schemes are constructed. You can now tag your files
+with command:
+
+  Tag --auto --scheme <scheme> <files>
+
+If you first want to see what the resulting tags would be like, add parameter --test:
+
+  Tag --test --auto --scheme <scheme> <files>
+
+If you don't want to use automatic tag generation you can of course also enter all
+information manually. There are easy-to-use switches to enter standard fields and
+a general switch to enter any field to tags.
+Easy switches are:
+ --artist  <x>  : artist is <x>
+ --title   <x>  : title is <x>
+ --album   <x>  : album is <x>
+ --track   <x>  : track number is <x>
+ --comment <x>  : comment is <x>
+ --genre   <x>  : genre is <x>
+ --year    <x>  : year is <x>
+
+General switch is:
+
+ -t "item=x"    : item is x
+
+Multiple calls to any of these switches are possible.
+
+These switches can also be used when automatic tag generation is used, user entered
+values will always override generated values.
+
+To tag using tag.ini or CDDB file as source your files need to be in the same
+directory with the source text files. And their names must be in form "TrackNN.XXX",
+NN being the track number and XXX one of the supported file extensions.
+After that simply call Tag with text file as parameter, for example:
+
+  Tag *.
+
+will search all files without extension and if they are CDDB files it will tag
+tracks with the information from the file.
+
+You can also use:
+
+ - f "item=x"    : item will be set to the text contained within the external file x
+
+This may be useful for storing cuesheet information in an APEv2 tag, for example:
+
+  Tag -f "cuesheet=X:\CDImage.ape.cue" CDImage.ape
+
+but can be used to store any text in any tag.
+
+NB: The text contained in the file is stored, not the file itself.
+
+
+Renaming:
+---------
+Tag allows fast mass renaming of files to match naming scheme you specify. You
+can also move the files to subdirectories according to your scheme.
+The renaming can be done by using tags already in your files, or if the files
+don't have tags they can be renamed based on the scheme of original names.
+To rename using tags you need to tell Tag the new scheme you want with parameter
+--scheme. Let's assume our file
+
+  Red Hot Chili Peppers - 01 - Around The World.mp3
+
+has correct tags and we want to rename it to be
+
+  01. Around The World.mp3
+
+New name uses scheme "N. T" so we call Tag with command:
+
+  Tag --rentag --scheme "N. T" <files>
+
+To rename files without using tags option --scheme specifies scheme of old names.
+If it is not specified Tag will try to autodetect it.
+Parameter --rentag <newscheme> is used to specify the new scheme of files. The
+command to rename our example file
+
+  Red Hot Chili Peppers - 01 - Around The World.mp3
+
+to
+
+  01. Around The World.mp3
+
+without using tags would be:
+
+  Tag --scheme "A - N - T" --rentag "N. T" <files>
+
+or since the above example would be autodetected you can simply call:
+
+  Tag --rentag "N. T" <files>
+
+If you also want to move the files to subdirectories use option --move. To move
+our example file to subdirectory Californication we would add "L\" in front of
+the new scheme and add option --move to command line. So with our example file
+the command would be:
+
+  Tag --rentag --scheme "L\N. T" --move <files>
+
+or without using tags:
+
+  Tag --rename "L\N. T" --move <files>
+
+
+Generating Playlists:
+---------------------
+Tag can generate playlists for your tracks, naming the lists by the name of the
+directory files are in, by scheme "Album artist - Album title", or use the name
+you specify.
+Playlists have playing times, Winamp's display title and AlbumList extensions by
+default, but if wanted they can also contain only filenames.
+By default playlists are sorted by track number, but they can also be sorted by
+ duration:      track duration
+ size:          filesize
+ name:          name with full path
+ path:          only file path
+ basename:      filename without path
+ extension:     file extension
+ attrib:        file attributes
+ time_access:   time file was last accessed
+ time_create:   time file was created
+ time, date:    time file was last modified
+ bitrate:       bitrate of file
+ channels:      audio channels in file
+ samplerate:    samplerate of file
+ format:        audio format
+ <x>:           any item <x> in tag (artist, title, track, comment, genre, year...)
+
+Sorting order can also be reversed.
+You can tell Tag to write only one playlist of all files or to write multiple
+playlists, one to every directory with files.
+Tag will try to automatically detect album artist and album title from tags, but
+those can also be given with parameters --a-artist and --a-title.
+Sorting options are given with parameter --sort, and if you want to sort by multiple
+properties add new properties with parameter --sort+.
+
+Playlist options:
+ --playlist        : generate one playlist per directory
+ --oneplaylist     : generate one playlist from all files
+ --playlists       : generate one playlist per album in current directory
+ --a-artist <x>    : set album artist to <x>
+ --a-title <x>     : set album title to <x>
+ --onlyfiles       : writes only filenames in playlist, no extra information
+ --dirname         : use directory name for playlist naming
+ --plname <name>   : use <name> as playlist name.
+ --slashes         : use slashes '/' instead of backslashes '\' in playlists
+ --nospaces        : replaces space by underscore in names of written files
+ --sort <by>       : sort playlist only by <x>
+ --sort+ <x>       : add new playlist sorting property <x>
+ --sortdesc        : sort in descending order
+
+Example to write one big playlist of all .mp3 files and sort the playlist by
+path and by track number:
+
+  Tag --oneplaylist --sort path --sort+ track --recursive *.mp3
+
+
+Outputting cuesheets:
+---------------------
+You can output the contents of an embedded cuesheet to file using one of the
+--tocue switches.
+
+To output the content to a file whose name is detirmed by tag values:
+
+  Tag --tocue "%A - %L" <files>
+
+To output the content to a specific file:
+
+  Tag --tocuen "C:\My Music\CDImage.cue" "C:\My Music\CDImage.wv"
+
+To output the content to a file with the same name as the source:
+
+  Tag --tocuea <files>
+
+If the file is "C:\CDImage.wv" the cuesheet will be called "C:\CDImage.wv.cue"
+
+By default, using --tocue and --tocuea will overwrite existing files,
+but --tocuen will append to an existing file.  To make --tocuen overwrite use
+the --overwrite switch (hack).
+
+
+Outputting tags to STDOUT:
+--------------------------
+To output the contents of a tag to STDOUT use:
+
+  Tag --tostdoutn "EACLOG" "C:\My Music\CDImage.wv"
+
+This can be used in conjunction with redirection to write tag contents to a text file:
+
+  Tag --tostdoutn "EACLOG" "C:\My Music\CDImage.wv" > log.txt
+  Tag --tostdoutn "COMMENT" "C:\My Music\CDImage.wv" > comment.txt
+
+Only one tag can be written at a time.
+
+
+Removing tags:
+--------------
+You can remove all supported tags from files and with ID3v2 version also just
+ID3v2 tags.
+To remove all tags use command:
+
+  Tag --remove <files>
+
+and to remove only ID3v2 tags:
+
+  Tag --removeid3v2 <files>
+
+
+All options:
+------------
+ --title   <value> : set title to <value>
+ --artist  <value> : set artist to <value>
+ --album   <value> : set album to <value>
+ --year    <value> : set year to <value>
+ --comment <value> : set comment to <value>
+ --track   <value> : set track number to <value>
+ --genre   <value> : set genre to <value>
+
+Tag fields can also be set with:
+ -t <item=x>       : set tag item <item> to value <x>
+ -f <item=x>       : set tag item <item> from content of file <x>
+ -u <item=x>       : set tag item <item> to value <x> (x is UTF-8 coded)
+
+ --help            : show full help
+ --hideinfo        : don't display file information
+ --hidetags        : don't display tags
+ --hidenames       : don't display filenames
+ --simple          : use simple tag display format
+ --recursive       : search files recursively in all subdirectories
+ --fromfile <file> : copy tag information from <file>
+ --allow <item=x>  : allow access to files with specified properties only
+ --auto            : generate tags from filenames
+ --scheme <scheme> : specify file structure scheme (ie. L/A - N - T)
+ --autoscheme      : select automatically best scheme from list of schemes
+ --nomagic         : use plain schemes, disable extra automations
+ --chreplace       : use character replacing when tagging
+ --rentag          : rename files to match scheme, filename from tag data
+ --rename <scheme> : rename files to <scheme>, filename generated from old name
+ --move            : when renaming move files to subdirectories
+ --overwrite       : overwrite existing files when renaming
+ --trackinc        : use incremental track numbering
+ --caps            : capitalize words
+ --Caps            : capitalize only first word
+ --lower           : convert all characters to lower case
+ --upper           : convert all characters to upper case
+ --tcaps <item>    : capitalize words in tag field <item>
+ --tCaps <item>    : capitalize only first word in tag field <item>
+ --tlower <item>   : convert all characters to lower case in tag field <item>
+ --tupper <item>   : convert all characters to upper case in tag field <item>
+ --nozero          : ignore leading zeros on track numbers
+ --zeropad         : add trailing zero to track number if missing
+ --commafix        : fix comma separated artist field (x, the -> the x)
+ --spacefix        : replaces underscore (_) and %20 with space
+ --itemfix         : fix item names in APE v1.0/2.0 tags
+ --umlfix          : fix umlauts (ae -> ä, oe -> ö, ue -> ü)
+ --swapta          : swap title <--> artist
+ --remove          : remove all tags
+ --removeid3v2     : remove only ID3v2 tags
+ --removeid3v2u    : remove only unnecessary ID3v2 tags (fields fit in ID3v1)
+ --playlist        : generate one playlist per directory
+ --oneplaylist     : generate one playlist from all files
+ --playlists       : generate one playlist per album in current directory
+ --a-artist <x>    : set album artist to <x>
+ --a-title <x>     : set album title to <x>
+ --onlyfiles       : writes only filenames in playlist, no extra information
+ --dirname         : use directory name for playlist naming
+ --plname <name>   : use <name> as playlist name.
+ --slashes         : use slashes '/' instead of backslashes '\' in playlists
+ --nospaces        : replaces space by underscore in names of written files
+ --sort <by>       : sort playlist only by <x>
+ --sort+ <x>       : add new playlist sorting property <x>
+ --sortdesc        : sort in descending order
+ --newdate         : don't keep files original date/time
+ --oldtype         : use old tag format
+ --ape2            : default to APE v2.0
+ --force <tag>     : force use of selected tag type
+ --extid3          : extend over long title field into comment field with id3
+ --nocheck         : don't check file extension
+ --test            : test mode, no files will be modified
+ --paranoid        : return non-zero code on warnings/non-critical errors
+ --tofile <scheme> : save screen output to file, name generated from <scheme>
+ --tofileext <ext> : use extension <ext> instead of .txt
+ --tofilen <name>  : save screen output to file <name>
+ --tocue <scheme>  : output cuesheet tag to file, name generated from <scheme>
+ --tocuen <name>   : output cuesheet tag to file <name>
+ --tocuea          : output cuesheet tag to file, name generated from source
+ --tostdoutn <tag> : write <tag> value to stdout
+ --stdout          : write tag details to stdout instead of stderr
+ --nfo <file>      : generate .nfo file and save to <file>
+ --listdefaults    : view default settings
+ --listexceptions  : view list of exceptions in capitalize function
+ --listgenres      : view list of possible ID3v1 tag genres
+ --listpresets     : view list of defined presets
+ --decode          : use external decoder and use <scheme> to name output
+ --acculen         : display length more accurately
+ --ansioutput      : don't convert output to OEM codepage
+ --<number>        : use predefined preset <number>
+
+
+--------------------------------------------------------------------------------
+
+Release History:
+----------------
+
+All versions since 2.0.39 released by Neil Popham <neilpopham@bigfoot.com>.
+All versions prior to and including 2.0.39 by Case.
+
+Legend:
+(+) Added feature
+(*) Improved/changed feature
+(-) Bug fixed
+
+Version 2.0.52:
+(*) Reverted ListSeparator to "; "
+(*) Tag values longer than 256 bytes (generally those loaded from a file) will not be split
+(*) Extended information now written to playlists even for 'unknown' filetypes
+
+Version 2.0.51:
+(*) Now leaves FLAC vendor string untouched
+Thanks to Nick Voronin for providing the necessary patch
+
+Version 2.0.50:
+(*) Now uses libFLAC 1.1.4
+
+Version 2.0.49:
+(+) Added direct support for TAK files (recognition of file extension, etc.)
+
+Version 2.0.48:
+(*) Now uses libFLAC 1.1.3
+
+Version 2.0.47:
+(-) Changed ListSeparator from "<#>" to "<>" to resolve crash when setting tag of 1 char
+
+Version 2.0.46:
+(*) Changed ListSeparator from "; " to "<#>"
+(+) New --tostdoutn switch to output tag value to stdout
+
+Version 2.0.45:
+(+) New --tocue/--tocuen/--tocuea switches to output cuesheet tag to file
+(+) New --paranoid switch to return non-zero code on warnings/non-critical errors
+(*) Now uses libOgg 1.1.3 and libVorbis 1.1.2
+
+Version 2.0.44:
+(*) Removed code that truncated schemes with a full stop at the end
+(+) New --stdout switch to write tag details to stdout instead of stderr
+(*) Now uses libVorbis 1.1.1
+
+Version 2.0.43:
+(*) Now reports correct information for v3.98+ Monkey's Audio files
+(*) The -f switch will now add files larger than 10KB
+
+Version 2.0.42:
+(*) Monkey's Audio files now use APEv2 tags by default (previously APEv1)
+(*) Now uses libFLAC 1.1.2
+
+Version 2.0.41:
+(*) Now uses libFLAC 1.1.1, libOgg 1.1.2 and libVorbis 1.1.0
+
+Version 2.0.40:
+(*) Removed beta status
+
+Version 2.0.40b4:
+(*) Improved -f switch file loading, and moved file contents from stack to heap
+Thanks to Niko Korhonen for his help and suggestions for the above
+
+Version 2.0.40b3:
+(-) Now correctly encodes tag to UTF8 when using -f switch
+
+Version 2.0.40b2:
+(+) New switch -f "<tag>=<file>" to set a tag value from the contents of a text file
+
+Version 2.0.40b1:
+(+) Added direct support for OptimFrog files (recognition of file extension, etc.)
+(*) Amended --ape2 option to override to APEv2 format on any file, not just MusePack
+
+Version 2.0.39:
+(*) Defaults to APEv2 on WavPack files
+(+) New option --acculen to display sample accurate length of files
+(+) New option --ansioutput to prevent ANSI -> OEM conversion of output
+(*) Now uses id3lib 3.8.3, libFLAC 1.1.0 and latest CVS code of Ogg libraries
+
+Version 2.0.38:
+(-) File moving failed when any directory in generated path ended with dot
+(*) No longer aborts info reading if tags contain invalid utf8 encoding
+
+Version 2.0.37:
+(-) Too large ID3v2 tags caused MP3 file info reading to fail
+(-) Binary data caused APEv2 tag writer to crash
+(-) Memory access problems in MPC info reader with stream version 15.15
+(-) option --zeropad had incorrect description
+
+Version 2.0.36:
+(-) Fixed problems with zero length files
+
+Version 2.0.35:
+(*) Added 'Disc number' field to schemes (used with %D)
+
+Version 2.0.34:
+(*) Made the executable smaller
+(*) Changed tag name 'Ogg comment' to 'Vorbis comment'
+(*) Changed license to LGPL
+
+Version 2.0.33:
+(-) Writing a new tag and removing ID3v2 tag simultanously from a file with two
+    or more tags left old tags in the end of the file
+
+Version 2.0.32:
+(-) MP3 length calculation was sometimes one second off
+
+Version 2.0.31:
+(*) Now adds three dots (...) to the end of fields that don't fully fit in ID3v1 tag
+(*) Option --id3ext can be used to specify the old behavior (no dots, extend too
+    long artist field to comment field)
+
+Version 2.0.30:
+(-) Option --removeid3v2u didn't check that ID3v2 tag actually exists
+(*) Option --removeid3v2u will always remove id3v2 tag from formats where it's not
+    allowed (only leaves it in MP3, AAC and FLAC)
+
+Version 2.0.29:
+(+) New option --removeid3v2u, only removes ID3v2 tags if basic fields fit in
+    ID3v1 tag
+(*) Uses Windows functions for character conversions, should work with all codepages
+(-) No longer uppercases characters after ´ and `
+(*) Now converts Unicode character codes after '%' character when using --spacefix
+
+Version 2.0.28:
+(*) Option --fromfile now copies only new tag fields, no field values are replaced
+(+) New option --umlfix to fix umlauts (ae -> ä, oe -> ö, ue -> ü)
+(+) Option --overwrite for overwriting existing files when renaming
+(+) Converts first digit of three digit tracknumbers to album number when tagging
+    from filenames (can be disabled with --nomagic switch)
+(-) Converts characters properly from ANSI to OEM codepages when displaying filenames
+
+Version 2.0.27:
+(+) New case conversion functions --tcaps, --tCaps, --tlower & --tupper that only
+    convert characters of specified tag item.
+(+) Can read file info from Monkey's Audio files
+(-) Removed warning messages about failed fileinfo reading with some formats
+
+Version 2.0.26:
+(*) Updated vorbis comment editor backend and id3lib to latest versions
+(*) Now statically links with id3lib, external libraries no longer required
+
+Version 2.0.25:
+(+) Support for FLAC, can read file info and use native tags
+(+) Return of --trackinc function
+(+) New function --nomagic, disables all extra automations from automatic tagging
+    (which were automatic appending of CD number to album field and automatic
+	extraction of release year from album)
+
+Version 2.0.24:
+(*) Scheme handling improved slightly, now schemes without special separator characters
+    work better
+(*) Playlists for Various Artists albums are labeled with album name only
+(-) Fixed bugs in Unicode parameter passing
+
+Version 2.0.23:
+(*) Removed some tag item name conversions when dealing with Oggs
+
+Version 2.0.22:
+(+) New function --zeropad adds leading zeros to tracknumbers < 10
+
+Version 2.0.21:
+(-) Fixed memory overwrite bug with Ogg file info reader
+
+Version 2.0.20:
+(-) Tag removing always recreated tags if --spacefix or --itemfix were used
+(-) Option --spacefix had memory allocation problem, long text fields caused crash
+
+Version 2.0.19:
+(*) Tag copying from other file now preserves title field if it's not empty
+
+Version 2.0.18:
+(*) Function --nospaces now affects also files when renaming
+(*) Function --spacefix now fixes all tag fields and not only artist and title
+(*) Autoscheme now works on files at root directory
+
+Version 2.0.17:
+(+) Displays encoder version used with MPC
+(-) Playlist functions didn't work without specifying name
+
+Version 2.0.16:
+(*) Option --plname now works with scheme identifiers too (thanks Kjetil)
+
+Version 2.0.15a:
+(-) Program crashed if --nfo wasn't used (whoops)
+
+Version 2.0.15:
+(-) Case capitalization functions didn't capitalize first character if first word
+    was listed in exceptions
+(-) NFO file generator was one month behind when using numeric form
+(*) NFO file name can be given using scheme when identifiers are marked with '%' or '*'
+
+Version 2.0.14:
+(*) Config file can now be loaded from Tag's directory even when not located in path
+(*) Doesn't try to write empty tags anymore if --auto fails
+(*) Improved error reporting
+(-) Can now read/remove empty APE tags
+(-) Empty tag fields work again (they weren't working after changes in 2.0.12)
+
+Version 2.0.13:
+(+) Added user customizable character replacing for tagging from filename.
+    Useful if you use some special codes to mark illegal characters (?, *, /, \, |)
+
+Version 2.0.12:
+(-) Last character of last tag field in APE tags was sometimes lost
+(-) Rename functions worked incorrectly with single digit track number
+(-) ID3v2 tag removing and taggging didn't work at the same time
+(-) Character conversions accessed memory incorrectly
+
+Version 2.0.11:
+(*) Rename functions simplified
+(-) Path creation now handles special characters correctly
+(-) Unicode parameters are now only used for tag values
+
+Version 2.0.10:
+(+) New option --playlists, creates one playlist for every album in current directory
+
+Version 2.0.9:
+(-) Rename functions handled path incorrecly
+(*) Option -u not needed in NT based operating systems anymore, parameters are
+    read in UNICODE (Thanks to ErikS!)
+
+Version 2.0.8:
+(+) Doesn't use Windows' UTF-8 code anymore, works with Win95.
+
+Version 2.0.7:
+(*) NFO generator only accepts correctly formatted scheme
+
+Version 2.0.6:
+(+) New option --itemfix changes item name cases to match official names.
+    This can be used to fix tags created with buggy versions of Tag
+(*) Changes to tag display routine's Windows ANSI to OEM character conversions
+
+Version 2.0.5:
+(-) Itemnames were lowercase when direct switches were used (--title, --artist...)
+
+Version 2.0.4:
+(-) Minor bugfix in APE v1.0 to APE v2.0 conversion
+
+Version 2.0.3:
+(-) Scheme was recognized incorrectly if it didn't start with identifier
+(+) New schemes for scheme autodetector
+
+Version 2.0.2:
+(-) Playlists and .nfo files were written in unix mode
+(+) NFO file can use comment field
+
+Version 2.0.1:
+(+) If scheme is given using proper identifier markers (%, *) you can use all
+    characters normally without being interpreted as identifier.
+
+Version 2.0:
+(*) New readme
+(*) Some small additions
+
+Version 2.0 RC7:
+(-) NFO file generator was too anxious in replacing characters
+(+) Character replacement can now be customized in config file
+(+) New option --tofileext <ext> allows selecting extension for generated name
+
+Version 2.0 RC6:
+(+) New option --plname <name> allows user specify name for playlist
+(+) New option --slashes converts backslashes to slashes in playlists
+(-) Screen output writing didn't append to existing file when name was made using scheme
+(-) Renaming had character ignoring bugs
+
+Version 2.0 RC5:
+(+) Pictures from ID3v2 tags are saved in APE tags
+(+) .nfo file generator is finished, template is read from config file
+(+) New options, --a-artist defines album artist and --a-title defines album title.
+    Both are used with playlists and .nfo file.
+(+) Decoding is back. Supports mpc, mp3 and ape. Other decoders don't allow naming output
+
+Version 2.0 RC4:
+(+) Tag info reading from tag.ini and CDDB files is back. There is no option
+    --inimode anymore, feature is used by entering name of the file as parameter.
+(+) Output direction to text files, option --tofile <scheme> writes screen output
+    to file generated from scheme (tag data from first file).
+    --tofilen <file> writes output to <file>.
+(+) New option --nospaces, all files generated by Tag will have spaces replaced by
+    underscore.
+
+Version 2.0 RC3:
+(-) Lots of bugs fixed, too many to remember all
+
+Version 2.0 RC2:
+(-) Tags were not written when manually setting fields
+(-) Ogg tags couldn't be saved
+(+) New option -u to insert tag fields coded in UTF-8
+(*) Some improvements to internal tag handling
+
+Version 2.0 RC1:
+(*) Total code rewrite.
+    Some functions that were previously supported are not implemented yet
+    but all functions shown on usage screen are implemented and should work.
+(-) No longer crashes when reading files with multiple tags (this happened with v1.33)
+(+) Full wildcard support for directories.
+    (Command "tag */s*/*.*" would search all files in directories starting with 's'
+    in all directories under current working directory.)
+(+) Now accepts directories as parameters.
+(*) New option --oneplaylist to write one playlist of all files. Options --playlist creates
+    one playlist in every directory there are files.
+(*) Sort improved. Option --sortdesc reverses sort order. Multiple --sort+ parameters define
+    multiple rules to sort by. Accepted parameters are:
+    duration: total song playtime
+    size:     filesize
+    name:     name with full path
+    path:     only file path
+    basename: filename without path
+    extension: file extension
+    attrib:   file attributes
+    time_access: time file was last accessed
+    time_create: time file was created
+    time_write, time, date: time file was last modified
+    bitrate:  bitrate of file
+    channels: audio channels in file
+    samplerate: samplerate of file
+    format:   audio format
+    <x>:      any item in tag (artist, title, track, comment, genre, year...)
+(*) Can now write multiple tags at once (use --force multiple times)
+(*) With --oldtype writes all tags that were in file
+(+) Displays basic information about MP3s, MPCs and Oggs (can be disabled with --hideinfo)
+(*) Autoscheme improved
+(*) Supports unlimited number of presets
+(*) Some other things I can't remember right now.
+
+Version 1.331:
+(+) Short directory names are now converted to long names.
+
+Version 1.33:
+(+) Included ID3v2 tag reading by using id3lib (http://id3lib.sourceforge.net/)
+    For things to work the library file id3lib.dll is needed somewhere in path.
+
+Version 1.324:
+(*) Fixes and improvements to --inimode
+(*) Improved long title cutting with ID3v1 tags (>30 characters).
+    If moving parenthesis to comment field doesn't cut title, this is done.
+    Otherwise title is cut at 30 characters and rest is moved to comment.
+(+) New option --swapta. Swaps title field with artist field.
+
+Version 1.323:
+(*) Autoscheme is now enabled by default in config
+(*) Some modifications to autoscheme
+(*) Lots of new schemes to autoscheme detection list
+
+Version 1.322:
+(+) New option --inimode. Reads entries from tag.ini or if that's missing searches
+    cddb-file and uses them to tag files track01.*, track02.* ...
+(+) New options for playlist creation:
+    --onlyfiles writes only filenames leaving out durations and other extensions
+    --dirname uses directory name as name for playlist
+(*) If playlist name would be empty, directory name is used
+
+Version 1.321:
+(*) Genre can be given as ID3 genre number (0-147)
+
+Version 1.32:
+(+) Code sequences (%xx) on names are translated to characters
+(*) Test mode (--test) now displays what tag would be like
+(*) Added some more naming schemes to tag.cfg to be used with --autoscheme
+(*) Autoscheme works better
+
+Version 1.310:
+(*) Playlist sorting works better, numbers are sorted in correct order regardless of
+    length differences (02 comes before 010)
+
+Version 1.309:
+(+) New option --lognames saves a logfile with new names when renaming
+
+Version 1.308:
+(*) Improvements to commafix, it now doesn't change order of words if artist field
+    is a list
+
+Version 1.307:
+(+) New option --spacefix replaces underscore (_) and %20 with space character
+
+Version 1.306:
+(+) New option --fromfile <file> can be used to copy tag from one file to another
+
+Version 1.305:
+(+) New option --nozero ignores leading zeros on track numbers
+(+) New option --commafix fixes order of words on comma separated artist field
+
+Version 1.304:
+(-) Fixed a bug with memory allocation
+(*) Made memory allocation safer, program exits now on errors
+
+Version 1.303:
+(-) Generated APE 2.0 tags were corrupted
+
+Version 1.302:
+(-) Autoscheme didn't recognize brackets or other weird characters as being part of name
+
+Version 1.301:
+(+) New option --ape2 changes MPC to default to APE 2.0. Otherwise 1.0 is default
+(-) Fixed bug with tag type checking, APE tag was sometimes recognized as ID3v1
+
+Version 1.30:
+(+) Support for APE 2.0
+(*) Recursive function now longer warns about missings files with wildcards
+
+Version 1.29:
+(+) New option --autoscheme reads scheme possibilities from Tag.cfg and tries to
+    select best mode automatically
+(-) Lyrics tag was not read if ID3 tag's title had space characters in the end
+
+Version 1.281:
+(-) Tags couldn't be manually edited
+
+Version 1.28:
+(+) New option --recursive applies commands in all subdirectories recursively
+
+Version 1.273:
+(+) Now allows tagging of .aac files
+(*) Small modifications to APE tag reading
+
+Version 1.272:
+(+) Now detects WavPack and FLAC as supported formats
+
+Version 1.271:
+(+) Preliminary reading of APE 2.0 tags
+(-) Small bug fixed with APE writing, reserved field was not always zero
+(*) Temporarily disabled displaying of multiple tags because of bugs
+
+Version 1.27:
+(-) User defined fields (-f) were not written with option --auto
+(+) New option --trackinc increases tracknumber after every file processed
+
+Version 1.262:
+(+) Allows writing of multiple tag files
+(+) Can display APE tag with ID3v1 tag ( rough hack, might be buggy )
+
+Version 1.261:
+(+) Doesn't modify date/time information of file. Can be disabled with --newdate
+
+Version 1.26:
+(+) Huge speedup in Ogg handling, vorbiscomment is only needed for writing tags
+
+Version 1.25:
+(+) Now reads playtimes from Ogg files
+
+Version 1.247:
+(-) Now playlist creation should work properly
+
+Version 1.246:
+(-) Empty lines in parameter file are no longer read
+(-) Playlist creation now creates relative paths correctly
+
+Version 1.245:
+(-) Ogg tags were not written for files without tags
+(-) Playlist creation now uses given album and artist names correctly
+(+) Started support for decoding (beta, only MPC right now)
+(*) Small clarifications on usage screen
+
+Version 1.241:
+(*) Allowed longer strings for year and tracknumber fields
+(+) Reads Media field when generating .NFO files
+
+Version 1.24:
+(+) Can now write user defined fields in APE tags
+(*) Changed handling of upper/lower case conversions
+(-) Exception words now work like they should
+(*) Exceptions now include some roman numbers by default
+
+Version 1.23:
+(+) Now shows if file has ID3v2 tags
+(+) Can remove ID3v2 tags
+(+) Started support for writing .NFO files
+
+Version 1.22:
+(+) Skipping of ID3v2 with MPC files
+(*) Removed environment variable TAG_SCHEME
+(+) Configuration file Tag.cfg
+(+) Added presets (in config)
+(+) List of exception words for case conversion (in config)
+(+) Can now read filenames from list (use '@' in front of list)
+(+) New options:
+      --Caps:  capitalizes only first word of text strings
+      --lower: converts strings to lower case
+      --upper: converts string to upper case
+(*) Some changes to usage screen
+
+Version 1.21:
+(+) Support for Lyrics3 v2.00 tags
+(+) Environment variable TAG_SCHEME can be used to set default naming scheme
+(*) Some fixes in latin to ascii conversions
+
+Version 1.20:
+(*) Now saves MPCs with APE tags by default
+(+) New parameter --oldtype is needed to save files with tag type they have
+(-) Parameter --caps alone didn't do anything
+(*) Changed usage screen
+
+Version 1.19:
+(-) If vorbiscomment was not in path, temporary files were left undeleted
+
+Version 1.18:
+(*) Changed Usage screen
+(+) Added help file Tag.txt
+
+Older Versions:
+Never kept log of changes before 1.18...
