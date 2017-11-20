@@ -9,163 +9,163 @@ You'll find more information about JuggleKeys on http://www.jugglemaster.fr/comp
 Enjoy !
 
 
-———————————————————————————————————————————————————————————————————————————————————————————————————————————|———————————————————————
+â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
 
 In French :
 
-JuggleKeys - Liste des fonctionnalités :
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+JuggleKeys - Liste des fonctionnalitÃ©s :
+Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯Â¯
 
 1. Administration
-Sauvegarde instantanée des données de configuration :
-	Suspension des fonctionnalités en plein écran
+Sauvegarde instantanÃ©e des donnÃ©es de configuration :
+	Suspension des fonctionnalitÃ©s en plein Ã©cran
 	Focus X-Window par la souris
 	Hook de chaque bouton de la souris
 	Affichage des tooltips
 Via le menu d'Administration :
 	Cancel visual effects [Ctrl + Alt + BackSpace] : Annulation de tous les effets visuels
-	Hide tray icon : masquage de l'icône du systray (Ctrl + Alt + BackSpace pour annuler)
-	Edit : Édition de l'ensemble des scripts { Win + Click sur l'icône }
+	Hide tray icon : masquage de l'icÃ´ne du systray (Ctrl + Alt + BackSpace pour annuler)
+	Edit : Ã‰dition de l'ensemble des scripts { Win + Click sur l'icÃ´ne }
 	Recorder : Enregistrement d'un ensemble d'actions
 	Help : aide sur AutoHotkey
-	Suspend : Suspension/reprise des fonctionnalités [Ctrl + Win] ou { Alt + Click sur l'icône }
-	Reload : Rechargement complet du script { Shift + Click sur l'icône }
-	WindowSpy : Récupération des informations liées aux fenêtres [Ctrl + Win + S]
+	Suspend : Suspension/reprise des fonctionnalitÃ©s [Ctrl + Win] ou { Alt + Click sur l'icÃ´ne }
+	Reload : Rechargement complet du script { Shift + Click sur l'icÃ´ne }
+	WindowSpy : RÃ©cupÃ©ration des informations liÃ©es aux fenÃªtres [Ctrl + Win + S]
 	Website : visite du site web d'AutoHotkey
 	About : ce fichier
-Automatisation des tâches suivantes :
+Automatisation des tÃ¢ches suivantes :
 Confirmation de fermeture de session
-Confirmation d'arrêt de la machine
-Rechargement du programme suite à la modification d'un script
-Fermeture des fenêtres de dialogue intempestifs
-Délai de 400ms avant la prise en compte de la pression de F1, Insert, ScrollLock et CapsLock
-Synchronisation de l'horloge au démarrage du script
-Pendule qui sonne à chaque heure
+Confirmation d'arrÃªt de la machine
+Rechargement du programme suite Ã  la modification d'un script
+Fermeture des fenÃªtres de dialogue intempestifs
+DÃ©lai de 400ms avant la prise en compte de la pression de F1, Insert, ScrollLock et CapsLock
+Synchronisation de l'horloge au dÃ©marrage du script
+Pendule qui sonne Ã  chaque heure
 
 
-2. Améliorations système
+2. AmÃ©liorations systÃ¨me
 NumLock toujours active
-Fermeture des applis par un Esc long (+Ctrl pour les fenêtres internes)
-Rechargement de WindowFX [Ctrl + Win + X] (effets spéciaux sur les fenêtres)
-Économiseur d'écran [Ctrl + Win + L]
-Extinction de l'écran [Shift + Win + L] (Shift plus fort que Ctrl)
-Blocage avancé de la session [Win + L]
-	Extinction immédiate de l'écran
-	Reprise de la session dans les 10 secondes suite à l'appui d'une touche quelconque
-Mise en veille avec validation obligatoire dans les 4 secondes (bouton oui par défaut) [Win + F12]
-Mise en veille prolongée avec validation obligatoire dans les 4 secondes (bouton oui par défaut) [Ctrl + Win + F12]
-Arrêt de l'ordinateur avec validation obligatoire dans les 4 secondes (bouton non par défaut) [Shift + Win + F12] (Shift plus fort que Ctrl)
-Redémarrage de l'ordinateur avec validation obligatoire dans les 4 secondes (bouton non par défaut) [Ctrl + Shift + Win + F12] (Ctrl + Shift plus fort que Shift)
-Renommage des fichiers sous l'explorateur sans sélection à l'origine de l'extension (comme sous Linux)
-Vidage de la corbeille [Shift + Ctrl + Win + Suppr] (Ctrl + Win + Suppr étant réservé à l'ajout/suppression de programmes, et l'opération ici pouvant avoir plus de conséquences, d'où l'ajout de la touche Shift)
-Rescan des périphériques [Shift + Ctrl + Win + H] (Ctrl + Win + H étant réservé au Gestionnaire de périphériques)
-Affichage/Masquage des fichiers cachés sous l'explorateur [Ctrl + Win + F]
-Affichage/Masquage des fichiers système sous l'explorateur [Shift + Ctrl + Win + F]
-Réglage du volume sonore [Win + Flèches] :
+Fermeture des applis par un Esc long (+Ctrl pour les fenÃªtres internes)
+Rechargement de WindowFX [Ctrl + Win + X] (effets spÃ©ciaux sur les fenÃªtres)
+Ã‰conomiseur d'Ã©cran [Ctrl + Win + L]
+Extinction de l'Ã©cran [Shift + Win + L] (Shift plus fort que Ctrl)
+Blocage avancÃ© de la session [Win + L]
+	Extinction immÃ©diate de l'Ã©cran
+	Reprise de la session dans les 10 secondes suite Ã  l'appui d'une touche quelconque
+Mise en veille avec validation obligatoire dans les 4 secondes (bouton oui par dÃ©faut) [Win + F12]
+Mise en veille prolongÃ©e avec validation obligatoire dans les 4 secondes (bouton oui par dÃ©faut) [Ctrl + Win + F12]
+ArrÃªt de l'ordinateur avec validation obligatoire dans les 4 secondes (bouton non par dÃ©faut) [Shift + Win + F12]Â (Shift plus fort que Ctrl)
+RedÃ©marrage de l'ordinateur avec validation obligatoire dans les 4 secondes (bouton non par dÃ©faut) [Ctrl + Shift + Win + F12] (Ctrl + Shift plus fort que Shift)
+Renommage des fichiers sous l'explorateur sans sÃ©lection Ã  l'origine de l'extension (comme sous Linux)
+Vidage de la corbeille [Shift + Ctrl + Win + Suppr]Â (Ctrl + Win + Suppr Ã©tant rÃ©servÃ© Ã  l'ajout/suppression de programmes, et l'opÃ©ration ici pouvant avoir plus de consÃ©quences, d'oÃ¹ l'ajout de la touche Shift)
+Rescan des pÃ©riphÃ©riques [Shift + Ctrl + Win + H] (Ctrl + Win + H Ã©tant rÃ©servÃ© au Gestionnaire de pÃ©riphÃ©riques)
+Affichage/Masquage des fichiers cachÃ©s sous l'explorateur [Ctrl + Win + F]
+Affichage/Masquage des fichiers systÃ¨me sous l'explorateur [Shift + Ctrl + Win + F]
+RÃ©glage du volume sonore [Win + FlÃ¨ches] :
 	+ Ctrl : concerne le volume Wave (et non master)
-	+ Shift : procède par pas de 10% au lieu de 5%
+	+ Shift : procÃ¨de par pas de 10% au lieu de 5%
 	Pause : Silence/Reprise (faded)
 Parcours du Alt-Tab via Click droit + Molette
-Scroll molette concerne le contrôle survolé
-Luminosité { Win + Wheel }
+Scroll molette concerne le contrÃ´le survolÃ©
+LuminositÃ© { Win + Wheel }
 
 
-3. Fenêtres
-Scroll automatique avec la molette souris du contrôle placé sous la souris (+ Shift pour la fenêtre survolée)
-Fonctionnement du bouton du milieu analogue à la touche F4 avec les combinaisons Ctrl et Alt :
-	+ Win force la fermeture de la fenêtre si elle ne répond pas
-Increase { Win + PageUp }
+3. FenÃªtres
+Scroll automatique avec la molette souris du contrÃ´le placÃ© sous la souris (+ Shift pour la fenÃªtre survolÃ©e)
+Fonctionnement du bouton du milieu analogue Ã  la touche F4 avec les combinaisons Ctrl et Alt :
+	+ Win force la fermeture de la fenÃªtre si elle ne rÃ©pond pas
+Increase { Win + PageUpÂ }
 Decrease { Win + PageDown }
 Full screen(s) { MiddleButton sur Maximize }
 Kill { MiddleButton sur Close }
 Maximize { Shift + Win + PageUp }
 Minimize { Shift + Win + PageDown } { RightButton + LeftButton }
-Minimize to Tray { Win + End } { MiddleButton sur Minimize }
+Minimize to Tray { Win + End }Â { MiddleButton sur Minimize }
 Restore { Win + { NumPad5 | NumPad0 | NumPadIns | Enter }
 Roll up/down { RightButton + LeftButton sur la barre de titre }
 Always on Top { Win + LeftButton }
-Transparence de la fenêtre active { Ctrl + Win + Wheel } : + Shift pour la fenêtre survolée
+Transparence de la fenÃªtre active { Ctrl + Win + Wheel } : + Shift pour la fenÃªtre survolÃ©e
 
 
-4. Applications système
-D'une manière générale, raccourcis via Ctrl + Win + <touche>
-Les raccourcis Win + <touche> concernent plus les applications non-système
-	Starter [Win + S] (gestionnaire de démarrage)
+4. Applications systÃ¨me
+D'une maniÃ¨re gÃ©nÃ©rale, raccourcis via Ctrl + Win + <touche>
+Les raccourcis Win + <touche> concernent plus les applications non-systÃ¨me
+	Starter [Win + S] (gestionnaire de dÃ©marrage)
 	Console [Win + R] :
-		console avancée par onglets
-		positionnement du titre et du répertoire de travail en fonction du répertoire parcouru)
+		console avancÃ©e par onglets
+		positionnement du titre et du rÃ©pertoire de travail en fonction du rÃ©pertoire parcouru)
 		collage du contenu du presse-papiers [Ctrl + V]
 		fermeture du shell [Ctrl + D] (comme sous PuTTY)
 		fermeture de la console classique par Alt+F4
-	Registres [Ctrl + Win + R] (Win + R étant réservé à la console)
+	Registres [Ctrl + Win + R] (Win + R Ã©tant rÃ©servÃ© Ã  la console)
 	Outils d'administration [Ctrl + Win + A]
-	Gestionnaire de périphériques [Ctrl + Win + H] (comme Hardware)
+	Gestionnaire de pÃ©riphÃ©riques [Ctrl + Win + H] (comme Hardware)
 	Gestion des disques [Ctrl + Win + D]
 	Gestion de l'ordinateur [Ctrl + Win + C] (comme Computer)
-	Observateur d'événements [Ctrl + Win + V]
+	Observateur d'Ã©vÃ©nements [Ctrl + Win + V]
 	Ajout/Suppression de programmes [Ctrl + Win + Suppr]
 	
 
 5. Autres applications
-D'une manière générale, raccourcis via Win + <touche>
-Les raccourcis Ctrl + Win + <touche> concernent plus des applications système
+D'une maniÃ¨re gÃ©nÃ©rale, raccourcis via Win + <touche>
+Les raccourcis Ctrl + Win + <touche> concernent plus des applications systÃ¨me
 	Thunderbird :
 		lien hypertexte [Ctrl + K]
 		mise en gras du texte [Ctrl + G]
 	PuTTY [Win + P] :
 		collage du contenu du presse-papier [Ctrl + V]
-		touche de suppression d'un caractère [Suppr]
+		touche de suppression d'un caractÃ¨re [Suppr]
 	WMP [Ctrl + W] :
 		pause [Space]
 		TODO
-	eMule [Ctrl + Win + E] (Win + E étant réservé à l'exploration de fichier)
-	MediaMonkey [Ctrl + Win + M] (Win + M étant réservé à la minimisation de l'ensemble des fenêtres)
+	eMule [Ctrl + Win + E] (Win + E Ã©tant rÃ©servÃ© Ã  l'exploration de fichier)
+	MediaMonkey [Ctrl + Win + M] (Win + M Ã©tant rÃ©servÃ© Ã  la minimisation de l'ensemble des fenÃªtres)
 	DieOrLive [Win + G] (logiciel de jeu de Go)
 	KGS [Win + K] (logiciel client de serveur de jeu de go)
 	NeroBurningROM [Win + N]
-	WaveEditor [Ctrl + Win + W] (Ctrl + W étant réservé à WMP)
+	WaveEditor [Ctrl + Win + W] (Ctrl + W Ã©tant rÃ©servÃ© Ã  WMP)
 	SnagIt [Win + BackSpace]
 	Photoshop [Ctrl + Win + BackSpace]
 	Calculator [Win + C]
-	Explorer [Ctrl + Win + Shift + E] (Ctrl + Win + E étant réservé à eMule)
-	Firefox (en mode fenêtre unique) [Win + I] (comme Internet)
+	Explorer [Ctrl + Win + Shift + E] (Ctrl + Win + E Ã©tant rÃ©servÃ© Ã  eMule)
+	Firefox (en mode fenÃªtre unique) [Win + I] (comme Internet)
 	IE [Ctrl + Win + I]
 	JMP [Win + J] (logiciel de jonglage sous Eclipse)
 	UltraEdit [Win + U]
-	RootkitUnhooker [Ctrl + Win + Shift + Esc] (Gestionnaire de tâches bas niveau)
+	RootkitUnhooker [Ctrl + Win + Shift + Esc] (Gestionnaire de tÃ¢ches bas niveau)
 	Toad [Win + T]
 	SQL Developer [Win + Q]
 		
 
 6. Texte
-Numéro de compte bancaire { Win + B } (si défini dans le fichier de configuration)
-Numéro de carte bleue { Shift + Win + B }
+NumÃ©ro de compte bancaire { Win + B } (si dÃ©fini dans le fichier de configuration)
+NumÃ©ro de carte bleue { Shift + Win + B }
 Login Windows { Ctrl + Win + B } (comme BURH)
 Login DNS { Shift + Ctrl + Win + B }
 Mot de passe local { Ctrl + Win + P }
-Modification de la casse de la sélection { Win + F5} :
+Modification de la casse de la sÃ©lection { Win + F5}Â :
 	Shift <=> majuscules :
 		{ Win + F5 } tout en minuscules
 		{ Shift + Win + F5 } pour TOUT EN MAJUSCULES
 	Alt <=> inversion :{ Alt + Win + F5 } : pour tOUT inverser
-	Ctrl <=> les premiers caractères des mots :
-		{ Ctrl + Win + F5 } pour Une phrase ({ + Alt } pour inverser tous les caractères)
-		{ Ctrl + Shift + Win + F5 } pour Un Titre (phrase + Shift pour mettre les premières lettres en majuscules) ({ + Alt } pour inverser tous les caractères)
+	Ctrl <=> les premiers caractÃ¨res des mots :
+		{ Ctrl + Win + F5 }Â pour Une phrase ({ + Alt }Â pour inverser tous les caractÃ¨res)
+		{ Ctrl + Shift + Win + F5 }Â pour Un Titre (phrase + Shift pour mettre les premiÃ¨res lettres en majuscules) ({ + Alt }Â pour inverser tous les caractÃ¨res)
 	{ Alt + Win + Shift + F5 } pour un rANdOm
 Copier/Couper Coller en texte brut (sans mise en forme) : { Ctrl + Shift + } C, X, V
 Redimensionnement { Alt + Wheel }
-	+ Ctrl pour forcer dans certaines fenêtres (Firefox)
+	+ Ctrl pour forcer dans certaines fenÃªtres (Firefox)
 	+ Win pour centrer
 	+ Shift par petits pas
 Redimensionnement { Win + RightDrag } :
-	Découpage de chaque fenêtre en 9 zones : les zones périmètres provoquent un Redimensionnement par rapport aux coins ou aux bords concernés, la zone centrale provoque un déplacement de la fenêtre
-	+ Ctrl pour forcer dans certaines fenêtres (Firefox)
+	DÃ©coupage de chaque fenÃªtre en 9 zones : les zones pÃ©rimÃ¨tres provoquent un Redimensionnement par rapport aux coins ou aux bords concernÃ©s, la zone centrale provoque un dÃ©placement de la fenÃªtre
+	+ Ctrl pour forcer dans certaines fenÃªtres (Firefox)
 	+ Win pour centrer
 	+ Shift par petits pas
-Redimensionnement centré { Win + NumPad± } :
+Redimensionnement centrÃ© { Win + NumPadÂ± } :
 	+ Alt pour ne pas centrer
 	
 	
 7. Raccourcis textuels
-Création automatique d'un raccourci textuel du texte sélectionné [Win + H] (comme Hostring)
-Complétion de termes suite à une frappe clavier avec exclusion de certaines fenêtres (Console, PuTTY, ...)
+CrÃ©ation automatique d'un raccourci textuel du texte sÃ©lectionnÃ© [Win + H] (comme Hostring)
+ComplÃ©tion de termes suite Ã  une frappe clavier avec exclusion de certaines fenÃªtres (Console, PuTTY, ...)
