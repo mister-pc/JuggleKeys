@@ -22,7 +22,6 @@
 
 ; Jarter les PeriodicTimer AHK_InitTimers
 ; Faire une variable ini DisplayFusion, pr savoir si cé lancé ou pas, et désactiver tt code DF si pas
-; Idem pr les autres applis, pr savoir si elles st activées (et installées !)
 
 ; Ss WinSpy, les copier-coller des listes copient le contenu de la liste précédemment sélectionnée - nyap de chgt d'indice
 ; de mm, entourer correctement ctrl et fenetre sélectionnés (qd p RShift)
@@ -170,11 +169,11 @@ Return
 ; 49 : Delayed Shutdown
 ; 50 : GUI_MouseRings
 ; 51 : GUI_ErgonomicKeyboard
-; 52 : GUI_ClashOfClansActivitySimulation
-; 53 : GUI_ClashOfClansActivityTop
-; 54 : GUI_ClashOfClansActivityLeft
-; 55 : GUI_ClashOfClansActivityBottom
-; 56 : GUI_ClashOfClansActivityRight
+; 52 : GUI_AndroidActivitySimulation
+; 53 : GUI_AndroidActivityTop
+; 54 : GUI_AndroidActivityLeft
+; 55 : GUI_AndroidActivityBottom
+; 56 : GUI_AndroidActivityRight
 ; 69... : GUI_BSOD (2 per monitor)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -315,11 +314,10 @@ ADM_ApplyMouseHooks()
 , AHK_WindowsTimeSynchronization()
 , AHK_FreeMemory()
 , AHK_SetPeriodicCkeckTimers()
-, APP_DeactivateBlueStacksAutostart()
-, APP_InitBlueStacksCursorTimer()
+, APP_InitAndroidCursorTimer()
 , SYS_SetClassicStartMenu()
 , SCR_InitWallpapers()
-, AHK_BackupScripts()
+; , AHK_BackupScripts()
 SetTimer, TRY_CheckTrayIconStateTimer, %ZZZ_CheckTrayIconStateTimer%
 Return
 
@@ -406,7 +404,7 @@ AHK_InitTimers() {
 	, ZZZ_HideMemoTimer := -507
 	, ZZZ_WindowSpyRefreshTimer := -101
 	, ZZZ_KillRegServerTimer := -1012
-	, ZZZ_BlueStacksMouseTimer, -1024
+	, ZZZ_AndroidMouseTimer, -1024
 	, ZZZ_IgnoreKeyTimer := -100
 	, ZZZ_DragWindowResizingTimer := -100
 	, ZZZ_RepaintMagnifierTimer := -100
@@ -443,6 +441,7 @@ AHK_DisplayDisabledOptions() {
 			, SCR_WallpaperRotationEnabled: "     - Automatic wallpaper rotation disabled`n"
 			, SCR_WallpaperFolder: "     - Wallpaper folder not defined`n"
 			, LOG_BankEncryptedAccount: "     - Bank encrypted account not defined`n"
+			, LOG_BankEncryptedProAccount: "     - Bank encrypted pro account not defined`n"
 			, LOG_CBEncryptedNumber: "     - CB number not defined`n"
 			, LOG_MailEncryptedAddresses: "     - Mail addresses not defined`n"
 			, LOG_MainEncryptedPassword: "     - Local password not defined`n"
@@ -486,7 +485,7 @@ AHK_DisplayDisabledOptions() {
 	
 	; User personal information :
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	LOC_Variables := "LOG_BankEncryptedAccount|LOG_CBEncryptedNumber|LOG_MailEncryptedAddresses|LOG_MainEncryptedPassword"
+	LOC_Variables := "LOG_BankEncryptedAccount|LOG_BankEncryptedProAccount|LOG_CBEncryptedNumber|LOG_MailEncryptedAddresses|LOG_MainEncryptedPassword"
 	Loop, Parse, LOC_Variables, |
 	{
 		If (!%A_LoopField%) {
@@ -602,38 +601,39 @@ AHK_FreeMemory() {
 AHK_LoadIniFile(PRM_FirstLoad = false) {
 
 	Global
-	Static STA_DefaultValuesA := { "WIN_Brightness": 128, "WIN_Transparency": 220, "WIN_MenusTransparency": 230, "WIN_TransparencyEnabled": 0, "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AUD_Step": 5, "AUD_BigStep": 10, "SYS_CPURefreshTime": 1000, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_ChangeWallPaperTimer": 3600, "SCR_PixelsPerMillimeter": 3.5, "APP_BlueStacksActivityEnabled": 0, "SCR_MouseRings": 20 }
-	Static STA_ApplicationPathA := [ "Apache"
-		, "AutoScriptWriter"
-		, "BlueStacks"
-		, "CDBurner"
-		, "ClassicStartMenu"
-		, "CygWin"
-		, "DieOrLive"
-		, "DirectoryOpus"
-		, "DirectoryOpusRT"
-		, "Eclipse"
-		, "Firefox"
-		, "InternetExplorer"
-		, "JavaWebStart"
-		, "MP3Editor"
-		, "MailApplication"
-		, "MediaMonkey"
-		, "MySQL"
-		, "Photoshop"
-		, "Quintessential"
-		, "RegistryManager"
-		, "SQLDeveloper"
-		, "SciTE"
-		, "SnagIt"
-		, "StartupDelayer"
-		, "TextEditor"
-		, "VideoConverter"
-		, "VisionGo"
-		, "WinSpector"
-		, "WindowsMediaPlayer"
-		, "uTorrent" ]
-	Local LOC_Exception, LOC_VariableName, LOC_Value, LOC_Directories, LOC_Attributes, LOC_Exception
+	Static STA_DefaultValuesA := { "WIN_Brightness": 128, "WIN_Transparency": 220, "WIN_MenusTransparency": 230, "WIN_TransparencyEnabled": 0, "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AUD_Step": 5, "AUD_BigStep": 10, "SYS_CPURefreshTime": 1000, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_ChangeWallPaperTimer": 3600, "SCR_PixelsPerMillimeter": 3.5, "APP_AndroidActivityEnabled": 0, "SCR_MouseRings": 20 }
+	Static STA_ApplicationDefaultPathA := { "Apache": "" ; EasyPHP-Devserver-16.1\eds-binaries\httpserver\apache2418vc11x86x170131170253\bin\eds-httpserver.exe
+		, "AutoScriptWriter": "" ; AutoHotkey\AutoScriptWriter\AutoScriptWriter.exe
+		, "Android": "Nox\bin\Nox.exe"
+		, "CDBurner": "CDBurnerXP\cdbxpp.exe"
+		, "ClassicStartMenu": "Classic Shell\ClassicStartMenu.exe"
+		, "CygWin": "CygWin\Cygwin.bat"
+		, "DieOrLive": ""
+		, "DirectoryOpus": "GPSoftware\Directory Opus\dopus.exe"
+		, "DirectoryOpusRT": "GPSoftware\Directory Opus\dopusrt.exe"
+		, "Eclipse": "Eclipse\eclipse.exe"
+		, "Firefox": "Pale Moon\palemoon.exe"
+		, "GitHub": "" ; C:\Users\<userName>\AppData\Local\Apps\2.0\6606GGNH.N77\W7TJK2BM.OBG\gith..tion_317444273a93ac29_0003.0003_5794af8169eeff14\GitHub.exe
+		, "InternetExplorer": "Internet Explorer\iexplore.exe"
+		, "JavaWebStart": "Java\jre\bin\javaws.exe"
+		, "MP3Editor": "Mp3 Editor Pro\Mp3EditorPro.exe"
+		, "MailApplication": "Mozilla Thunderbird\thunderbird.exe"
+		, "MediaMonkey": "MediaMonkey\MediaMonkey.exe"
+		, "MySQL": "" ; EasyPHP-Devserver-16.1\eds-binaries\dbserver\mysql5711x86x170131170253\bin\eds-dbserver.exe
+		, "Photoshop": "Adobe\Adobe Photoshop CS2\Photoshop.exe"
+		, "Quintessential": "Quintessential Media Player\QMPlayer.exe"
+		, "RegistryManager": "Registrar Registry Manager\rr.exe"
+		, "SQLDeveloper": ""
+		, "SciTE": "" ; AutoHotkey\SciTE\SciTE.exe
+		, "SnagIt": "TechSmith\Snagit 10\Snagit32.exe"
+		, "StartupDelayer": "r2 Studios\Startup Delayer\Startup Delayer.exe"
+		, "TextEditor": "IDM Computer Solutions\UltraEdit\uedit64.exe"
+		, "VideoConverter": "Freemake\Freemake Video Converter\FreemakeVC.exe"
+		, "VisionGo": "Vision Go 0.5\VisionGo.exe"
+		, "WinSpector": "Winspector\WinspectorU.exe"
+		, "WindowsMediaPlayer": "Windows Media Player\wmplayer.exe"
+		, "uTorrent": "uTorrent\uTorrent.exe" }
+	Local LOC_Exception, LOC_VariableName, LOC_DefaultValue, LOC_Directories, LOC_Attributes, LOC_Exception
 
 	LOC_Directories := "\conf|\clip|\media"
 	Loop, Parse, LOC_Directories, |
@@ -698,43 +698,48 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 	IniRead, SYS_ScrollTimeOut, %AHK_IniFile%, Mouse, ScrollTimeOut, % STA_DefaultValuesA["SYS_ScrollTimeOut"] ; The length of a scrolling session. Keep scrolling within this time to accumulate boost. Default: 500. Recommended between 400 and 1000.
 	IniRead, SYS_ScroolBoost, %AHK_IniFile%, Mouse, ScroolBoost, % STA_DefaultValuesA["SYS_ScroolBoost"] ; If you scroll a long distance in one session, apply additional boost factor. The higher the value, the longer it takes to activate, and the slower it accumulates. Set to zero to disable completely. Default: 30.
 	IniRead, SYS_ScrollLimit, %AHK_IniFile%, Mouse, ScrollLimit, % STA_DefaultValuesA["SYS_ScrollLimit"] ; Spamming applications with hundreds of individual scroll events can slow them down. This sets the maximum number of scrolls sent per click, i.e. max velocity. Default: 60.
-	IniRead, APP_BlueStacksActivityEnabled, %AHK_IniFile%, Applications, BlueStacksActivityEnabled, % STA_DefaultValuesA["APP_BlueStacksActivityEnabled"]
+	IniRead, APP_AndroidActivityEnabled, %AHK_IniFile%, Applications, AndroidActivityEnabled, % STA_DefaultValuesA["APP_AndroidActivityEnabled"]
 
-	For LOC_VariableName, LOC_Value In STA_DefaultValuesA
+	For LOC_VariableName, LOC_DefaultValue In STA_DefaultValuesA
 	{
 		If (StrLen(%LOC_VariableName%) == 0) {
-			%LOC_VariableName% := LOC_Value
+			%LOC_VariableName% := LOC_DefaultValue
 		}
 	}
 
 	; Applications :
-	For LOC_Value, LOC_VariableName In STA_ApplicationPathA
+	For LOC_VariableName, LOC_DefaultValue In STA_ApplicationDefaultPathA
 	{
-		IniRead, APP_%LOC_VariableName%Path, %AHK_IniFile%, Applications, %LOC_VariableName%Path, % ""
+		IniRead, APP_%LOC_VariableName%Path, %AHK_IniFile%, Applications, %LOC_VariableName%Path, %LOC_DefaultValue%
 		If (APP_%LOC_VariableName%Path) {
-			If (FileExist(ZZZ_ProgramFiles32 . "\" . APP_%LOC_VariableName%Path)) {
-				APP_%LOC_VariableName%Path := ZZZ_ProgramFiles32 . "\" . APP_%LOC_VariableName%Path
-			} Else If (FileExist(ZZZ_ProgramFiles64 . "\" . APP_%LOC_VariableName%Path)) {
-				APP_%LOC_VariableName%Path := ZZZ_ProgramFiles64 . "\" . APP_%LOC_VariableName%Path
-			} Else If (!FileExist(APP_%LOC_VariableName%Path)) {
-				APP_%LOC_VariableName%Path := ""
-			}
-		}
-		If (!APP_%LOC_VariableName%Path) {
-			IniWrite, % "", %AHK_IniFile%, Applications, %LOC_VariableName%Path
-		}
-	}
-
-	; BlueStacks :
-	If (PRM_FirstLoad) {
-		If (WinExist("BlueStacks App Player")) {
-			SetTimer, APP_BlueStacksMouseTimer, -1
-			If (APP_BlueStacksActivityEnabled) {
-				APP_ClashOfClansActivity(true)
+			If (!FileExist(APP_%LOC_VariableName%Path)) {
+				If (FileExist(ZZZ_ProgramFiles32 . "\" . APP_%LOC_VariableName%Path)) {
+					APP_%LOC_VariableName%Path := ZZZ_ProgramFiles32 . "\" . APP_%LOC_VariableName%Path
+				} Else If (FileExist(ZZZ_ProgramFiles64 . "\" . APP_%LOC_VariableName%Path)) {
+					APP_%LOC_VariableName%Path := ZZZ_ProgramFiles64 . "\" . APP_%LOC_VariableName%Path
+				} Else {
+					APP_%LOC_VariableName%Path := ""
+				}
 			}
 		} Else {
-			If (APP_BlueStacksActivityEnabled) {
-				APP_BlueStacksActivityEnabled := 0
+			APP_%LOC_VariableName%Path := ""
+		}
+	}
+	For LOC_VariableName, LOC_DefaultValue In STA_ApplicationDefaultPathA
+	{
+		IniWrite, % APP_%LOC_VariableName%Path, %AHK_IniFile%, Applications, %LOC_VariableName%Path
+	}
+
+	; Android :
+	If (PRM_FirstLoad) {
+		If (WinExist("Nox App Player ahk_class Qt5QWindowIcon")) {
+			SetTimer, APP_AndroidMouseTimer, -1
+			If (APP_AndroidActivityEnabled) {
+				APP_AndroidActivity(true)
+			}
+		} Else {
+			If (APP_AndroidActivityEnabled) {
+				APP_AndroidActivityEnabled := 0
 				, AHK_SaveIniFile()
 			}
 		}
@@ -783,7 +788,7 @@ AHK_SaveIniFile() {
 	IniWrite, %SCR_WallpaperFolder%, %AHK_IniFile%, Main, WallpaperFolder
 	IniWrite, %SCR_PixelsPerMillimeter%, %AHK_IniFile%, Main, PixelsPerMillimeter
 	IniWrite, %AHK_BackupDays%, %AHK_IniFile%, Main, BackupDays
-	IniWrite, %APP_BlueStacksActivityEnabled%, %AHK_IniFile%, Applications, BlueStacksActivityEnabled
+	IniWrite, %APP_AndroidActivityEnabled%, %AHK_IniFile%, Applications, AndroidActivityEnabled
 
 	IniWrite, %SCR_MouseTracesEnabled%, %AHK_IniFile%, Mouse, TracesEnabled
 	IniWrite, %SCR_MouseRings%, %AHK_IniFile%, Mouse, Rings
@@ -801,6 +806,8 @@ AHK_SaveIniFile() {
 	IniWrite, %LOG_MailEncryptedAddresses%, %AHK_IniFile%, Text, MailEncryptedAddresses
 	IniRead, LOG_BankEncryptedAccount, %AHK_IniFile%, Text, BankEncryptedAccount, %A_Space%
 	IniWrite, %LOG_BankEncryptedAccount%, %AHK_IniFile%, Text, BankEncryptedAccount
+	IniRead, LOG_BankEncryptedProAccount, %AHK_IniFile%, Text, BankEncryptedProAccount, %A_Space%
+	IniWrite, %LOG_BankEncryptedProAccount%, %AHK_IniFile%, Text, BankEncryptedProAccount
 	IniRead, LOG_CBEncryptedNumber, %AHK_IniFile%, Text, CBEncryptedNumber, %A_Space%
 	IniWrite, %LOG_CBEncryptedNumber%, %AHK_IniFile%, Text, CBEncryptedNumber
 	IniRead, LOG_DomainName, %AHK_IniFile%, Text, DomainName, %A_Space%
@@ -896,7 +903,8 @@ AHK_SaveIniFile() {
 ZZZ_CheckModificationsTimer:
 SetTimer, ZZZ_CheckModificationsTimer, Off
 If (AHK_CheckModifications()) {
-	ADM_Reload()
+	AHK_BackupScripts()
+	, ADM_Reload()
 } Else
 If (!A_IsSuspended) {
 	SetTimer, ZZZ_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
@@ -920,7 +928,8 @@ AHK_CheckModifications() {
 			}
 		}
 	} Else {
-		ADM_Reload()
+		AHK_RunLockManager()
+		; ADM_Reload()
 	}
 
 	; Reload ini file if modified :
@@ -958,6 +967,7 @@ AHK_CheckModifications() {
 			}
 		}
 	}
+	
 	Return, LOC_Reload
 }
 
@@ -1565,7 +1575,7 @@ AHK_BackupScripts() {
 	, LOC_CurrentTimeStamp := 365 * A_YYYY + 30 * A_MM + A_DD
 	If (FileExist(LOC_Folder)) {
 		FileGetAttrib, LOC_Attributes, %LOC_Folder%
-		If (!InStr(LOC_Attributes, "D"))	{
+		If (!InStr(LOC_Attributes, "D")) {
 			FileDelete, %LOC_Folder%
 			FileCreateDir, %LOC_Folder%
 		}
@@ -1573,6 +1583,7 @@ AHK_BackupScripts() {
 		FileCreateDir, %LOC_Folder%
 	}
 	FileCopy, %A_ScriptDir%\*.ahk, %LOC_Folder%\*.bak, 1
+	FileCopy, %A_ScriptDir%\conf\*.ini, %LOC_Folder%, 1
 	
 	If (AHK_BackupDays) {
 		Loop, Files, %A_ScriptDir%\backup\????-??-??_??-??, D

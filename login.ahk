@@ -38,14 +38,18 @@ LOG_SetFieldValue(PRM_VariableName, PRM_DecryptedValue = false, PRM_Display = tr
 }
 
 LOG_FieldValueManager(PRM_Action, PRM_VariableName, PRM_DecryptedValue = false, PRM_Display = false) {
+	
 	; PRM_Action ==  1 : set
 	; PRM_Action ==  0 : get
 	; PRM_Action == -1 : password check
-	Global LOG_MailEncryptedAddresses, LOG_BankEncryptedAccount, LOG_CBEncryptedNumber, LOG_DomainEncryptedPassword, LOG_MainEncryptedPassword, LOG_DomainLogin, LOG_DomainName
-	Static STA_Password := ""
-	, STA_EncryptedFields := "LOG_MailEncryptedAddresses,LOG_BankEncryptedAccount,LOG_CBEncryptedNumber,LOG_DomainEncryptedPassword,LOG_MainEncryptedPassword"
 	
-	; password check :
+	
+
+	Global LOG_MailEncryptedAddresses, LOG_BankEncryptedAccount, LOG_BankEncryptedProAccount, LOG_CBEncryptedNumber, LOG_DomainEncryptedPassword, LOG_MainEncryptedPassword, LOG_DomainLogin, LOG_DomainName
+	Static STA_Password := ""
+	, STA_EncryptedFields := "LOG_MailEncryptedAddresses,LOG_BankEncryptedAccount,LOG_BankEncryptedProAccount,LOG_CBEncryptedNumber,LOG_DomainEncryptedPassword,LOG_MainEncryptedPassword"
+	
+	;~ ; Password check :
 	If (!STA_Password
 		|| STA_Password != LOG_Decrypt(LOG_MainEncryptedPassword, STA_Password)) {
 		; MsgBox, no STA_Password %PRM_VariableNames%
@@ -104,7 +108,7 @@ LOG_FieldsManager(PRM_Title, PRM_Text, PRM_TextWidth, PRM_VariableNames, PRM_Var
 	LOC_EncryptedField := false
 	Loop, Parse, PRM_VariableNames, `,
 	{
-		If A_LoopField In LOG_MailEncryptedAddresses,LOG_BankEncryptedAccount,LOG_CBEncryptedNumber,LOG_DomainEncryptedPassword,LOG_MainEncryptedPassword
+		If A_LoopField In LOG_MailEncryptedAddresses,LOG_BankEncryptedAccount,LOG_BankEncryptedProAccount,LOG_CBEncryptedNumber,LOG_DomainEncryptedPassword,LOG_MainEncryptedPassword
 		{
 			LOC_EncryptedField := true
 			Break
@@ -438,6 +442,39 @@ LOG_BankEncryptedAccount() {
 		SendInput, {Tab}
 	}
 	IniWrite, %LOG_BankEncryptedAccount%, %AHK_IniFile%, Text, BankEncryptedAccount
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Bank Pro Account { Alt + Win + B } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOG_TrayMenuBankProAccount:
+If (WIN_FocusLastWindow()) {
+	LOG_BankEncryptedProAccount()
+}
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+!#b::
+AHK_KeyWait("#")
+LOG_BankEncryptedProAccount()
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOG_BankEncryptedProAccount() {
+	Global LOG_BankEncryptedProAccount, AHK_IniFile
+	IniRead, LOG_BankEncryptedProAccount, %AHK_IniFile%, Text, BankEncryptedProAccount, %A_Space%
+	LOG_FieldsManager(PRM_Title := "Enregistement du compte en banque pro", PRM_Text := "Numéro de compte en &banque", PRM_TextWidth := 0, PRM_VariableNames := "LOG_BankEncryptedProAccount", PRM_VariableWidth := 180)
+	If (LOG_BankEncryptedProAccount) {
+		AHK_SendRaw(LOG_Decrypt(LOG_BankEncryptedProAccount))
+		SendInput, {Tab}
+	}
+	IniWrite, %LOG_BankEncryptedProAccount%, %AHK_IniFile%, Text, BankEncryptedProAccount
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

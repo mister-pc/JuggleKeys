@@ -997,7 +997,9 @@ Return
 ^<!v::
 ^<!+v::
 !Insert::
+#IfWinNotActive, ahk_class mintty
 +Insert::
+#IfWinNotActive
 !+Insert::
 TXT_PasteManager(A_ThisHotKey)
 Return

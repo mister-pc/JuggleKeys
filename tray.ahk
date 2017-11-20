@@ -20,7 +20,7 @@ TRY_InitMenus() {
 	Menu, Locutions, Add, ps`tpuis, TRY_TrayMenuHotstring
 	Menu, Locutions, Add, dlmo`tdans la mesure où, TRY_TrayMenuHotstring
 	Menu, Locutions, Add, dc`tdonc, TRY_TrayMenuHotstring
-	Menu, Locutions, Add, cad`tc'est à dire, TRY_TrayMenuHotstring
+	Menu, Locutions, Add, cad`tc'est-à-dire, TRY_TrayMenuHotstring
 	Menu, Locutions, Add
 	Menu, Locutions, Add, ya`til y a, TRY_TrayMenuHotstring
 	Menu, Locutions, Add, yav`til y avait, TRY_TrayMenuHotstring
@@ -78,8 +78,9 @@ TRY_InitMenus() {
 	Menu, Verbs, Add, sq`test-ce que, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, ayé`tça y est, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, ê`têtre, TRY_TrayMenuHotstring
-	Menu, Verbs, Add, gé`tj'ai, TRY_TrayMenuHotstring
+	Menu, Verbs, Add, jé`tj'ai, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, jné`tje n'ai, TRY_TrayMenuHotstring
+	Menu, Verbs, Add, jém`tj'aime, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, té`tt'ai, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, jnté`tje ne t'ai, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, gt`tj'étais, TRY_TrayMenuHotstring
@@ -93,10 +94,11 @@ TRY_InitMenus() {
 	Menu, Verbs, Add, vx`tveux, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, ve`tveut, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, vd`tvend, TRY_TrayMenuHotstring
+	Menu, Verbs, Add, vo`tvaut, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, vt`tvont, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, cmc`tcommence, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, dvlp`tdéveloppe, TRY_TrayMenuHotstring
-	Menu, Verbs, Add, mq`tmanq, TRY_TrayMenuHotstring
+	Menu, Verbs, Add, mq`tmanqu, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, djn`tdéjeun, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, spr`tespère, TRY_TrayMenuHotstring
 	Menu, Verbs, Add, jspr`tj'espère, TRY_TrayMenuHotstring
@@ -199,6 +201,7 @@ TRY_InitMenus() {
 	Menu, Positions, Add, sl`tselon, TRY_TrayMenuHotstring
 	Menu, Positions, Add, mg`tmalgré, TRY_TrayMenuHotstring
 	Menu, Positions, Add, qt`tquant, TRY_TrayMenuHotstring
+	Menu, Positions, Add, lx`tlieux, TRY_TrayMenuHotstring
 	Menu, Positions, Add, ald`tau lieu de, TRY_TrayMenuHotstring
 
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -312,6 +315,7 @@ TRY_InitMenus() {
 	Menu, Things, Add, grp`tgroupe, TRY_TrayMenuHotstring
 	Menu, Things, Add, trp`ttroupe, TRY_TrayMenuHotstring
 	Menu, Things, Add, rf`tréféren, TRY_TrayMenuHotstring
+	Menu, Things, Add, rte`troute, TRY_TrayMenuHotstring
 	Menu, Things, Add, étab`tétablissement, TRY_TrayMenuHotstring
 	Menu, Things, Add, philo`tphilosophie, TRY_TrayMenuHotstring
 
@@ -490,6 +494,7 @@ TRY_InitMenus() {
 	TRY_AddMenuItem("Login", "           Win + Shift + Enter`tWindows Login", "LOG_TrayMenuWindowsLogin", "shell32.dll", 16)
 	TRY_AddMenuItem("Login", "Ctrl + Win + Shift + Enter`tWindows Domain Login", "LOG_TrayMenuDNSLogin", "shell32.dll", 19)
 	TRY_AddMenuItem("Login", "           Win +              B`tBank Account", "LOG_TrayMenuBankAccount", "mmcndmgr.dll", 109)
+	TRY_AddMenuItem("Login", " Alt + Win +              B`tBank Pro Account", "LOG_TrayMenuBankProAccount", "mmcndmgr.dll", 109)
 	TRY_AddMenuItem("Login", "           Win + Shift + B`tCB", "LOG_TrayMenuCB", "certmgr.dll")
 	TRY_AddMenuItem("Login", "Ctrl + Win +              @`tMail addresses", "LOG_TrayMenuMailAddresses", "shell32.dll", 157)
 
@@ -572,7 +577,7 @@ TRY_InitMenus() {
 	;;;;;;;;;
 
 	If (APPMp3EditorPath) {
-		TRY_AddMenuItem("Audio", "Ctrl + Win +             BackSpace`t&MP3Editor", "APP_MP3Editor", APPMp3EditorPath)
+		TRY_AddMenuItem("Audio", "Ctrl + Win +             BackSpace`t&MP3Editor", "APP_MP3Editor", APP_Mp3EditorPath)
 	}
 	If (APP_MediaMonkeyPath) {
 		TRY_AddMenuItem("Audio", "Ctrl + Win +              M`t&MediaMonkey", "APP_MediaMonkey", APP_MediaMonkeyPath)
@@ -787,7 +792,7 @@ TRY_InitMenus() {
 	;;;;;;;;;;;;;;;;
 
 	If (APP_SnagItPath) {
-		TRY_AddMenuItem("Applications", "           Win +           BackSpace`t&Snag It", "APP_SnagIt", APP_SnagItPat)
+		TRY_AddMenuItem("Applications", "           Win +           BackSpace`t&Snag It", "APP_SnagIt", APP_SnagItPath)
 	}
 	If (APP_MP3EditorPath) {
 		TRY_AddMenuItem("Applications", "Ctrl + Win +           BackSpace`t&MP3 Editor", "APP_MP3Editor", APP_MP3EditorPath)
@@ -802,7 +807,7 @@ TRY_InitMenus() {
 		TRY_AddMenuItem("Applications", "           Win +           E`t&Explorer", "APP_DOpus", "explorer.exe")
 	}
 	If (APP_DirOrLivePath) {
-		TRY_AddMenuItem("Applications", "           Win +           G`t&Die Or Live", "APP_DieOrLive", APP_DirOrLivePath)
+		TRY_AddMenuItem("Applications", "           Win +           G`t&Die Or Live", "APP_DieOrLive", APP_DieOrLivePath)
 	}
 	If (APP_FirefoxPath) {
 		TRY_AddMenuItem("Applications", "           Win +           I`t&Firefox", "APP_TrayMenuFirefox", APP_FirefoxPath)
@@ -924,41 +929,42 @@ TRY_InitMenus() {
 
 	Menu, Tray, NoStandard
 	Menu, Tray, UseErrorLevel
-	TRY_AddMenu("Tray", "&Locutions")
-	TRY_AddMenu("Tray", "&Subordonates")
-	TRY_AddMenu("Tray", "&Verbs")
-	TRY_AddMenu("Tray", "&Adverbs")
-	TRY_AddMenu("Tray", "&Positions")
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray", "&Pronuns")
-	TRY_AddMenu("Tray", "&Some")
-	TRY_AddMenu("Tray", "&Adjectives")
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray", "&Things")
-	TRY_AddMenu("Tray", "&Actions")
-	TRY_AddMenu("Tray", "&Computing")
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray", "&Time")
-	TRY_AddMenu("Tray", "&Various")
-	TRY_AddMenu("Tray", "&Suffixes")
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray", "&Login", "Pale Moon\palemoon.exe", 5)
-	TRY_AddMenu("Tray", "&Case", "pifmgr.dll", 3)
-	TRY_AddMenu("Tray", "&ClipBoard", "clipbrd.exe", 2)
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray", "&Audio", "shell32.dll", 169)
-	TRY_AddMenu("Tray", "&Power", "powercfg.cpl", 5)
-	TRY_AddMenu("Tray", "&Screen", "shell32.dll", 140)
-	TRY_AddMenu("Tray", "&Windows", "shell32.dll", 141)
-	TRY_AddMenu("Tray", "&System", "moricons.dll", 114)
-	TRY_AddMenu("Tray", "&Applications", "shell32.dll", 25)
-	TRY_AddMenu("Tray")
-	TRY_AddMenu("Tray", "&Administration        ", "shell32.dll", 170)
-	TRY_AddMenu("Tray", "&Options", "shell32.dll", 36)
+	TRY_AddMenu("Tray", "&Locutions", "Gray")
+	, TRY_AddMenu("Tray", "&Subordonates", "Gray")
+	, TRY_AddMenu("Tray", "&Verbs", "Gray")
+	, TRY_AddMenu("Tray", "&Adverbs", "Gray")
+	, TRY_AddMenu("Tray", "&Positions", "Gray")
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray", "&Pronuns", "Gray")
+	, TRY_AddMenu("Tray", "&Some", "Gray")
+	, TRY_AddMenu("Tray", "&Adjectives", "Gray")
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray", "&Things", "Gray")
+	, TRY_AddMenu("Tray", "&Actions", "Gray")
+	, TRY_AddMenu("Tray", "&Computing", "Gray")
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray", "&Time", "Gray")
+	, TRY_AddMenu("Tray", "&Various", "Gray")
+	, TRY_AddMenu("Tray", "&Suffixes", "Gray")
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray", "&Login", , "Pale Moon\palemoon.exe", 5)
+	, TRY_AddMenu("Tray", "&Case", , "pifmgr.dll", 3)
+	, TRY_AddMenu("Tray", "&ClipBoard", , "clipbrd.exe", 2)
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray", "&Audio", , "shell32.dll", 169)
+	, TRY_AddMenu("Tray", "&Power", , "powercfg.cpl", 5)
+	, TRY_AddMenu("Tray", "&Screen", , "shell32.dll", 140)
+	, TRY_AddMenu("Tray", "&Windows", , "shell32.dll", 141)
+	, TRY_AddMenu("Tray", "&System", , "moricons.dll", 114)
+	, TRY_AddMenu("Tray", "&Applications", , "shell32.dll", 25)
+	, TRY_AddMenu("Tray")
+	, TRY_AddMenu("Tray", "&Administration        ", , "shell32.dll", 170)
+	, TRY_AddMenu("Tray", "&Options", , "shell32.dll", 36)
 
-	TRY_AddMenuItem("Tray", "&Suspend", "AHK_ToggleSuspend", "shell32.dll", 110)
-	TRY_AddMenuItem("Tray", "E&xit", "AHK_Exit", "shell32.dll", 132)
+	, TRY_AddMenuItem("Tray", "&Suspend", "AHK_ToggleSuspend", "shell32.dll", 110)
+	, TRY_AddMenuItem("Tray", "E&xit", "AHK_Exit", "shell32.dll", 132)
+	Menu, Tray, Color, Silver, Single
 	Menu, Tray, Default, &Suspend
 	Menu, Tray, Tip, %AHK_ScriptInfo%
 
@@ -973,7 +979,7 @@ TRY_InitMenus() {
 ; Manage menus :
 ;;;;;;;;;;;;;;;;
 
-TRY_AddMenu(PRM_Menu, PRM_SubMenu = "", PRM_IconFile1 = "", PRM_IconNumber1 = 1, PRM_IconFile2 = "", PRM_IconNumber2 = 1, PRM_IconFile3 = "", PRM_IconNumber3 = 1) {
+TRY_AddMenu(PRM_Menu, PRM_SubMenu = "", PRM_Color = "", PRM_IconFile1 = "", PRM_IconNumber1 = 1, PRM_IconFile2 = "", PRM_IconNumber2 = 1, PRM_IconFile3 = "", PRM_IconNumber3 = 1) {
 
 	Global ZZZ_ProgramFiles32, ZZZ_ProgramFiles64
 	If (PRM_SubMenu == "") {
@@ -984,6 +990,11 @@ TRY_AddMenu(PRM_Menu, PRM_SubMenu = "", PRM_IconFile1 = "", PRM_IconNumber1 = 1,
 	StringReplace, LOC_SubMenu, LOC_SubMenu, % " ", , All
 	StringReplace, LOC_SubMenu, LOC_SubMenu, % " ", , All
 	Menu, %PRM_Menu%, Add, %PRM_SubMenu%, :%LOC_SubMenu%
+	If (PRM_Color) {
+		Try {
+			Menu, %PRM_Menu%, Color, %PRM_Color%
+		}
+	}
 
 	LOC_Break := false
 	Loop, 3
@@ -1036,9 +1047,11 @@ TRY_AddMenuItem(PRM_Menu, PRM_MenuItem = "", PRM_Action = false, PRM_IconFile1 =
 			Loop, Parse, LOC_DirectoryPrefixes, |
 			{
 				If (FileExist(A_LoopField . LOC_IconFile)) {
-					Menu, %PRM_Menu%, Icon, %PRM_MenuItem%, %A_LoopField%%LOC_IconFile%, %LOC_IconNumber%, 16
-					LOC_Break := true
-					Break
+					Try {
+						Menu, %PRM_Menu%, Icon, %PRM_MenuItem%, %A_LoopField%%LOC_IconFile%, %LOC_IconNumber%, 16
+						LOC_Break := true
+						Break
+					}
 				}
 			}
 			If (LOC_Break) {

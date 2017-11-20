@@ -366,7 +366,11 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 		LOC_File := LOC_BackgroundA[LOC_LogonIndex]
 		FileCreateDir, %A_WinDir%\System32\oobe\info\backgrounds
 		APP_RunAs()
-		Run, xcopy /r /h /y "%LOC_File%" "%A_WinDir%\System32\oobe\info\backgrounds\backgroundDefault.jpg", , Hide
+		Try {
+			Run, xcopy /r /h /y "%LOC_File%" "%A_WinDir%\System32\oobe\info\backgrounds\backgroundDefault.jpg", , Hide
+		} Catch LOC_Exception {
+			AHK_Catch(LOC_Exception, "SYS_WriteRegistryOptions", PRM_KillRegServer)
+		}
 		RunAs
 		; AHK_Debug("FileCopy, ", LOC_BackgroundA[LOC_LogonIndex] . ", " . A_WinDir . "\System32\oobe\info\backgrounds\backgroundDefault.jpg, 1")
 	}
@@ -430,6 +434,13 @@ SYS_WindowsUpdate() {
 	Global LOG_DomainLogin, LOG_DomainEncryptedPassword
 	TRY_ShowTrayTip("Launching Windows Update...")
 	APP_RunAs()
+	/*
+		sc.exe config trustedinstaller start= demand
+		sc.exe start trustedinstaller
+		sc.exe config wuauserv start= demand
+		sc.exe start wuauserv
+		wuapp.exe startmenu
+	*/
 	RunWait, %A_WinDir%\system32\sc.exe config trustedinstaller start= demand, , Hide UseErrorLevel
 	RunWait, %A_WinDir%\system32\sc.exe start trustedinstaller, , Hide UseErrorLevel
 	RunWait, %A_WinDir%\system32\sc.exe config wuauserv start= demand, , Hide UseErrorLevel
@@ -506,14 +517,21 @@ SYS_WheelUp(PRM_Cancel = false) {
 	}
 
 	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_HoveredWindowID, LOC_ControlClass
+	WinGetClass, LOC_WindowClass, ahk_id %LOC_HoveredWindowID%
+	WinGetTitle, LOC_WindowTitle, ahk_id %LOC_HoveredWindowID%
 	SYS_WheelAccelerate()
 	, SYS_WheelDown(PRM_Cancel := true)
+	, LOC_UltraEdit := (SubStr(LOC_WindowClass, 1, 4) == "Afx:" && InStr(LOC_WindowTitle, "UltraEdit") == "")
 	Loop, %ZZZ_ScrollAcceleration% {
 		If (STA_Cancel) {
 			Return
 		}
-		PostMessage, 0x20A, 120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
-		Sleep, 10
+		If (LOC_UltraEdit) {
+			ControlSend, %LOC_ControlClass%, {WheelUp}, ahk_id %LOC_HoveredWindowID%
+		} Else {
+			PostMessage, 0x20A, 120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
+			Sleep, 10
+		}
 	}
 }
 
@@ -528,14 +546,21 @@ SYS_WheelDown(PRM_Cancel = false) {
 	}
 	
 	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_HoveredWindowID, LOC_ControlClass
+	WinGetClass, LOC_WindowClass, ahk_id %LOC_HoveredWindowID%
+	WinGetTitle, LOC_WindowTitle, ahk_id %LOC_HoveredWindowID%
 	SYS_WheelAccelerate()
 	, SYS_WheelUp(PRM_Cancel := true)
+	, LOC_UltraEdit := (SubStr(LOC_WindowClass, 1, 4) == "Afx:" && InStr(LOC_WindowTitle, "UltraEdit") == "")
 	Loop, %ZZZ_ScrollAcceleration% {
 		If (STA_Cancel) {
 			Return
 		}
-		PostMessage, 0x20A, -120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
-		Sleep, 10
+		If (LOC_UltraEdit) {
+			ControlSend, %LOC_ControlClass%, {WheelDown}, ahk_id %LOC_HoveredWindowID%
+		} Else {
+			PostMessage, 0x20A, -120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
+			Sleep, 10
+		}
 	}
 }
 

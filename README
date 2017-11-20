@@ -7,3 +7,165 @@ Just launch 'JuggleKeys.ahk', and you'll see the application menu icon in the sy
 You'll find more information about JuggleKeys on http://www.jugglemaster.fr/computing/jugglekeys
 
 Enjoy !
+
+
+———————————————————————————————————————————————————————————————————————————————————————————————————————————|———————————————————————
+
+In French :
+
+JuggleKeys - Liste des fonctionnalités :
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
+1. Administration
+Sauvegarde instantanée des données de configuration :
+	Suspension des fonctionnalités en plein écran
+	Focus X-Window par la souris
+	Hook de chaque bouton de la souris
+	Affichage des tooltips
+Via le menu d'Administration :
+	Cancel visual effects [Ctrl + Alt + BackSpace] : Annulation de tous les effets visuels
+	Hide tray icon : masquage de l'icône du systray (Ctrl + Alt + BackSpace pour annuler)
+	Edit : Édition de l'ensemble des scripts { Win + Click sur l'icône }
+	Recorder : Enregistrement d'un ensemble d'actions
+	Help : aide sur AutoHotkey
+	Suspend : Suspension/reprise des fonctionnalités [Ctrl + Win] ou { Alt + Click sur l'icône }
+	Reload : Rechargement complet du script { Shift + Click sur l'icône }
+	WindowSpy : Récupération des informations liées aux fenêtres [Ctrl + Win + S]
+	Website : visite du site web d'AutoHotkey
+	About : ce fichier
+Automatisation des tâches suivantes :
+Confirmation de fermeture de session
+Confirmation d'arrêt de la machine
+Rechargement du programme suite à la modification d'un script
+Fermeture des fenêtres de dialogue intempestifs
+Délai de 400ms avant la prise en compte de la pression de F1, Insert, ScrollLock et CapsLock
+Synchronisation de l'horloge au démarrage du script
+Pendule qui sonne à chaque heure
+
+
+2. Améliorations système
+NumLock toujours active
+Fermeture des applis par un Esc long (+Ctrl pour les fenêtres internes)
+Rechargement de WindowFX [Ctrl + Win + X] (effets spéciaux sur les fenêtres)
+Économiseur d'écran [Ctrl + Win + L]
+Extinction de l'écran [Shift + Win + L] (Shift plus fort que Ctrl)
+Blocage avancé de la session [Win + L]
+	Extinction immédiate de l'écran
+	Reprise de la session dans les 10 secondes suite à l'appui d'une touche quelconque
+Mise en veille avec validation obligatoire dans les 4 secondes (bouton oui par défaut) [Win + F12]
+Mise en veille prolongée avec validation obligatoire dans les 4 secondes (bouton oui par défaut) [Ctrl + Win + F12]
+Arrêt de l'ordinateur avec validation obligatoire dans les 4 secondes (bouton non par défaut) [Shift + Win + F12] (Shift plus fort que Ctrl)
+Redémarrage de l'ordinateur avec validation obligatoire dans les 4 secondes (bouton non par défaut) [Ctrl + Shift + Win + F12] (Ctrl + Shift plus fort que Shift)
+Renommage des fichiers sous l'explorateur sans sélection à l'origine de l'extension (comme sous Linux)
+Vidage de la corbeille [Shift + Ctrl + Win + Suppr] (Ctrl + Win + Suppr étant réservé à l'ajout/suppression de programmes, et l'opération ici pouvant avoir plus de conséquences, d'où l'ajout de la touche Shift)
+Rescan des périphériques [Shift + Ctrl + Win + H] (Ctrl + Win + H étant réservé au Gestionnaire de périphériques)
+Affichage/Masquage des fichiers cachés sous l'explorateur [Ctrl + Win + F]
+Affichage/Masquage des fichiers système sous l'explorateur [Shift + Ctrl + Win + F]
+Réglage du volume sonore [Win + Flèches] :
+	+ Ctrl : concerne le volume Wave (et non master)
+	+ Shift : procède par pas de 10% au lieu de 5%
+	Pause : Silence/Reprise (faded)
+Parcours du Alt-Tab via Click droit + Molette
+Scroll molette concerne le contrôle survolé
+Luminosité { Win + Wheel }
+
+
+3. Fenêtres
+Scroll automatique avec la molette souris du contrôle placé sous la souris (+ Shift pour la fenêtre survolée)
+Fonctionnement du bouton du milieu analogue à la touche F4 avec les combinaisons Ctrl et Alt :
+	+ Win force la fermeture de la fenêtre si elle ne répond pas
+Increase { Win + PageUp }
+Decrease { Win + PageDown }
+Full screen(s) { MiddleButton sur Maximize }
+Kill { MiddleButton sur Close }
+Maximize { Shift + Win + PageUp }
+Minimize { Shift + Win + PageDown } { RightButton + LeftButton }
+Minimize to Tray { Win + End } { MiddleButton sur Minimize }
+Restore { Win + { NumPad5 | NumPad0 | NumPadIns | Enter }
+Roll up/down { RightButton + LeftButton sur la barre de titre }
+Always on Top { Win + LeftButton }
+Transparence de la fenêtre active { Ctrl + Win + Wheel } : + Shift pour la fenêtre survolée
+
+
+4. Applications système
+D'une manière générale, raccourcis via Ctrl + Win + <touche>
+Les raccourcis Win + <touche> concernent plus les applications non-système
+	Starter [Win + S] (gestionnaire de démarrage)
+	Console [Win + R] :
+		console avancée par onglets
+		positionnement du titre et du répertoire de travail en fonction du répertoire parcouru)
+		collage du contenu du presse-papiers [Ctrl + V]
+		fermeture du shell [Ctrl + D] (comme sous PuTTY)
+		fermeture de la console classique par Alt+F4
+	Registres [Ctrl + Win + R] (Win + R étant réservé à la console)
+	Outils d'administration [Ctrl + Win + A]
+	Gestionnaire de périphériques [Ctrl + Win + H] (comme Hardware)
+	Gestion des disques [Ctrl + Win + D]
+	Gestion de l'ordinateur [Ctrl + Win + C] (comme Computer)
+	Observateur d'événements [Ctrl + Win + V]
+	Ajout/Suppression de programmes [Ctrl + Win + Suppr]
+	
+
+5. Autres applications
+D'une manière générale, raccourcis via Win + <touche>
+Les raccourcis Ctrl + Win + <touche> concernent plus des applications système
+	Thunderbird :
+		lien hypertexte [Ctrl + K]
+		mise en gras du texte [Ctrl + G]
+	PuTTY [Win + P] :
+		collage du contenu du presse-papier [Ctrl + V]
+		touche de suppression d'un caractère [Suppr]
+	WMP [Ctrl + W] :
+		pause [Space]
+		TODO
+	eMule [Ctrl + Win + E] (Win + E étant réservé à l'exploration de fichier)
+	MediaMonkey [Ctrl + Win + M] (Win + M étant réservé à la minimisation de l'ensemble des fenêtres)
+	DieOrLive [Win + G] (logiciel de jeu de Go)
+	KGS [Win + K] (logiciel client de serveur de jeu de go)
+	NeroBurningROM [Win + N]
+	WaveEditor [Ctrl + Win + W] (Ctrl + W étant réservé à WMP)
+	SnagIt [Win + BackSpace]
+	Photoshop [Ctrl + Win + BackSpace]
+	Calculator [Win + C]
+	Explorer [Ctrl + Win + Shift + E] (Ctrl + Win + E étant réservé à eMule)
+	Firefox (en mode fenêtre unique) [Win + I] (comme Internet)
+	IE [Ctrl + Win + I]
+	JMP [Win + J] (logiciel de jonglage sous Eclipse)
+	UltraEdit [Win + U]
+	RootkitUnhooker [Ctrl + Win + Shift + Esc] (Gestionnaire de tâches bas niveau)
+	Toad [Win + T]
+	SQL Developer [Win + Q]
+		
+
+6. Texte
+Numéro de compte bancaire { Win + B } (si défini dans le fichier de configuration)
+Numéro de carte bleue { Shift + Win + B }
+Login Windows { Ctrl + Win + B } (comme BURH)
+Login DNS { Shift + Ctrl + Win + B }
+Mot de passe local { Ctrl + Win + P }
+Modification de la casse de la sélection { Win + F5} :
+	Shift <=> majuscules :
+		{ Win + F5 } tout en minuscules
+		{ Shift + Win + F5 } pour TOUT EN MAJUSCULES
+	Alt <=> inversion :{ Alt + Win + F5 } : pour tOUT inverser
+	Ctrl <=> les premiers caractères des mots :
+		{ Ctrl + Win + F5 } pour Une phrase ({ + Alt } pour inverser tous les caractères)
+		{ Ctrl + Shift + Win + F5 } pour Un Titre (phrase + Shift pour mettre les premières lettres en majuscules) ({ + Alt } pour inverser tous les caractères)
+	{ Alt + Win + Shift + F5 } pour un rANdOm
+Copier/Couper Coller en texte brut (sans mise en forme) : { Ctrl + Shift + } C, X, V
+Redimensionnement { Alt + Wheel }
+	+ Ctrl pour forcer dans certaines fenêtres (Firefox)
+	+ Win pour centrer
+	+ Shift par petits pas
+Redimensionnement { Win + RightDrag } :
+	Découpage de chaque fenêtre en 9 zones : les zones périmètres provoquent un Redimensionnement par rapport aux coins ou aux bords concernés, la zone centrale provoque un déplacement de la fenêtre
+	+ Ctrl pour forcer dans certaines fenêtres (Firefox)
+	+ Win pour centrer
+	+ Shift par petits pas
+Redimensionnement centré { Win + NumPad± } :
+	+ Alt pour ne pas centrer
+	
+	
+7. Raccourcis textuels
+Création automatique d'un raccourci textuel du texte sélectionné [Win + H] (comme Hostring)
+Complétion de termes suite à une frappe clavier avec exclusion de certaines fenêtres (Console, PuTTY, ...)

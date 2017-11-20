@@ -90,7 +90,7 @@ APP_Run(PRM_ApplicationName, PRM_Process, PRM_Parameters = "", PRM_WorkingDirect
 			}
 			If (PRM_Parameters == "") {
 				Run, "%PRM_Process%", %PRM_WorkingDirectory%, %PRM_Maximized% UseErrorLevel, LOC_WindowPID
-				; AHK_Debug("Run, """ . PRM_Process . """, " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
+				AHK_Debug("Run, """ . PRM_Process . """, " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
 			} Else {
 				Run, "%PRM_Process%" %PRM_Parameters%, %PRM_WorkingDirectory%, %PRM_Maximized% UseErrorLevel, LOC_WindowPID
 				; AHK_Debug("Run, """ . PRM_Process . """ " . PRM_Parameters . ", " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
@@ -202,6 +202,9 @@ APP_SnagIt:
 #BackSpace::
 If (APP_SnagItPath) {
 	APP_Run("SnagIt", APP_SnagItPath, APP_AreFilesSelected(), A_MyDocuments)
+} Else {
+	HotKey, #BackSpace, Off
+	SendInput, #{BackSpace}
 }
 Return
 
@@ -214,7 +217,18 @@ Return
 
 APP_MP3Editor:
 ^#BackSpace::
-APP_MP3Editor()
+If (APP_MP3EditorPath) {
+	APP_MP3Editor()
+} Else {
+	HotKey, ^#BackSpace, Off
+	HotKey, IfWinActive, Mp3 Editor Pro ahk_class TMainForm
+	HotKey, XButton1, Off
+	HotKey, XButton2, Off
+	HotKey, XButton1 Up, Off
+	HotKey, XButton2 Up, Off
+	HotKey, IfWinActive
+	SendInput, ^#{BackSpace}
+}
 Return
 
 APP_MP3Editor() {
@@ -291,7 +305,12 @@ APP_MP3EditorClick(PRM_ThisHotKey) {
 
 APP_Photoshop:
 ^#!BackSpace::
-APP_Run("Photoshop", APP_PhotoshopPath, APP_AreFilesSelected(), A_MyDocuments, , false)
+If (APP_PhotoshopPath) {
+	APP_Run("Photoshop", APP_PhotoshopPath, APP_AreFilesSelected(), A_MyDocuments, , false)
+} Else {
+	HotKey, ^#!BackSpace, Off
+	SendInput, ^#!{BackSpace}
+}
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -524,7 +543,14 @@ APP_Explorer() {
 
 APP_DieOrLive:
 #g::
-APP_Run("DieOrLive", APP_DieOrLivePath, , , false)
+If (APP_DieOrLivePath) {
+	APP_Run("DieOrLive", APP_DieOrLivePath, , , false)
+} Else If (APP_GitHubPath) {
+	APP_Run("Git/Hub", APP_GitHubPath, , , false)
+} Else {
+	Hotkey, #g, Off
+	SendInput, #g
+}
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -638,7 +664,7 @@ APP_FirefoxManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunch
 				LOC_SlashIndex := InStr(LOC_File, "\", , 0)
 				If (LOC_SlashIndex) {
 					LOC_Selection := SubStr(LOC_File, 1, LOC_SlashIndex - 1)
-					StringReplace, LOC_File, LOC_File, \, , All
+					StringReplace, LOC_File, LOC_File, \, %A_Space%, All
 				} Else {
 					LOC_DotIndex := InStr(LOC_Selection, ".", , 0)
 					If (LOC_DotIndex) {
@@ -953,7 +979,21 @@ APP_IE(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedWarning = 
 
 APP_JMP:
 #j::
-APP_Run("JMP", APP_EclipsePath, "-vmargs -Xms768m -Xmx768m -XX:PermSize=256m -XX:MaxPermSize=256m -XX:+CMSPermGenSweepingEnabled -XX:+CMSClassUnloadingEnabled", , , "Java EE - ahk_class SWT_Window0")
+If (APP_EclipsePath) {
+	APP_Run("JMP", APP_EclipsePath, "-vmargs -Xms768m -Xmx768m -XX:PermSize=256m -XX:MaxPermSize=256m -XX:+CMSPermGenSweepingEnabled -XX:+CMSClassUnloadingEnabled", , , "Java EE - ahk_class SWT_Window0")
+} Else {
+	HotKey, #j, Off
+	HotKey, IfWinActive, - Eclipse ahk_class SWT_Window0
+	HotKey, +RButton, Off
+	HotKey, ^RButton, Off
+	HotKey, IfWinActive, Eclipse ahk_class SWT_Window0
+	HotKey, F3, Off
+	HotKey, +F3, Off
+	HotKey, ^r, Off
+	HotKey, ^+f, Off
+	HotKey, IfWinActive
+	SendInput, #j
+}
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1002,7 +1042,18 @@ Return
 
 APP_KGS:
 #k::
-APP_KGS()
+If (APP_JavaWebStartPath) {
+	APP_KGS()
+} Else {
+	HotKey, #k, Off
+	HotKey, IfWinActive, KGS : Information ahk_class SunAwtFrame
+	HotKey, Enter, Off
+	HotKey, Esc, Off
+	HotKey, IfWinActive, KGS : Nouvelle partie ahk_class SunAwtFrame
+	HotKey, Enter, Off
+	HotKey, Esc, Off
+	SendInput, #k
+}
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1117,8 +1168,75 @@ APP_KGSNewGame(PRM_OKOrClose = true) {
 
 APP_MediaMonkey:
 #m::
-APP_MediaMonkey()
+If (APP_MediaMonkeyPath) {
+	APP_MediaMonkey()
+} Else {
+	APP_DisableMediaMonkey()
+	SendInput, #m
+}
 Return
+
+APP_DisableMediaMonkey() {
+	HotKey, #m, Off
+	HotKey, #Space, Off
+	HotKey, IfWinActive, MediaMonkey ahk_class TFMainWindow
+	HotKey, !Enter, Off
+	HotKey, <^>!Enter, Off
+	HotKey, !i, Off
+	HotKey, <^>!i, Off
+	HotKey, <^>!g, Off
+	HotKey, <^>!l, Off
+	HotKey, ^Delete, Off
+	HotKey, ^p, Off
+	HotKey, ^!+t, Off
+	HotKey, ^i, Off
+	HotKey, ^+i, Off
+	HotKey, ^+a, Off
+	HotKey, IfWinActive, Tags-auto depuis les noms de fichier ahk_class TFChooseMask
+	HotKey, !a, Off
+	HotKey, <^>!a, Off
+	HotKey, !b, Off
+	HotKey, <^>!b, Off
+	HotKey, !t, Off
+	HotKey, <^>!t, Off
+	HotKey, !n, Off
+	HotKey, <^>!n, Off
+	HotKey, !p, Off
+	HotKey, <^>!p, Off
+	HotKey, !r, Off
+	HotKey, <^>!r, Off
+	HotKey, IfWinActive, ahk_class TFRenameWithMask
+	HotKey, !a, Off
+	HotKey, <^>!a, Off
+	HotKey, !b, Off
+	HotKey, <^>!b, Off
+	HotKey, !g, Off
+	HotKey, <^>!g, Off
+	HotKey, !t, Off
+	HotKey, <^>!t, Off
+	HotKey, !n, Off
+	HotKey, <^>!n, Off
+	HotKey, !r, Off
+	HotKey, <^>!r, Off
+	HotKey, !y, Off
+	HotKey, <^>!y, Off
+	HotKey, IfWinActive, ahk_class TFSongProperties
+	HotKey, !t, Off
+	HotKey, <^>!t, Off
+	HotKey, !a, Off
+	HotKey, <^>!a, Off
+	HotKey, !g, Off
+	HotKey, <^>!g, Off
+	HotKey, !b, Off
+	HotKey, <^>!b, Off
+	HotKey, !+a, Off
+	HotKey, <^>!+a, Off
+	HotKey, !n, Off
+	HotKey, <^>!n, Off
+	HotKey, !y, Off
+	HotKey, <^>!y, Off
+	HotKey, IfWinActive
+}
 
 APP_MediaMonkey() {
 	Global APP_MediaMonkeyPath
@@ -1154,7 +1272,12 @@ APP_MediaMonkeyPlayPause(true)
 Return
 
 #Space::
-APP_MediaMonkeyPlayPause()
+If (APP_MediaMonkeyPath) {
+	APP_MediaMonkeyPlayPause()
+} Else {
+	APP_DisableMediaMonkey()
+	SendInput, #{Space}
+}
 Return
 
 APP_MediaMonkeyPlayPausePostControl:
@@ -1496,8 +1619,13 @@ Return
 ; Easy PHP { Win + P } :
 ;;;;;;;;;;;;;;;;;;;;;;;;
 APP_EasyPHP:
-#p::
-APP_EasyPHP()
+; #p::
+If (APP_ApachePath && APP_MySQLPath) {
+	APP_EasyPHP()
+} Else {
+	HotKey, #p, Off
+	SendInput, #p
+}
 Return
 
 APP_EasyPHP() {
@@ -1514,10 +1642,10 @@ APP_EasyPHP() {
 		TRY_ShowTrayTip("EasyPHP stopped")
 	} Else {
 		If (!LOC_ApachePID) {
-			APP_Run("Apache", APP_ApachePath)
+			Run, %APP_ApachePath%, , Hide UseErrorLevel
 		}
 		If (!LOC_MySQLPID) {
-			APP_Run("MySQL", APP_MySQLPath)
+			Run, %APP_MySQLPath%, , Hide UseErrorLevel
 		}
 		TRY_ShowTrayTip("EasyPHP launched")
 	}
@@ -1527,13 +1655,26 @@ APP_EasyPHP() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Git Bash :
+;;;;;;;;;;;;
+
+#IfWinActive, ahk_class mintty
+RButton::
+SendInput, +{Insert}
+Return
+#IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; PuTTY Connection Manager { Win + P } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;APP_PuTTY:
-;#p::
-;APP_Run("PuTTY", A_ProgramFiles . "\PuTTY Connection Manager\puttycm.exe")
-;Return
+APP_PuTTY:
+#p::
+APP_Run("PuTTY", A_ProgramFiles . "\PuTTY Connection Manager\puttycm.exe")
+Return
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2169,8 +2310,8 @@ APP_MailManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedW
 
 #IfWinActive, Rédaction ahk_class MozillaWindowClass
 
-^k:: ; hyperlink
-SendInput, ^l
+^l:: ; hyperlink
+SendInput, ^k
 Return
 
 ^g:: ; bold
@@ -2392,14 +2533,42 @@ APP_UltraEdit() {
 }
 
 #IfWinActive, UltraEdit
-~WheelDown::
-~WheelUp::
-~^WheelDown::
-~^WheelUp::
-~WheelLeft::
-~WheelRight::
+WheelDown::
+WheelUp::
+WheelLeft::
+^WheelUp::
+WheelRight::
+^WheelDown::
+APP_UltraEditWheel(A_ThisHotKey)
 Return
 #IfWinActive
+
+APP_UltraEditWheel(PRM_HotKey) {
+	WinGet, LOC_UltraEditID, ID, A
+	CoordMode, Mouse, Screen
+	MouseGetPos, , , LOC_HoveredWindowID
+	If (SubStr(PRM_HotKey, 1, 1) == "^") {
+		LOC_Prefix := "^"
+		, LOC_Direction := SubStr(PRM_HotKey, 7)
+	} Else {
+		LOC_Prefix := ""
+		, LOC_Direction := SubStr(PRM_HotKey, 6)
+	}
+	
+	If (LOC_HoveredWindowID == LOC_UltraEditID) {
+		SendInput, %LOC_Prefix%{Wheel%LOC_Direction%}
+	} Else {
+		If (LOC_Prefix) {
+			If (LOC_Direction == "Up") {
+				SYS_WheelLeft()
+			} Else {
+				SYS_WheelRight()
+			}
+		} Else {
+			SYS_Wheel%LOC_Direction%()
+		}
+	}
+}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2703,189 +2872,111 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Blue Stacks (Android) { Win + A } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Android { Win + A } :
+;;;;;;;;;;;;;;;;;;;;;;;
 
 #a::
-APP_BlueStacks()
+APP_Android()
 Return
 
-APP_BlueStacks() {
-	Global APP_BlueStacksPath, APP_BlueStacksActivityEnabled, ZZZ_BlueStacksMouseTimer
-	Process, Close, HD-Service.exe
-	Process, Close, HD-Network.exe
-	Process, Close, HD-BlockDevice.exe
-	Process, Close, HD-SharedFolder.exe
-	Process, Close, HD-UpdaterService.exe
-	Process, Close, HD-LogRotatorService.exe
-	Process, Close, HD-Frontend.exe
-	Process, Close, HD-Agent.exe
-	APP_Run("Android", APP_BlueStacksPath, , , PRM_Maximized = false)
-	SetTimer, APP_BlueStacksMinimizedLaunchTimer, -1
-	SetTimer, APP_BlueStacksMouseTimer, %ZZZ_BlueStacksMouseTimer%
-	If (APP_BlueStacksActivityEnabled) {
-		SetTimer, APP_ClashOfClansActivityTimer, -10000
+APP_Android() {
+	Global APP_AndroidPath, APP_AndroidActivityEnabled, ZZZ_AndroidMouseTimer
+	APP_Run("Android", APP_AndroidPath, , , PRM_Maximized = false)
+	SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
+	If (APP_AndroidActivityEnabled) {
+		SetTimer, APP_AndroidActivityTimer, -10000
 	}
 }
 
-APP_BlueStacksMinimizedLaunchTimer:
-APP_BlueStacksMinimizedLaunchTimer()
+APP_AndroidMouseTimer:
+APP_AndroidMouseTimer()
 Return
 
-APP_BlueStacksMinimizedLaunchTimer() {
-	WinWait, BlueStacksAppPlayer, Initialisation InitializingGame, 10
-	If (!ErrorLevel) {
-		CoordMode, Mouse, Screen
-		WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
-		If (LOC_Width == SCR_VirtualScreenWidth
-			&& LOC_Height == SCR_VirtualScreenHeight) {
-			MouseClick, , LOC_X + 1600 * LOC_Width / 1680, LOC_Y + 40 * LOC_Height / 1050
-		}
-	}
-}
-
-APP_BlueStacksMouseTimer:
-APP_BlueStacksMouseTimer()
-Return
-
-APP_BlueStacksMouseTimer() {
-	Global ZZZ_BlueStacksMouseTimer
+APP_AndroidMouseTimer() {
+	Global ZZZ_AndroidMouseTimer
 	Static STA_LastCheck := 0, STA_LastWindowID := 0
-	If (A_TickCount - STA_LastCheck < -ZZZ_BlueStacksMouseTimer) {
-		SetTimer, APP_BlueStacksMouseTimer, %ZZZ_BlueStacksMouseTimer%
+	If (A_TickCount - STA_LastCheck < -ZZZ_AndroidMouseTimer) {
+		SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
 		Return
 	}
 	STA_LastCheck := A_TickCount
 	MouseGetPos, , , LOC_WindowID
 	If (LOC_WindowID != Abs(STA_LastWindowID)) {
-		WinGetTitle, LOC_WindowTitle, ahk_id %LOC_WindowID%
-		If (LOC_WindowTitle == "BlueStacks App Player") {
+		If (WinExist("Nox App Player ahk_class Qt5QWindowIcon ahk_id " . LOC_WindowID)) {
 			AHK_SetCursor("Hand")
-			SetTimer, APP_BlueStacksMouseTimer, %ZZZ_BlueStacksMouseTimer%
+			SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
 			STA_LastWindowID := LOC_WindowID
 		} Else {
 			If (STA_LastWindowID > 0) {
 				AHK_ResetCursor()
 			}
 			STA_LastWindowID := -LOC_WindowID
-			If (WinExist("BlueStacks App Player")) {
-				SetTimer, APP_BlueStacksMouseTimer, %ZZZ_BlueStacksMouseTimer%
+			If (WinExist("Nox App Player ahk_class Qt5QWindowIcon")) {
+				SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
 			}
 		}
 		STA_LastWindowID := LOC_WindowID
 	}
 }
 
-#IfWinActive, BlueStacks App Player
+#IfWinActive, Nox App Player ahk_class Qt5QWindowIcon
 RAlt::LAlt
 
 ; Back :
-Esc::
 XButton1::
 XButton2::
-APP_BlueStacksEscape()
-, APP_ClashOfClansActivity(, true)
+SendInput, {Esc}
+APP_AndroidActivity(, true)
 Return
 
 ; Drag :
 RButton::
-APP_BlueStacksDrag()
-, APP_ClashOfClansActivity(, true)
+APP_AndroidActivity(, true)
 Return
 
 ~LButton::
 ~LButton Up::
 ~Space::
-~Up::
-~Down::
-APP_BlueStacksDrag(true)
-, APP_ClashOfClansActivity(, true)
+APP_AndroidActivity(, true)
+Return
+
+Left::
+SendInput, a
+APP_AndroidActivity(, true)
+Return
+Right::
+SendInput, d
+APP_AndroidActivity(, true)
+Return
+Up::
+SendInput, w
+APP_AndroidActivity(, true)
+Return
+Down::
+SendInput, s
+APP_AndroidActivity(, true)
 Return
 
 ^+s::
-APP_ClashOfClansActivity(true, true)
+APP_AndroidActivity(true, true)
 Return
 
-APP_ClashOfClansActivityTimer:
-APP_ClashOfClansActivity()
+APP_AndroidActivityTimer:
+APP_AndroidActivity()
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-APP_DeactivateBlueStacksAutostart() {
-	Run, %A_WinDir%\system32\sc.exe config BstHdAndroidSvc start= demand, , Hide UseErrorLevel
-	Run, %A_WinDir%\system32\sc.exe config BstHdLogRotatorSvc start= demand, , Hide UseErrorLevel
-	Run, %A_WinDir%\system32\sc.exe config BstHdUpdaterSvc start= demand, , Hide UseErrorLevel
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-APP_InitBlueStacksCursorTimer() {
+APP_InitAndroidCursorTimer() {
 	Global
-	SetTimer, APP_BlueStacksMouseTimer, %ZZZ_BlueStacksMouseTimer%
+	SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-APP_BlueStacksEscape() {
-	WinGetPos, LOC_X, LOC_Y, , LOC_Height
-	CoordMode, Mouse, Screen
-	MouseGetPos, LOC_MouseX, LOC_MouseY
-	MouseClick, Left, LOC_X + 10, LOC_Y + LOC_Height - 10
-	MouseMove, LOC_MouseX, LOC_MouseY, 0
-	AHK_ShowToolTip("Back")
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-APP_BlueStacksDrag:
-APP_BlueStacksDrag(, true)
-Return
-
-APP_BlueStacksDrag(PRM_ReinitLeftButton = false, PRM_TimerOn = false) {
-	Static STA_DragEnabled := false, STA_MouseX, STA_MouseY
-	
-	CoordMode, Mouse, Screen
-	; Dont move mouse while active :
-	If (PRM_TimerOn
-		&& STA_DragEnabled) {
-		MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_WindowID
-		If (LOC_MouseX != STA_MouseX
-			|| LOC_MouseY != STA_MouseY) {
-			WinGetTitle, LOC_WindowTitle, ahk_id %LOC_WindowID%
-			If (LOC_WindowTitle == "BlueStacks App Player") {
-				;~ WinActivate, ahk_class Shell_TrayWnd
-				;~ SendInput, {LButton Up}
-				;~ MouseMove, STA_MouseX, STA_MouseY
-				;~ SendInput, {LButton Down}
-				;~ WinActivate, ahk_id %LOC_WindowID%
-			}
-		}
-		Return
-	}
-	
-	If (PRM_ReinitLeftButton) {
-		STA_DragEnabled := false
-		Return
-	}
-
-	If (STA_DragEnabled) {
-		SendInput, {LButton Up}
-		SetTimer, APP_BlueStacksDrag, Off
-	} Else {
-		SendInput, {LButton Up}
-		MouseGetPos, STA_MouseX, STA_MouseY
-		SetTimer, APP_BlueStacksDrag, 50
-	}
-	STA_DragEnabled := !STA_DragEnabled
-	, AHK_ShowToolTip("Drag mode: " . (STA_DragEnabled ? "On" : "Off"))
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Activity simulation for Clash of Clans :
-APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) {
-	Global SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, ZZZ_CloseHandleFunction, APP_BlueStacksActivityEnabled
+; Activity simulation for Android :
+APP_AndroidActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) {
+	Global SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, ZZZ_CloseHandleFunction, APP_AndroidActivityEnabled
 	Static STA_SecondsToWait := 0, STA_MaxSecondsToWait := 0, STA_PreviousMouseX, STA_PreviousMouseY, STA_PreviousClickX, STA_PreviousClickY, STA_WindowID := 0, STA_ProcessID := 0, STA_GetProcessMemoryInfoFunction := AHK_GetFunction("psapi", "GetProcessMemoryInfo"), STA_OpenProcessFunction := AHK_GetFunction("kernel32", "OpenProcess"), STA_ToolTipGuiID := 0
 	
 	If (!STA_MaxSecondsToWait) {
@@ -2902,11 +2993,11 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 	}
 	
 	If (!WinExist("ahk_id " . (0 + STA_WindowID))) {
-		WinGet, STA_WindowID, ID, BlueStacks App Player
+		WinGet, STA_WindowID, ID, Nox App Player ahk_class Qt5QWindowIcon
 		If (!STA_WindowID) {
-			SetTimer, APP_ClashOfClansActivityTimer, Off
+			SetTimer, APP_AndroidActivityTimer, Off
 			STA_WindowID := 0
-			Loop, 5 { ; GUI_ClashOfClansActivity*
+			Loop, 5 { ; GUI_AndroidActivity*
 				LOC_GuiID := 51 + A_Index
 				Gui, %LOC_GuiID%:Destroy
 			}
@@ -2914,12 +3005,12 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 		}
 	}
 	
-	Process, Exist, HD-Frontend.exe
+	Process, Exist, Nox.exe
 	STA_ProcessID := ErrorLevel
 	If (!STA_ProcessID) {
-		SetTimer, APP_ClashOfClansActivityTimer, Off
+		SetTimer, APP_AndroidActivityTimer, Off
 		STA_WindowID := STA_ProcessID := 0
-		Loop, 5 { ; GUI_ClashOfClansActivity*
+		Loop, 5 { ; GUI_AndroidActivity*
 			LOC_GuiID := 51 + A_Index
 			Gui, %LOC_GuiID%:Destroy
 		}
@@ -2927,12 +3018,12 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 	}
 
 	If (PRM_StateChanged) {
-		APP_BlueStacksActivityEnabled := !APP_BlueStacksActivityEnabled
+		APP_AndroidActivityEnabled := !APP_AndroidActivityEnabled
 		, STA_SecondsToWait := 0
 		, AHK_SaveIniFile()
 	}
 	
-	If (APP_BlueStacksActivityEnabled) {
+	If (APP_AndroidActivityEnabled) {
 		CoordMode, Mouse, Screen
 		If (WinExist("ahk_id " . STA_WindowID)) {
 			WinGetPos, LOC_WindowX, LOC_WindowY, LOC_WindowWidth, LOC_WindowHeight
@@ -2942,10 +3033,10 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 				 ; Clash of Clans (110, 80)-(1440, 800) - Star Wars Commander (150, 0)-(1540, 790) - Castle Clash (130, 90)-(1400, 810) - marge of 10% :
 				 LOC_MinX := Round(LOC_WindowX + 280 * LOC_WindowWidth / SCR_VirtualScreenWidth)
 				, LOC_MinY := Round(LOC_WindowY + 120 * LOC_WindowHeight / SCR_VirtualScreenHeight)
-				, LOC_MaxX := Round(LOC_WindowX + 1400 * LOC_WindowWidth / SCR_VirtualScreenWidth) 
+				, LOC_MaxX := Round(LOC_WindowX + 1320 * LOC_WindowWidth / SCR_VirtualScreenWidth) 
 				, LOC_MaxY := Round(LOC_WindowY + 790 * LOC_WindowHeight / SCR_VirtualScreenHeight)
 				If (!WinExist("ahk_id " . STA_ToolTipGuiID)) {
-					Gui, 52:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +HWndSTA_ToolTipGuiID +LastFound ; GUI_ClashOfClansActivitySimulation
+					Gui, 52:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +HWndSTA_ToolTipGuiID +LastFound ; GUI_AndroidActivitySimulation
 					Gui, 52:Color, FFFFDF, 000000
 					Gui, 52:Margin, 5, 5
 					Gui, 52:Font, Bold
@@ -2953,7 +3044,7 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 					WinSet, Transparent, 180
 					WinSet, ExStyle, +0x00000020
 					; SYS_DockWindowToWindow(STA_ToolTipGuiID, STA_WindowID)
-					Loop, 4	{ ; GUI_ClashOfClansActivity*
+					Loop, 4	{ ; GUI_AndroidActivity*
 						LOC_GuiIndex := 52 + A_Index
 						Gui, %LOC_GuiIndex%:Destroy
 						Gui, %LOC_GuiIndex%:-Caption -SysMenu -Border -Resize +AlwaysOnTop +ToolWindow +Owner +Disabled +LastFound
@@ -2962,12 +3053,12 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 					}
 				}
 				; Gui, 52:+LastFound
-				Gui, 52:Show, % "X" . (LOC_WindowX + 1603 * LOC_WindowWidth / SCR_VirtualScreenWidth - 34) . " Y" . (LOC_WindowY + 407 * LOC_WindowHeight / SCR_VirtualScreenHeight) . " AutoSize NA NoActivate", GUI_ClashOfClansActivitySimulation
+				Gui, 52:Show, % "X" . (LOC_WindowX + 1603 * LOC_WindowWidth / SCR_VirtualScreenWidth - 34) . " Y" . (LOC_WindowY + 407 * LOC_WindowHeight / SCR_VirtualScreenHeight) . " AutoSize NA NoActivate", GUI_AndroidActivitySimulation
 				; WinSet, AlwaysOnTop, On
-				Gui, 53:Show, % "x" . LOC_MinX . " y" . (LOC_MinY - 1) . " w" . (LOC_MaxX - LOC_MinX + 1) . " h2 NoActivate", GUI_ClashOfClansActivityTop
-				Gui, 54:Show, % "x" . (LOC_MinX - 1) . " y" . LOC_MinY . " w2 h" . (LOC_MaxY - LOC_MinY + 1) . " NoActivate", GUI_ClashOfClansActivityLeft
-				Gui, 55:Show, % "x" . LOC_MinX . " y" . LOC_MaxY . " w" . (LOC_MaxX - LOC_MinX + 1) . " h2 NoActivate", GUI_ClashOfClansActivityBottom
-				Gui, 56:Show, % "x" . LOC_MaxX . " y" . LOC_MinY . " w2 h" . (LOC_MaxY - LOC_MinY + 1) . " NoActivate", GUI_ClashOfClansActivityRight
+				Gui, 53:Show, % "x" . LOC_MinX . " y" . (LOC_MinY - 1) . " w" . (LOC_MaxX - LOC_MinX + 1) . " h2 NoActivate", GUI_AndroidActivityTop
+				Gui, 54:Show, % "x" . (LOC_MinX - 1) . " y" . LOC_MinY . " w2 h" . (LOC_MaxY - LOC_MinY + 1) . " NoActivate", GUI_AndroidActivityLeft
+				Gui, 55:Show, % "x" . LOC_MinX . " y" . LOC_MaxY . " w" . (LOC_MaxX - LOC_MinX + 1) . " h2 NoActivate", GUI_AndroidActivityBottom
+				Gui, 56:Show, % "x" . LOC_MaxX . " y" . LOC_MinY . " w2 h" . (LOC_MaxY - LOC_MinY + 1) . " NoActivate", GUI_AndroidActivityRight
 			} Else {
 				If (WinExist("ahk_id " . STA_ToolTipGuiID)) {
 					Loop, 5 {
@@ -3017,9 +3108,9 @@ APP_ClashOfClansActivity(PRM_StateChanged = false, PEM_ReinitCountdown = false) 
 			, STA_PreviousMouseX := 0
 			, STA_PreviousMouseY := 0
 		}
-		SetTimer, APP_ClashOfClansActivityTimer, -1000
+		SetTimer, APP_AndroidActivityTimer, -1000
 	} Else {
-		SetTimer, APP_ClashOfClansActivityTimer, Off
+		SetTimer, APP_AndroidActivityTimer, Off
 		Loop, 5 {
 			LOC_GuiID := 51 + A_Index
 			Gui, %LOC_GuiID%:Destroy
@@ -3116,6 +3207,12 @@ APP_CheckXButton(PRM_Direction, PRM_ActiveWindows, PRM_4thButtonAction = "", PRM
 
 APP_RunAs(PRM_DomainLogin = "", PRM_DomainEncryptedPassword = "") {
 	Global LOG_DomainLogin, LOG_DomainEncryptedPassword
+	
+	; TODO : à supprimer !
+	AHK_Debug("RunAs, ", LOG_DomainLogin . ",", LOG_DomainEncryptedPassword)
+	RunAs, %LOG_DomainLogin%, %LOG_DomainEncryptedPassword%
+	Return, true
+	
 	If (A_IsAdmin) {
 		LOC_DomainLogin := (PRM_DomainLogin ? PRM_DomainLogin : LOG_DomainLogin)
 		LOC_DomainPassword := LOG_GetFieldValue(PRM_DomainEncryptedPassword && PRM_DomainLogin
@@ -3124,7 +3221,6 @@ APP_RunAs(PRM_DomainLogin = "", PRM_DomainEncryptedPassword = "") {
 		If (LOC_DomainPassword) {
 			RunAs, %LOG_DomainLogin%, %LOC_DomainPassword%
 		}
-		AHK_Debug("RunAs,", LOG_DomainLogin . ",", LOC_DomainPassword)
 	}
 }
 

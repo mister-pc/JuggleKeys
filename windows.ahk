@@ -157,6 +157,7 @@ WIN_InitGroups() {
 	GroupAdd, WIN_NoDialogWindows, BoÓte ‡ outils ContrÙles ahk_class MsoCommandBar ; Word
 	GroupAdd, WIN_NoDialogWindows, ahk_class WindowsForms10.Window.8.app.0.11ecf05 ; Startup Delayer
 	; GroupAdd, WIN_NoDialogWindows, ahk_class WindowsForms10.Window.0.app.0.33c0d9d ; DisplayFusion
+	GroupAdd, WIN_NoDialogWindows, TimeCamp ahk_class wxWindowNR ; TimeCamp
 	GroupAdd, WIN_NoDialogWindows, Take it Easy ahk_class #32770 ; MediaMonkey plugin
 	GroupAdd, WIN_NoDialogWindows, Directory Opus ahk_class DOpus.ParentWindow ; Directory Opus
 	GroupAdd, WIN_NoDialogWindows, Registry Monitor ahk_class TMonitorForm
@@ -165,6 +166,7 @@ WIN_InitGroups() {
 	GroupAdd, WIN_NoDialogWindows, Ouverture du document, veuillez patienter... ahk_class #32770 ; PDF-XChange
 	GroupAdd, WIN_NoDialogWindows, OpenVPN ahk_class OpenVPN-GUI ; OpenVPN
 	GroupAdd, WIN_NoDialogWindows, ahk_class ExtPlayerCanvas ; Quintessential playlist
+	GroupAdd, WIN_NoDialogWindows, Nox ahk_class Qt5QWindowToolSaveBits
 
 	GroupAdd, WIN_NoDialogWindows, GUI_Memo ahk_class AutoHotkeyGUI
 	GroupAdd, WIN_NoDialogWindows, GUI_SplashScreen ahk_class AutoHotkeyGUI
@@ -233,6 +235,10 @@ WIN_InitGroups() {
 	GroupAdd, WIN_SuspendingWindowsGroup, FIFA 10 ahk_class FIFA 10Class ; FIFA 2010
 	GroupAdd, WIN_SuspendingWindowsGroup, Infos B‡B - Google†Sheets ahk_class MozillaWindowClass
 	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class GameUnrealWWindowsViewportWindow ; Harry Potter et la chambre des secrets
+	GroupAdd, WIN_SuspendingWindowsGroup, Divinity2 ahk_class Gamebryo Application ; Divinity 2
+	GroupAdd, WIN_SuspendingWindowsGroup, Doomsday ahk_class QWidget ; Doom
+	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class ZDoomMainWindow ; Doom
+	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class DragonAge2 ; Dragon Age 2
 	
 	GroupAdd, WIN_StartMenuGroup, ahk_class BaseBar ; Start menus
 	GroupAdd, WIN_StartMenuGroup, ahk_class ClassicShell.CMenuContainer ; Start menu
@@ -1304,7 +1310,7 @@ WIN_MaximizeOnNextScreen() {
 			AHK_ShowToolTip("Window maximized on next screen")
 		} Else {
 			If (LOC_WindowWidth == SCR_VirtualScreenWidth
-				&& LOC_WindowHeight = SCR_VirtualScreenHeight) {
+				&& LOC_WindowHeight == SCR_VirtualScreenHeight) {
 				WinRestore, ahk_id %LOC_ActiveWindowID%
 				AHK_ShowToolTip("Window restored")
 			} Else {
@@ -1416,7 +1422,7 @@ WIN_MiddleButton() {
 
 	; Kill window from everywhere { Shift | Alt } + { Middle Button } :
 	If (A_ThisHotkey == "!MButton"
-		|| A_ThisHotkey == "+MButton" && LOC_WindowTitle != "BlueStacks App Player") {
+		|| A_ThisHotkey == "+MButton") {
 		WIN_Close()
 		, AUD_Beep()
 		WinActivate, ahk_id %LOC_ActiveWindowID%
@@ -1479,6 +1485,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "PlayerCanvas" && (InStr(LOC_WindowTitle, "QMP") || LOC_WindowTitle == "Quintessential Media Player") ; Quintessential
 		|| LOC_WindowClass == "ExtPlayerCanvas" ; Quintessential
 		|| LOC_WindowClass == "PROCEXPL" ; Process Explorer
+		|| LOC_WindowClass == "ProcessHacker" ; Process Hacker
 		|| LOC_WindowClass == "TMainForm" ; Media Monkey
 		|| LOC_WindowClass == "TFMainWindow" ; Media Monkey
 		|| LOC_WindowClass == "TFImage" ; Media Monkey album image
@@ -1513,9 +1520,12 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "CalcFrame"
 		|| LOC_WindowClass == "PuTTY" ; PuTTY
 		|| LOC_WindowClass == "AU3Reveal" ; Window Spy
+		|| LOC_WindowClass == "TAIDA64" ; Aida 64
 		|| LOC_WindowClass == "rctrl_renwnd32" ; Outlook message view
 		|| LOC_WindowClass == "IMWindowClass" ; Lync chat window
-		|| LOC_WindowClass == "SWT_Window0" && InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect")) { ; Sametime
+		|| LOC_WindowClass == "SWT_Window0" && InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect") ; Sametime
+		|| LOC_WindowClass == "tSkMainForm" ; Skype
+		|| LOC_WindowClass == "TConversationForm") { ; Skype
 		SendInput, !{F4}
 		AUD_Beep()
 		AHK_Debug("Alt-F4 sur " . LOC_WindowTitle . " ahk_class " . LOC_WindowClass)
@@ -1559,7 +1569,10 @@ WIN_MiddleButton() {
 	
 	; Directory Opus :
 	If (LOC_WindowClass == "dopus.lister") {
-		If (InStr(LOC_ControlClass, "dopus.filedisplay")
+		If (LOC_WindowTitle == "Corbeille"
+			|| LOC_WindowTitle == "Ordinateur") {
+			SendInput, {Ctrl Up}{Esc}^{F4}
+		} Else If (InStr(LOC_ControlClass, "dopus.filedisplay")
 			|| InStr(LOC_ControlClass, "dopus.iconfiledisplay")) {
 			ControlGet, LOC_SecondFileDisplayID, Hwnd, , dopus.filedisplay2
 			If (LOC_SecondFileDisplayID) {
@@ -1602,17 +1615,24 @@ WIN_MiddleButton() {
 			&& (InStr(LOC_WindowTitle, "Pale Moon")
 				|| InStr(LOC_WindowTitle, "Mozilla Firefox"))
 		|| LOC_WindowClass == "Chrome_WidgetWin_1") {
-		If (SubStr(LOC_ControlClass, 1, 5) == "DSUI:" ; PDF X-Change plug-in
+		If (InStr(LOC_WindowTitle, "- Ecosia -")) {
+			SendInput, %A_Space%^w
+		} Else If (SubStr(LOC_ControlClass, 1, 5) == "DSUI:" ; PDF X-Change plug-in
 			|| InStr(LOC_WindowTitle, "WeTransfer")) {
 			WinActivate, ahk_class Shell_TrayWnd
 			WinActivate, ahk_id %LOC_WindowID%
 			SendInput, ^{F4}
 		} Else {
-			WinGetPos, LOC_X, LOC_Y, , LOC_Height
-			MouseClick, Left, LOC_X + 10, LOC_Y + 2 * LOC_Height // 3
-			Sleep, 10
-			SendInput, ^w
-			MouseMove, LOC_MouseX, LOC_MouseY
+			WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
+			If (LOC_Width == SCR_VirtualScreenWidth
+				&& LOC_Height == SCR_VirtualScreenHeight) { ; Full video screen
+				SendInput, {Esc}
+			} Else {
+				MouseClick, Left, LOC_X + 10, LOC_Y + 2 * LOC_Height // 3
+				Sleep, 10
+				SendInput, ^w
+				MouseMove, LOC_MouseX, LOC_MouseY
+			}
 		}
 		AUD_Beep()
 		WinActivate, ahk_id %LOC_ActiveWindowID%
@@ -1636,16 +1656,31 @@ WIN_MiddleButton() {
 		AHK_Catch(LOC_Exception, "WIN_MiddleButton")
 	}
 
+	; Many Faces of Go :
+	If (SubStr(LOC_WindowTitle, 1, 20) == "The Many Faces of Go" 
+		&& RegExMatch(LOC_WindowClass, "S)^Afx:00400000:8:00010003:00000000:[A-F0-9]{8}$")) {
+		If (SubStr(LOC_WindowTitle, 21, 4) == " - [") {
+			SendInput, ^{F4}
+		} Else {
+			WinClose
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+	}
+	
 	; Thunderbird :
 	If (LOC_WindowClass == "MozillaWindowClass") {
 		If (InStr(LOC_WindowTitle, "Mozilla Thunderbird")) {
-			If (LOC_WindowTitle == "Messages en attente - Dossiers locaux - Mozilla Thunderbird"
-				|| RegExMatch(LOC_WindowTitle, "^Courrier entrant - [a-z‡‰ÊÈËÍÎÓÔÙú¸˘˚ˇA-Z¿ƒ∆…» ÀŒœ‘å‹Ÿ€ü0-9_ \-&]{1,} - Mozilla Thunderbird$")) { ; main board : current mail to delete
-				SendInput, {Esc}{Delete}
-				AHK_ShowToolTip("Mail deleted")
+			If (LOC_WindowTitle == "Agenda - Mozilla Thunderbird") { ; calendar
 				Return
 			}
-			If (LOC_WindowTitle == "Agenda - Mozilla Thunderbird") { ; calendar
+			If (LOC_WindowTitle == "Messages en attente - Dossiers locaux - Mozilla Thunderbird"
+				|| RegExMatch(LOC_WindowTitle, "^Courrier entrant - [a-z‡‰ÊÈËÍÎÓÔÙú¸˘˚ˇA-Z¿ƒ∆…» ÀŒœ‘å‹Ÿ€ü0-9_ \-&]{1,} - Mozilla Thunderbird$")
+				|| RegExMatch(LOC_WindowTitle, "^EnvoyÈs - [a-z‡‰ÊÈËÍÎÓÔÙú¸˘˚ˇA-Z¿ƒ∆…» ÀŒœ‘å‹Ÿ€ü0-9_ \-&]{1,} - Mozilla Thunderbird$")
+				|| RegExMatch(LOC_WindowTitle, "^[a-z‡‰ÊÈËÍÎÓÔÙú¸˘˚ˇA-Z¿ƒ∆…» ÀŒœ‘å‹Ÿ€ü0-9_ :']{1,} - Dossiers locaux - Mozilla Thunderbird$")
+				|| RegExMatch(LOC_WindowTitle, "^Brouillons - [a-z‡‰ÊÈËÍÎÓÔÙú¸˘˚ˇA-Z¿ƒ∆…» ÀŒœ‘å‹Ÿ€ü0-9_ \-&]{1,} - Mozilla Thunderbird$")) { ; main board : current mail to delete
+				SendInput, {Esc}{Delete}
+				AHK_ShowToolTip("Mail deleted")
 				Return
 			}
 			If (RegExMatch(LOC_WindowTitle, "^.*- Courrier entrant - [a-z‡‰ÊÈËÍÎÓÔÙú¸˘˚ˇA-Z¿ƒ∆…» ÀŒœ‘å‹Ÿ€ü0-9_ \-]{1,} - Mozilla Thunderbird$")
@@ -1691,26 +1726,19 @@ WIN_MiddleButton() {
 		Return
 	}
 
-	; BlueStacks :
-	If (LOC_WindowTitle == "BlueStacks App Player" && SubStr(LOC_WindowClass, 1, 29) == "WindowsForms10.Window.8.app.0") {
-		SetTimer, APP_ClashOfClansActivityTimer, Off
-		WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
-		CoordMode, Mouse, Screen
-		MouseGetPos, LOC_MouseX, LOC_MouseY
-		MouseClick, Left, LOC_X + LOC_Width - 10, LOC_Y + LOC_Height - 10
-		MouseMove, LOC_MouseX, LOC_MouseY, 0
-		Sleep, 500
-		Process, Close, HD-Service.exe
-		Process, Close, HD-Network.exe
-		Process, Close, HD-BlockDevice.exe
-		Process, Close, HD-SharedFolder.exe
-		Process, Close, HD-UpdaterService.exe
-		Process, Close, HD-LogRotatorService.exe
-		Process, Close, HD-Frontend.exe
-		Process, Close, HD-Agent.exe
-		Loop, 5 { ; GUI_ClashOfClansActivity*
+	; Nox :
+	If (LOC_WindowTitle == "Nox App Player" 
+		&& LOC_WindowClass == "Qt5QWindowIcon") {
+		SetTimer, APP_AndroidActivityTimer, Off
+		Loop, 5 { ; GUI_AndroidActivity*
 			LOC_GuiID := 51 + A_Index
 			Gui, %LOC_GuiID%:Destroy
+		}
+		SendInput, !{F4}
+		WinWait, Dialog ahk_class Qt5QWindowIcon, , 3
+		If (!ErrorLevel) {
+			WinActivate
+			SendInput, {Enter}
 		}
 		AHK_HideToolTip()
 		, AUD_Beep()
@@ -3519,7 +3547,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 		WinClose
 		Return
 	}
-	
+
 
 	; Games :
 	;;;;;;;;;
@@ -3625,6 +3653,13 @@ WIN_BoringPopUpsPeriodicTimer() {
 		}
 	}
 
+	Static STA_DiepIoCount := 0
+	If (WIN_IfWinActive(STA_DiepIoCount, , PRM_WindowTitle := "diep.io ahk_class MozillaWindowClass", PRM_WindowText := "", , PRM_SecondsWaitingAfterSuccess := 10)) {
+		SendInput, ^{F4}
+		Return
+	}
+
+
 	; Image :
 	;;;;;;;;;
 	Static STA_PhotoshopCount := 0
@@ -3679,7 +3714,20 @@ WIN_BoringPopUpsPeriodicTimer() {
 			STA_DecoderSuspension := 50
 		}
 	}
-	
+	Static STA_MediaMonkeyAutoPlayListCriteriasCount := 0
+	If (WIN_IfWinExist(STA_MediaMonkeyAutoPlayListCriteriasCount, PRM_ParentTitle := "MediaMonkey ahk_class TFMainWindow", PRM_WindowTitle := "Crit√®re de recherche ahk_class TFQueryCondition", , PRM_SecondsWaitingForParent := 10, PRM_SecondsWaitingAfterSuccess := 10)) {
+		WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
+		If (LOC_Height < 300) {
+			WinMove, , , LOC_X, LOC_Y, LOC_Width + 316, LOC_Height + 300
+			LOC_Controls := "TComboBoxPlus1|TComboBoxPlus2|TSimPanel1|TVirtualStringTree1"
+			Loop, Parse, LOC_Controls, |
+			{
+				ControlGetPos, LOC_ControlX, LOC_ControlY, LOC_ControlWidth, LOC_ControlHeight, %A_LoopField%
+				ControlMove, %A_LoopField%, LOC_ControlX, LOC_ControlY, LOC_ControlWidth + 300, LOC_ControlHeight + (A_LoopField == "TSimPanel1" || A_LoopField == "TVirtualStringTree1" ? 300 : 0)
+			 }
+		}
+		STA_MediaMonkeyAutoPlayListCriteriasCount := 10
+	}
 	Static STA_Mp3EditorCount := 0
 	If (WIN_IfWinActive(STA_Mp3EditorCount, PRM_ParentTitle := "Mp3 Editor Pro ahk_class TMainForm", PRM_WindowTitle := "Mp3 Editor Pro ahk_class #32770", PRM_WindowText := "Are you sure you want to exit", PRM_SecondsWaitingForParent := 4, PRM_SecondsWaitingAfterSuccess := 5)) {
 		SendInput, !o
@@ -3773,7 +3821,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_SchoolCalendarCount := 0
 	If (WIN_IfWinActive(STA_SchoolCalendarCount, PRM_ParentTitle := "Pale Moon ahk_class MozillaWindowClass", PRM_WindowTitle := "Cahier de textes ahk_class MozillaWindowClass", PRM_WindowText := "", PRM_SecondsWaitingForParent := 5, PRM_SecondsWaitingAfterSuccess := 15)) {
 		Sleep, 500
-		SendInput, !d{Tab 5}6{Enter}
+		SendInput, !d{Tab 6}5{Down}{Enter}
 		Return
 	}
 	
@@ -3786,6 +3834,12 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_ActiveXCount := 0
 	If (WIN_IfWinActive(STA_ActiveXCount, PRM_ParentTitle := "Internet Explorer ahk_class IEFrame", PRM_WindowTitle := "Windows Internet Explorer", PRM_WindowText := "Au moins un contrÙle ActiveX nía pas pu Ítre affichÈ", PRM_SecondsWaitingForParent := 5, PRM_SecondsWaitingAfterSuccess := 1)) {
 		WinClose
+		Return
+	}
+
+	Static STA_TimeCampCount := 0
+	If (WIN_IfWinActive(STA_TimeCampCount, , PRM_WindowTitle := "TimeCamp ahk_class wxWindowNR", , PRM_SecondsWaitingForParent := 30, PRM_SecondsWaitingAfterSuccess := 30)) {
+		WinSet, AlwaysOnTop, On
 		Return
 	}
 
@@ -3919,22 +3973,16 @@ WIN_BoringPopUpsPeriodicTimer() {
 	{
 		WinKill
 	}
+
+	Static STA_ProcessHackerCount := 0
+	If (WIN_IfWinActive(STA_ProcessHackerCount, PRM_ParentTitle := "Process Hacker [FUSION\BeLO]+ ahk_class ProcessHacker", PRM_WindowTitle := "Process Hacker ahk_class #32770", PRM_WindowText := "Terminate", PRM_SecondsWaitingForParent := 3, PRM_SecondsWaitingAfterSuccess := 0)) {
+		SendInput, {Left}{Enter}
+		Return
+	}
 	
 	IfWinExist, Envoi des mises ‡ jour facultatives - dysfonctionnement ahk_class #32770 
 	{
 		WinKill
-	}
-	
-	IfWinExist, Weather Watcher Live, Your selected weather station is currently unavailable
-	{
-		WinClose
-	}
-	
-	IfWinExist, Weather Watcher ahk_class #32770, Would you like to download it now
-	{
-		WinActivate
-		SendInput, n
-		; ControlSend, ahk_parent, n, Weather Watcher ahk_class #32770, Would you like to download it now
 	}
 	
 	IfWinExist, Assistant MatÈriel dÈtectÈ ahk_class #32770, SAMSUNG Android Composite ADB Interface

@@ -21,7 +21,7 @@
 :*:ms:: ; mais
 SendInput, {Left}ai{Right}
 Return
-:C*:MSA::{Left 2}{BackSpace 2}{Right 2} ; MSA (à partir de MaiSA)
+:*:msa::{Left 2}{BackSpace 2}{Right 2} ; msa (à partir de maisa)
 :*:cpd::
 SendInput, {Left 2}{BackSpace 2}e{Right}en{Right}ant ; cependant (à partir de coupd)
 Return
@@ -59,7 +59,16 @@ Return
 :C:Nya::{BackSpace}{Left 2}{BackSpace}Il n'{Right} {Right} ; Il n'y a
 :C:nyap::{BackSpace}{Left 4}il {Right}'{Right} {Right} {Right}as ; il n'y a pas
 :C:Nyap::{BackSpace}{Left 2}{BackSpace}Il n'{Right} {Right} {Right}as ; Il n'y a pas
-::qnya::{BackSpace}{Left 3}u'il {Right}'{Right} {Right} ; qu'il n'y a
+:*:qny:: ; qu'il n'y (à partir de quelqu'uny)
+SendInput, {Left 2}{BackSpace}{Left 3}{BackSpace 4}{Right 3}il {Right}'{Right}
+Return
+:*:qnya:: ; qu'il n'y a (à partir de qu'il n'ya)
+SendInput, {Left} {Right}
+Return
+:*:qnyap:: ; qu'il n'y a pas (à partir de qu'il n'y ap)
+SendInput, {Left} {Right}as
+Return
+:*:qnyapt::{Left}{BackSpace 2}oin{Right} ; qu'il n'y a point (à partir de qu'il n'y a past)
 :*:snya:: ; s'il n'y a
 SendInput, {Left 3}'il {Right}'{Right} {Right}
 Return
@@ -122,14 +131,15 @@ SendInput, {Left}{BackSpace 3}{Left}{BackSpace 3}{Right 2}
 Return
 :*:dlmo::{Left 3}ans {Right}a {Right}esure {Right}ù ; dans la mesure où
 :*:dc::{Left}on{Right} ; donc
-::cad::{BackSpace}{Left}{BackSpace}'est à {Right}ire ; c'est à dire
-:*:càd::{Left 2}'est {Right} {Right}ire ; c'est à dire
+::cad::{BackSpace}{Left}{BackSpace}'est-à-{Right}ire ; c'est-à-dire
+:*:càd::{Left 2}'est-{Right}-{Right}ire ; c'est-à-dire
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Subordonates :
 ;;;;;;;;;;;;;;;;
 
+::sil::{BackSpace}{Left 2}'{Right 2} ; s'il
 :*:tq:: ; tant que
 SendInput, {Left}ant {Right}ue
 Return
@@ -139,7 +149,10 @@ SendInput, {Left}ien {Right}ue
 Return
 :*:bq'::{Left}{BackSpace}{Right} ; bien qu' (à partir de tant que')
 :*:q ::{Left}ue{Right} ; que
-:*:q'::{Left}u{Right} ; qu'
+:*:q':: ; qu'
+SendInput, {Left}u{Right}
+Return
+:*:q'l::{Left}el{Right}e ; qu'elle (à partir de qu'l)
 :*:tdq:: ; tandis que
 SendInput, {Left 2}an{Right}is {Right}ue
 Return
@@ -240,8 +253,8 @@ Return
 SendInput, {Left 2}ar{Right}e {Right}ue
 Return
 :*:pcq'::{Left}{BackSpace}{Right} ; parce qu' (à partir de parce que')
-:*:ssq:: ; sans que
-SendInput, {Left 2}an{Right} {Right}ue
+:*:ssq:: ; sans que (à partir de sansq)
+SendInput, {Left} {Right}ue
 Return
 :*:ssq'::{Left}{BackSpace}{Right} ; sans qu' (à partir de sans que')
 
@@ -326,6 +339,9 @@ Return
 :C:gé::{BackSpace 3}j'ai ; j'ai
 :C:Gé::{BackSpace 3}J'ai ; J'ai
 ::jé::{BackSpace 2}'ai ; j'ai
+:C:gém::{BackSpace}{Left}{BackSpace 2}j'ai{Right]e ; j'aime
+:C:Gém::{BackSpace}{Left}{BackSpace 2}J'ai{Right]e ; J'aime
+::jém::{BackSpace}{Left}{BackSpace}'ai{Right}e ; j'aime
 :C*:gt::{Left}{BackSpace}j'é{Right}ais ; j'étais
 :C*:Gt::{Left}{BackSpace}J'é{Right}ais ; J'étais
 :C*:gv::{Left}{BackSpace}j'a{Right}ais ; j'avais
@@ -339,11 +355,18 @@ Return
 ::fre::{BackSpace}{Left 2}ai{Right 2} ; faire
 ::fé::{BackSpace 2}ait ; fait
 ::fo::{BackSpace 2}aut ; faut
-:C*:ft::{Left}on{Right} ; font
-:C*:Ft::{Left}on{Right} ; Font
+:C*:ft:: ; font
+SendInput, {Left}on{Right}
+Return
+:C*:Ft:: ; Font
+SendInput, {Left}on{Right}
+Return
+:C*:ftp::{Left 2}{BackSpace 2}{Right 2} ; ftp (à partir de fontp)
+:C*:Ftp::{Left 2}{BackSpace 2}{Right 2} ; Ftp (à partir de Fontp)
 ::st::{BackSpace}{Left}on{Right} ; sont
 :*:vx::{Left}eu{Right} ; veux
 ::ve::{BackSpace}ut ; veut
+::vo::{BackSpace 2}aut ; vaut
 :*:vd::{Left}en{Right} ; vend
 :*:vt::{Left}on{Right} ; vont
 :*:cmc:: ; commence (à partir de commec)
@@ -368,11 +391,13 @@ Return
 :*:pt::
 SendInput, {Left}eu{Right} ; peut
 Return
-:*:mq::{Left}an{Right} ; manq
+:*:mq::{Left}an{Right}u ; manqu
 :C*:djn::{Left}{BackSpace}eu{Right} ; déjeun (à partir de déjàn)
 :C*:Djn::{Left}{BackSpace}eu{Right} ; Déjeun (à partir de Déjàn)
 :*:jspr::{Left 3}'e{Right 2}è{Right}e ; j'espère
 :*:spr::{Left 3}e{Right 2}è{Right}e ; espère
+:?*:parapl:: ; parapluie
+Return
 :?*:apl::{Left}pe{Right} ; appel
 :*:pvr::{Left 2}ou{Right}oi{Right} ; pouvoir
 :*:pvoir::{Left 4}ou{Right 4} ; pouvoir
@@ -551,7 +576,12 @@ SendInput, {Left} {Right}e
 Return
 :*:vàvd'::{Left}{BackSpace}Right} ; vis-à-vis de (à partir de vis-à-vis de')
 :*:sf::{Left}au{Right} ; sauf
-:*:ss::{Left}an{Right} ; sans
+:*:ss:: ; sans
+SendInput, {Left}an{Right}
+Return
+:*:ssd::{BackSpace 5}SSD ; SSD (à partir de sansd)
+:*:ssh::{Left 2}{BackSpace 2}{Right 2} ; ssh (à partir de sansh)
+:*:sso::{Left 2}{BackSpace 2}{Right 2} ; sso (à partir de sanso)
 ::s_::{BackSpace 2}ur ; sur
 ::_s::{BackSpace}{Left}{BackSpace}{Right}ous ; sous
 :*:dess:: ; dessous
@@ -577,6 +607,7 @@ Return
 SendInput, {Left}al{Right}ré ; malgré
 Return
 :*:qt::{Left}uan{Right} ; quant
+:*:lx::{Left}ieu{Right} ; lieux
 :*:ald ::{Left 3}u {Right}ieu {Right}e{Right} ; au lieu de
 :*:ald'::{Left 3}u {Right}ieu {Right 2} ; au lieu d'
 
@@ -610,7 +641,13 @@ Return
 :*:dt::{Left}on{Right} ; dont
 :?*:qa::{Left}u{Right} ; qua
 :?*:qe::{Left}u{Right} ; que
-:?*:qi::{Left}u{Right} ; qui
+:?*:qé::{Left}u{Right} ; qué
+:?*:qè::{Left}u{Right} ; què
+:?*:qê::{Left}u{Right} ; quê
+:?*:qi:: ; qui
+SendInput, {Left}u{Right}
+Return
+:*:qil::{Left 2}'{Right 2} ; qu'il (à partir de quil)
 :?*:qo::{Left}u{Right} ; quo
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -643,19 +680,20 @@ Return
 :*:qq1:: ; quelqu'un (à partir de quelque1)
 SendInput, {BackSpace 2}'un
 Return
-:*:qqns::{Left 3}{BackSpace}e-{Right 3} ; quelques-uns (à partir de quelqu'uns)
-:*:qq&s::{Left 3}{BackSpace}e-{Right 3} ; quelques-uns (à partir de quelqu'uns)
-:*:qq1s::{Left 3}{BackSpace}e-{Right 3} ; quelques-uns (à partir de quelqu'uns)
+:*:qqns::{Left 3}{BackSpace}es-{Right 3} ; quelques-uns (à partir de quelqu'uns)
+:*:qq&s::{Left 3}{BackSpace}es-{Right 3} ; quelques-uns (à partir de quelqu'uns)
+:*:qq1s::{Left 3}{BackSpace}es-{Right 3} ; quelques-uns (à partir de quelqu'uns)
 :*:qq&es::{Left 4}{BackSpace}es-{Right 4} ; quelques-unes (à partir de quelqu'unes)
 :*:qq1es::{Left 4}{BackSpace}es-{Right 4} ; quelques-unes (à partir de quelqu'unes)
-:*:q1s::{Left 3}{BackSpace}e-{Right 3} ; quelques-uns (à partir de quelqu'uns)
-:*:quns::{Left 3}{BackSpace}e-{Right 3} ; quelques-uns (à partir de quelqu'uns)
-:*:qns::{Left 3}{BackSpace}e-{Right 3} ; quelques-uns (à partir de quelqu'uns)
-:*:qunes::{Left 4}{BackSpace}e-{Right 4} ; quelques-unes (à partir de quelqu'unes)
-:*:qnes::{Left 4}{BackSpace}e-{Right 4} ; quelques-unes (à partir de quelqu'unes)
+:*:q1s::{Left 3}{BackSpace}es-{Right 3} ; quelques-uns (à partir de quelqu'uns)
+:*:quns::{Left 3}{BackSpace}es-{Right 3} ; quelques-uns (à partir de quelqu'uns)
+:*:qns::{Left 3}{BackSpace}es-{Right 3} ; quelques-uns (à partir de quelqu'uns)
+:*:qunes::{Left 4}{BackSpace}es-{Right 4} ; quelques-unes (à partir de quelqu'unes)
+:*:qnes::{Left 4}{BackSpace}es-{Right 4} ; quelques-unes (à partir de quelqu'unes)
 :C*:+r:: ; plusieurs
 SendInput, {Left}{BackSpace}plusieu{Right}s
 Return
+:*:p+::{BackSpace}lusieurs ; plusieurs
 :C*:+rs::{BackSpace} ; plusieurs (à partir de plusieurss)
 :C*:+R:: ; Plusieurs
 SendInput, {BackSpace 2}Plusieurs
@@ -678,14 +716,36 @@ SendInput, {Left 3}{BackSpace 2}Plusi{Right 3}s
 Return
 :C*:+ieurs::{BackSpace} ; plusieurs (à partir de plusieurss)
 :C*:+Ieurs::{BackSpace} ; Plusieurs (à partir de Plusieurss)
+
+:*:dql:: ; duquel (à partir de dès quel)
+SendInput, {Left 4}{BackSpace 3}u{Right 4}
+Return
+:*:dqls::{Left 5}{BackSpace}es{Right 5} ; desquels (à partir de duquels)
+:*:dqles::{Left 6}{BackSpace}es{Right 4}l{Right 2} ; desquelles (à partir de duqueles)
+:*:lql:: ; lequel (à partir de lorsquel)
+SendInput, {Left 4}{BackSpace 3}e{Right 4}
+Return
+:*:lqls::{Left 5}s{Right 5} ; lesquels (à partir de lequels)
+:*:lqle:: ; laquelle (à partir de lequele)
+SendInput, {Left 5}{BackSpace}a{Right 4}l{Right}
+:*:lqles::{Left 7}{BackSpace}es{Right 7} ; lesquelles (à partir de laquelles)
+:*:aql:: ; auquel
+SendInput, {Left 2}u{Right}ue{Right}
+Return
+:*:aqls::{Left 5}x{Right 5} ; auxquels (à partir de auquels)
+:*:aqles::{Left 6}x{Right 4}l{Right 2} ; auxquelles (à partir de auqueles)
 :C*:qc:: ; quelque chose
 SendInput, {Left}uelque {Right}hose
 Return
 :C*:Qc:: ; Quelque chose
 SendInput, {Left}uelque {Right}hose
 Return
-:*:qlc::{Left 2}ue{Right 2}onque ; quelconque
-:*:qlq::{Left 2}ue{Right}con{Right}ue ; quelconque
+:*:ql:: ; quel
+SendInput, {Left}ue{Right}
+Return
+:*:qle::{Left}l{Right} ; quelle (à partir de quele)
+:*:qlc::onque ; quelconque (à partir de quelc)
+:*:qlq::{Left}con{Right}ue ; quelconque (à partir de quelq)
 :*:qic::onque ; quiconque (à partir de quic)
 :*:qp::{Left}uelque {Right}art ; quelque part
 :*:qf::{Left}uelque {Right}ois ; quelque fois
@@ -757,11 +817,11 @@ Return
 :*:htr::{Left}eu{Right} ; hauteur
 :*:horiz::ontal ; horizontal
 :*:cj::{Left}i-{Right}oint ; ci-joint
-:*:nveau::{Left 3}{BackSpace 2}{Left}{BackSpace 2}ou{Right 4} ; nouveau (à partir de n'avaieau)
+:?*:nveau::{Left 3}{BackSpace 2}{Left}{BackSpace 2}ou{Right 4} ; nouveau (à partir de n'avaieau)
 :*:nvo::{BackSpace 2}{Left 2}{BackSpace 2}ou{Right}e{Right}u ; nouveau (à partir de n'avaio)
-:*:nvl::{Left}{BackSpace 2}{Left}{BackSpace 2}ou{Right}e{Right} ; nouvel (à partir de n'avail)
+:?*:nvl::{Left}{BackSpace 2}{Left}{BackSpace 2}ou{Right}e{Right} ; nouvel (à partir de n'avail)
 :*:nvel::{Left 2}{BackSpace 2}{Left}{BackSpace 2}ou{Right 3} ; nouvel (à partir de n'avaiel)
-::st::{BackSpace}{Left}ain{Right} ; saint
+::st.::{BackSpace 2}{Left}ain{Right} ; saint
 ::sts::{BackSpace}{Left 2}ain{Right 2} ; saints
 ::ste::{BackSpace}{Left 2}ain{Right 2} ; sainte
 ::stes::{BackSpace}{Left 3}ain{Right 3} ; saintes
@@ -786,7 +846,10 @@ Return
 :*:chp::{Left}am{Right} ; champ
 :C*:Df::{Left}é{Right}aut ; Défaut
 :C*:df::{Left}é{Right}aut ; défaut
-:?*:nbr::{Left 2}om{Right 2} ; nombr
+:?*:nbr:: ; nombr
+SendInput, {Left 2}om{Right 2}
+Return
+:*:nbrx::{Left}eu{Right} ; nombreux (à partir de nombrx)
 :*:num:: ; numér
 SendInput, ér
 Return
@@ -818,6 +881,8 @@ Return
 :*:trpé::{Left}{BackSpace}{Right} ; troupé (à partir de troupeé)
 :C*:rf::{Left}é{Right}éren ; référen
 :C*:Rf::{Left}é{Right}éren ; Référen
+:*:rte::{Left 2}ou{Right 2} ; route
+:*:chb::{Left}am{Right} ; chamb
 ::étab::{BackSpace}lissement ; établissement
 ::étabs::{BackSpace}{Left}lissement{Right} ; établissements
 ::philo::{BackSpace}sophie ; philosophie
@@ -1087,6 +1152,8 @@ Return
 SendInput, obre
 Return
 :*:octo::{BackSpace 4} ; octo (à partir d'octobreo)
+:*:octa::{Left}{BackSpace 4}{Right} ; octa (à partir d'octobrea)
+:*:octe::{Left}{BackSpace 4}{Right} ; octe (à partir d'octobree)
 :*:octr::{Left}{BackSpace 4}{Right} ; octr (à partir d'octobrer)
 :*:nov:: ; novembre
 SendInput, embre
@@ -1105,11 +1172,21 @@ Return
 :*:mk:: ; Miuka
 SendInput, {BackSpace 2}Miuka
 Return
+:C*:wp:: ; WordPress
+SendInput, {BackSpace 2}WordPress
+Return
+:C*:WP:: ; WordPress
+SendInput, {Left}ord{Right}ress
+Return
+:C*:wp-::{Left}{BackSpace 9}wp{Right} ; wp- (à partir de WordPress-)
+:C*:WP-::{Left}{BackSpace 4}{Left}{BackSpace 3}{Right 2} ; WP- (à partir de WordPress-)
 :*:mkw::{BackSpace} WYBORSKA ; Miuka WYBORSKA (à partir de Miukaw)
 :*:bàb:: ; Bande à Balk
 SendInput, {BackSpace}{Left}{BackSpace}Bande {Right} Balk
 Return
 :C*:bb::{Left}Ül{Right}Ül ; bÜlbÜl
+:*:km.org::{Left 5}amea{Right}eahfilms{Right 4} ; kameameahfilms.org
+:*:kmf::{BackSpace 3}Kamea Meah films ; Kamea Meah films
 :*:bàbs::{Left}{BackSpace 3}{Left}{BackSpace}{Left}{BackSpace 5}{Right 3} ; BàBs (à partir de Bande à Balks)
 :C*:alodb:: ; À l'Ouest des Balkans
 SendInput, {BackSpace}{Left}{BackSpace}{Left}{BackSpace}À {Right}'Ouest {Right}es Balkans
@@ -6635,8 +6712,10 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, Edit Text ahk_class #32770 ; SnagIt
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class DSUI:PDFXCViewer ; PDF-XChange
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Sticky_Notes_Note_Window ; Windows 7 Sticky Notes
-	GroupAdd, HOT_HotstringsWindowsGroup, BlueStacks App Player ; BlueStacks
+	GroupAdd, HOT_HotstringsWindowsGroup, Nox App Player ahk_class Qt5QWindowIcon ; Nox
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class WordPadClass ; WordPad
+	GroupAdd, HOT_HotstringsWindowsGroup, Skype ahk_class tSkMainForm ; Skype
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class TConversationForm ; Skype
 	GroupAdd, HOT_IgnoringWindows, ahk_class Progman
 	GroupAdd, HOT_IgnoringWindows, ahk_class Shell_TrayWnd
 	GroupAdd, HOT_IgnoringWindows, ahk_class VistaSwitcher_SwitcherWnd

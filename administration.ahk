@@ -947,7 +947,11 @@ ADM_WindowSpy(PRM_Show = false, PRM_ListViewToActivate = false) {
 		|| STA_ColorGuiY != LOC_GuiY + LOC_ColoredZoneY + 1) {
 		STA_ColorGuiX := LOC_GuiX + LOC_ColoredZoneX + 1
 		, STA_ColorGuiY := LOC_GuiY + LOC_ColoredZoneY + 1
-		Gui, 31:Show, % "X" . STA_ColorGuiX . " Y" . STA_ColorGuiY . " NA", GUI_WindowSpyHoveredColor
+		Try {
+			Gui, 31:Show, % "X" . STA_ColorGuiX . " Y" . STA_ColorGuiY . " NA", GUI_WindowSpyHoveredColor
+		} Catch LOC_Exception {
+			AHK_Catch(LOC_Exception, "ADM_WindowSpy")
+		}
 	}
 
 	WinExist("ahk_id " . LOC_WindowID)
@@ -1828,7 +1832,7 @@ ADM_InitMemo() {
 		 
 		_Hotstrings_ : { Capslock }`t   { A(nt) | (a)B(le) | E(nce) | (a)G(e) | (c)H(ie) | J : <gie> | (e)L(le) | (is)M(e) | N(aison) | (ti)O(n) | (i)Q(ue) | (eu)R | (e)S(se) | (emen)T | Y : <aille> | Z : <euse> }
 		_Login_ :         { Win + Enter }`t[ Ctrl ] : <Windows Login> | [ Ctrl + Shift ] : <Windows domain Login>
-		_Bank_ :          { Win + B }`t    [ Shift ] \: CB\
+		_Bank_ :          { Win + B }`t    [ Alt ] \: Pro\`t    [ Shift ] \: CB\
 		_Case_ :           { Win + F8 }`t  [ Shift : \To uppercase\ | Ctrl : \Sentence first letter\ | Ctrl + Shift : \Words first letter\ ]`t[ Alt ] \: Invert\
 		 
 		_Clipboard_ :    { Ctrl } { C | X | V }`t    [ Alt ] \: To alternate buffer\`t[ Shift ] \: Plain text mode\`t[ { Shift } { Insert <or> Delete } ] \: Append mode\
