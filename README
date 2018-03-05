@@ -4,7 +4,7 @@ To use it, you must first install AutoHotkey that you can find at http://www.aut
 You must also configure the file JuggleKeys.ini, but keep in mind that the default configuration will already work properly.
 Just launch 'JuggleKeys.ahk', and you'll see the application menu icon in the systray.
 
-You'll find more information about JuggleKeys on https://www.jugglemaster.fr/computing/jugglekeys
+You'll find more information about JuggleKeys on http://www.jugglemaster.fr/computing/jugglekeys
 
 Enjoy !
 
