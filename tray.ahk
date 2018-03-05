@@ -134,7 +134,7 @@ TRY_InitMenus() {
 	Menu, Adverbs, Add, bcp`tbeaucoup, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, tàf`ttout à fait, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, tlm`ttellement, TRY_TrayMenuHotstring
-	Menu, Adverbs, Add, b`tbien, TRY_TrayMenuHotstring
+	Menu, Adverbs, Add, b&`tbien, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, mx`tmieux, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, deds`tdedans, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, deh`tdehors, TRY_TrayMenuHotstring
@@ -154,6 +154,7 @@ TRY_InitMenus() {
 	Menu, Adverbs, Add, tjrs`ttoujours , TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, tdm`ttout de même , TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, p`tpas, TRY_TrayMenuHotstring
+	Menu, Adverbs, Add, hl`thélas, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add, jms`tjamais, TRY_TrayMenuHotstring
 	Menu, Adverbs, Add
 	Menu, Adverbs, Add, h`thein, TRY_TrayMenuHotstring
@@ -229,7 +230,7 @@ TRY_InitMenus() {
 	; Some :
 	;;;;;;;;
 
-	Menu, Some, Add, r`trien, TRY_TrayMenuHotstring
+	Menu, Some, Add, r&`trien, TRY_TrayMenuHotstring
 	Menu, Some, Add, ca`tça, TRY_TrayMenuHotstring
 	Menu, Some, Add, clc`tcelui-ci, TRY_TrayMenuHotstring
 	Menu, Some, Add, qq`tquelque, TRY_TrayMenuHotstring
@@ -806,9 +807,6 @@ TRY_InitMenus() {
 	} Else {
 		TRY_AddMenuItem("Applications", "           Win +           E`t&Explorer", "APP_DOpus", "explorer.exe")
 	}
-	If (APP_DirOrLivePath) {
-		TRY_AddMenuItem("Applications", "           Win +           G`t&Die Or Live", "APP_DieOrLive", APP_DieOrLivePath)
-	}
 	If (APP_FirefoxPath) {
 		TRY_AddMenuItem("Applications", "           Win +           I`t&Firefox", "APP_TrayMenuFirefox", APP_FirefoxPath)
 	}
@@ -872,7 +870,6 @@ TRY_InitMenus() {
 	If (APP_AutoScriptWriterPath) {
 		TRY_AddMenuItem("Administration", "Ctrl + Win + Shift + R`tRe&corder", "ADM_Recorder", APP_AutoScriptWriterPath)
 	}
-	TRY_AddMenuItem("Administration", "Ctrl + Win + Shift + H`t&Hotstring", "HOT_NewHotstring", A_AhkPath)
 	TRY_AddMenuItem("Administration")
 	If (APP_SciTEPath) {
 		TRY_AddMenuItem("Administration", "Ctrl + Win + Shift + E`t&Edit", "ADM_Edit", APP_SciTEPath, , APP_SciTEPath)
@@ -895,7 +892,6 @@ TRY_InitMenus() {
 	;;;;;;;;;;;
 	SysGet, AHK_MouseButtonNumber, 43
 	TRY_AddMenuItem("Options", "Ctrl + Win + Shift + F`tX-Mouse &Focus", "WIN_ToggleFocusFollowsMouse")
-	TRY_AddMenuItem("Options", "Ctrl + Win + Shift + Y`tTransparenc&y", "WIN_ToggleAutomaticTransparency")
 	TRY_AddMenuItem("Options", "Ctrl + Win + Shift + Z`tWallpaper &Rotation", "SCR_ToggleWallpaperRotation")
 	If (AHK_MouseButtonNumber > 0) {
 		TRY_AddMenuItem("Options")
@@ -1068,7 +1064,6 @@ TRY_UpdateMenus() {
 	Global
 	Local PRM_Checked
 	TRY_SetCheckIcon("Options", "Ctrl + Win + Shift + F`tX-Mouse &Focus", PRM_Checked := WIN_FocusFollowsMouseEnabled)
-	TRY_SetCheckIcon("Options", "Ctrl + Win + Shift + Y`tTransparenc&y", PRM_Checked := WIN_TransparencyEnabled)
 	TRY_SetCheckIcon("Options", "Ctrl + Win + Shift + Z`tWallpaper &Rotation", PRM_Checked := SCR_WallpaperRotationEnabled)
 	If (AHK_MouseButtonNumber >= 1) {
 		TRY_SetCheckIcon("Options", "Ctrl + Win + Shift + 0`tMouse &Traces", PRM_Checked := SCR_MouseTracesEnabled)
@@ -1151,9 +1146,9 @@ Return
 
 TRY_Hotstring() {
 	StringGetPos, LOC_Hotstring, A_ThisMenuItem, `t
-	LOC_Hotstring := SubStr(A_ThisMenuItem, LOC_Hotstring + 4)
+	LOC_Hotstring := SubStr(A_ThisMenuItem, LOC_Hotstring + 2)
 	, WIN_FocusLastWindow()
-	AHK_SendRaw(LOC_Hotstring)
+	TXT_SendRaw(LOC_Hotstring)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1196,16 +1191,16 @@ Menu, Options, Show
 Return
 
 TRY_ToggleTrayIcon() {
-	Global ZZZ_TrayIconHidden, ZZZ_CheckTrayIconStateTimer
+	Global ZZZ_TrayIconHidden, ZZZ_CheckTrayIconStatePeriodicTimer
 	ZZZ_TrayIconHidden := !ZZZ_TrayIconHidden
 	If (ZZZ_TrayIconHidden) {
 		TRY_ShowTrayTip("", 2)
 		SetTimer, TRY_HideTrayTimer, -3000
 	} Else {
 		Menu, Tray, Icon
-		SetTimer, TRY_CheckTrayIconStateTimer, Off
+		SetTimer, TRY_CheckTrayIconStatePeriodicTimer, Off
 		TRY_SetHotstringsTrayIcon(PRM_Tooltip := false)
-		SetTimer, TRY_CheckTrayIconStateTimer, %ZZZ_CheckTrayIconStateTimer%
+		SetTimer, TRY_CheckTrayIconStatePeriodicTimer, %ZZZ_CheckTrayIconStateTimer%
 		TRY_ShowTrayTip("Tray icon recovered`nCtrl + Win + Shift + Q to hide it")
 	}
 }
@@ -1218,7 +1213,7 @@ Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-TRY_CheckTrayIconStateTimer:
+TRY_CheckTrayIconStatePeriodicTimer:
 TRY_SetHotstringsTrayIcon()
 Return
 
@@ -1229,14 +1224,6 @@ TRY_SetHotstringsTrayIcon(PRM_Tooltip = true) {
 	Global ZZZ_TrayIconHidden, ZZZ_InactiveTrayIcon, ZZZ_NoHotstringsTrayIcon, ZZZ_ActiveTrayIcon
 	Static STA_ShellNotifyIconFunction := AHK_GetFunction("shell32", "Shell_NotifyIcon"), STA_PreviousTrayState := -1 ; -1 : not defined / 0 : disabled / +1 : enabled / +2 : enabled + hotstrings
 
-	; Insert Lync conversations into hotstringed windows :
-	If (!WinActive("ahk_group HOT_HotstringsWindowsGroup")) {
-		WinGetClass, LOC_ActiveWindowClass, A
-		If (SubStr(LOC_ActiveWindowClass, 1, 37) == "HwndWrapper[TabbedConversations.exe;;") {
-			GroupAdd, HOT_HotstringsWindowsGroup, ahk_class %LOC_ActiveWindowClass%
-		}
-	}
-	
 	LOC_CurrentTrayState := (ZZZ_TrayIconHidden
 		? -1
 		: (A_IsSuspended || WinActive("ahk_group WIN_SuspendingWindowsGroup")

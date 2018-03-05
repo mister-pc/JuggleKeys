@@ -31,11 +31,29 @@ TXT_GetSelectedText() {
 TXT_PasteToSelection(PRM_Text) {
 	StringLen, LOC_Length, PRM_Text
 	SetKeyDelay, -1, -1
-	AHK_SendRaw(PRM_Text)
+	TXT_SendRaw(PRM_Text)
 	If (LOC_Length > 0) {
 		SendInput, {Left %LOC_Length%}{Shift Down}{Right %LOC_Length%}{Shift Up}
 	}
 	AutoTrim, On
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Send straight raw text :
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+TXT_SendRaw(PRM_Text = "") {
+
+	If (PRM_Text) {
+		LOC_ClipBoard := ClipBoardAll
+		TXT_SetClipBoard(PRM_Text)
+		SendInput, ^v
+		Sleep, 200
+		TXT_SetClipBoard(LOC_ClipBoard)
+	}
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -405,12 +423,14 @@ Return
 TXT_FormatPunctuation() {
 	If ((LOC_Selection := TXT_GetSelectedText()) != "") {
 		Try {
-			LOC_Selection := RegExReplace(LOC_Selection, "[  \t_]+", " ") ; Reduces multiple spaces and tabulations in one space
-			LOC_Selection := RegExReplace(LOC_Selection, "[\r\n]+", "`r`n") ; Reduces multiple carriage-returns in just one
-			LOC_Selection := RegExReplace(LOC_Selection, "([^ !?¿¡:;\r])([:;!?¿¡])", "$1 $2") ; Appends space before question mark, ...
-			LOC_Selection := RegExReplace(LOC_Selection, "([,:;.!?¿¡])([^ \r:.!?¿¡])", "$1 $2") ; Appends space after comma, dot, semi-colon, ...
-			LOC_Selection := RegExReplace(LOC_Selection, "^\r\n") ; Deletes starting carriage-return
-			LOC_Selection := RegExReplace(LOC_Selection, " $") ; Deletes last space
+			LOC_Selection := RegExReplace(LOC_Selection, "[  \t_]+", " ") ; Reduce multiple spaces and tabulations in one space
+			LOC_Selection := RegExReplace(LOC_Selection, "[\r\n]+", "`r`n") ; Reduce multiple carriage-returns in just one
+			LOC_Selection := RegExReplace(LOC_Selection, "^\r\n") ; Delete starting carriage-return
+			LOC_Selection := RegExReplace(LOC_Selection, "[ ]([.,])", "$1") ; Delete spaces before comma & dot
+			LOC_Selection := RegExReplace(LOC_Selection, "([BbCcDdFfGgJjKkLlMmNnPpRrSsTtVvWwXxZz]) ?' ?([AaÀàÄäÂâÆæEeÉéÈèÊêËëIiÎîÏïOoÔôÖöŒœUuÙùÛûÜüYyŸÿ])", "$1'$2") ; Delete spaces around apostrophe
+			LOC_Selection := RegExReplace(LOC_Selection, "[ ]$") ; Delete last space
+			LOC_Selection := RegExReplace(LOC_Selection, "([^ !?¿¡:;»])([:;!?¿¡»])", "$1 $2") ; Append space before question mark, ...
+			LOC_Selection := RegExReplace(LOC_Selection, "([,:;.!?¿¡«])([^ :.!?¿¡«])", "$1 $2") ; Append space after comma, dot, semi-colon, ...
 		} Catch LOC_Exception {
 			AHK_Catch(LOC_Exception, "TXT_FormatPunctuation")
 		}
@@ -594,9 +614,14 @@ Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#IfWinNotActive, MediaMonkey ahk_class TFMainWindow
+#IfWinActive, MediaMonkey ahk_class TFMainWindow
+~^+c::
+Return
+#IfWinActive, Pale Moon ahk_class MozillaWindowClass
+~^+c::
+Return
+#IfWinActive
 ^+c::
-#IfWinNotActive
 ^Insert::
 ^Delete::
 ^+Insert::
@@ -1261,14 +1286,14 @@ TXT_SaveAlternateClipBoard() {
 	}
 	STA_Writing := true
 	Try {
-		If (FileExist(A_ScriptDir . "\clip\" . AHK_ScriptName . ".clip")) {
-			FileDelete, %A_ScriptDir%\clip\%AHK_ScriptName%.clip
+		If (FileExist(A_ScriptDir . "\clip\alternate.clip")) {
+			FileDelete, %A_ScriptDir%\clip\alternate.clip
 		}
 	} Catch LOC_Exception {
 		AHK_Catch(LOC_Exception, "TXT_SaveAlternateClipBoard")
 	}
 	Try {
-		FileAppend, %ClipboardAll%, %A_ScriptDir%\clip\%AHK_ScriptName%.clip
+		FileAppend, %ClipboardAll%, %A_ScriptDir%\clip\alternate.clip
 	} Catch LOC_Exception {
 		AHK_Catch(LOC_Exception, "TXT_SaveAlternateClipBoard")
 	}
@@ -1616,40 +1641,235 @@ TXT_SetHistoryToClipBoard(PRM_GuiEvent = "DoubleClick") {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-TXT_GetFormattedNumber(PRM_Number) {
-	LOC_Number := "" . PRM_Number
-	, LOC_FormattedNumber := ""
-	While ((LOC_Length := StrLen(LOC_Number)) > 3) {
-		LOC_FormattedNumber := " " . SubStr(LOC_Number, -2, 3) . LOC_FormattedNumber
-		, LOC_Number := SubStr(LOC_Number, 1, LOC_Length - 3)
+; Current / previous / next word { { Control | Alt | Control + Alt } [ + Shift ] + { Arrows | BackSpace } } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;^Left:: ; Move to previous word OK
+;KBD_WordControl(false, 0)
+;Return
+
+;~ ^+Left:: ; Select previous word
+;~ KBD_ControlShiftArrow(false)
+;~ Return
+
+;^Right:: ; Move to next word KO
+;KBD_WordControl(true)
+;Return
+
+;~ ^+Right:: ; Select next word
+;~ KBD_ControlShiftArrow(true)
+;~ Return
+
+;^!Left:: ; Select current word from right to left KO
+;KBD_SelectCurrentWord(false)
+;Return
+
+;^!Right:: ; Select current word from left to right KO
+;KBD_SelectCurrentWord(true)
+;Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+^BackSpace:: ; Erase previous word OK
+KBD_WordControl(false, 2)
+Return
+KBD_TrayMenuDeletePreviousWord:
+If (WIN_FocusLastWindow()) {
+	KBD_WordControl(false, 2)
+}
+Return
+
+^+BackSpace:: ; Cut previous word OK
+KBD_WordControl(false, 3)
+Return
+KBD_TrayMenuCutPreviousWord:
+If (WIN_FocusLastWindow()) {
+	KBD_WordControl(false, 3)
+}
+Return
+
+!BackSpace:: ; Erase next word OK
+KBD_WordControl(true, 2)
+Return
+KBD_TrayMenuDeleteNextWord:
+If (WIN_FocusLastWindow()) {
+	KBD_WordControl(true, 2)
+}
+Return
+
+!+BackSpace:: ; Cut next word KO
+KBD_WordControl(true, 3)
+Return
+KBD_TrayMenuCutNextWord:
+If (WIN_FocusLastWindow()) {
+	KBD_WordControl(true, 3)
+}
+Return
+
+^!BackSpace:: ; Erase current word
+KBD_WordControl(true, 2)
+, KBD_WordControl(false, 2)
+Return
+KBD_TrayMenuDeleteCurrentWord:
+If (WIN_FocusLastWindow()) {
+	KBD_WordControl(true, 2)
+	, KBD_WordControl(false, 2)
+}
+Return
+
+^!+BackSpace:: ; Cut current word
+KBD_WordControl(false, 3, KBD_WordControl(true, 2))
+Return
+KBD_TrayMenuCutCurrentWord:
+If (WIN_FocusLastWindow()) {
+	KBD_WordControl(false, 3, KBD_WordControl(true, 2))
+}
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;~ KBD_ControlShiftArrow(PRM_Direction = true) {
+	;~ TXT_OnClipboardChange(PRM_Enabled := -1)
+	;~ , LOC_Selection := TXT_GetSelectedText()
+	;~ , TXT_OnClipboardChange(PRM_Enabled := 1)
+	;~ If (LOC_Selection) {
+		;~ SendInput, % "^+" . (PRM_Direction ? "Right" : "Left")
+	;~ } Else {
+		;~ KBD_WordControl(PRM_Direction, 1)
+	;~ }
+;~ }
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+KBD_SelectCurrentWord(PRM_Direction) {
+	LOC_FinalLength := KBD_WordControl(PRM_Direction, -1) + KBD_WordControl(!PRM_Direction, 0)
+	If (LOC_FinalLength > 0) {
+		SendInput, % "+{" . (PRM_Direction ? "Right" : "Left") . (LOC_FinalLength > 1 ? " " . LOC_FinalLength : "") . "}"
 	}
-	LOC_FormattedNumber := LOC_Number . LOC_FormattedNumber
-	Return, LOC_FormattedNumber
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+KBD_WordControl(PRM_Direction, PRM_Operation = 0, PRM_AppendedText = "") {
+	
+	; PRM_Direction == false => Left
+	; PRM_Direction == true  => Right
+	; PRM_Operation == -1 => no move (return length)
+	; PRM_Operation == 0  => move to text (return length)
+	; PRM_Operation == 1  => select text (return text)
+	; PRM_Operation == 2  => erase text (return text)
+	; PRM_Operation == 3  => cut text (return text)
+	; PRM_AppendedText    => Text to append to the result
+	Static STA_NoType := 0, STA_LowerType := 1, STA_UpperType := 2, STA_NumericType := 3, STA_SpaceType := 4, STA_PunctuationType := 5, STA_ApostropheType := 6 ; must be the same as in KBD_GetCharType()
+	
+; MsgBox, % "^{Alt Up}" . (GetKeyState("Shift") ? "" : "+") . "{" . (PRM_Direction ? "Right" : "Left") . "}"
+;	SendInput, % "^{Alt Up}" . (GetKeyState("Shift") ? "" : "+") . "{" . (PRM_Direction ? "Right" : "Left") . "}"
+	SendInput, % "^+{" . (PRM_Direction ? "Right" : "Left") . "}"
+	TXT_OnClipboardChange(PRM_Enabled := -1)
+	, LOC_Selection := TXT_GetSelectedText()
+	, TXT_OnClipboardChange(PRM_Enabled := 1)
+;Return
+	If (LOC_Selection == "") {
+;MsgBox, Out !
+		Return, % (PRM_Operation == -1 || PRM_Operation == 0 ? 0 : "")
+	}
+;MsgBox, Ici.
+	LOC_SelectionLength := StrLen(LOC_Selection)
+	, LOC_FinalLength := LOC_CharType := 0
+	Loop, %LOC_SelectionLength% {
+		LOC_Char := SubStr(LOC_Selection, PRM_Direction ? A_Index : LOC_SelectionLength - A_Index + 1, 1)
+		, LOC_CharType := KBD_GetCharType(LOC_Char)
+		If (A_Index == 1) { ; first char
+			LOC_MainType := LOC_CharType
+		} Else If (A_Index == 2 && LOC_MainType == STA_SpaceType) { ; single space to erase, then word
+			LOC_MainType := LOC_CharType
+		} Else If (PRM_Direction && LOC_MainType == STA_UpperType && LOC_CharType == STA_LowerType) { ; lowercase word starting with an uppercase
+			LOC_MainType := STA_LowerType
+		} Else If (!PRM_Direction && LOC_MainType == STA_LowerType && LOC_CharType == STA_UpperType) { ; lowercase word starting with an uppercase
+			LOC_FinalLength++
+			Break
+		} Else If (PRM_Direction && (LOC_MainType == STA_UpperType || LOC_MainType == STA_LowerType) && LOC_CharType == STA_ApostropheType) { ; apostrophe foolowing alpha
+			LOC_FinalLength++
+			Break
+		} Else If (A_Index == 2 && !PRM_Direction && LOC_MainType == STA_ApostropheType && (LOC_CharType == STA_UpperType || LOC_MainType == STA_LowerType)) { ; apostrophe preceeding alpha
+			LOC_MainType := LOC_CharType
+		} Else If (A_Index == LOC_SelectionLength
+			&& LOC_CharType == STA_SpaceType
+			&& LOC_MainType != STA_SpaceType
+			&& (!PRM_Direction || PRM_AppendedText == "")) { ; unique beginning/ending space to delete
+			LOC_FinalLength == LOC_SelectionLength
+			Break
+		} Else If (LOC_CharType != LOC_MainType) {
+			Break
+		}
+		LOC_FinalLength++
+	}
+	
+;MsgBox, Là : %LOC_FinalLength% < %LOC_SelectionLength% ?
+	; No move operation => set cursor pos to original :
+	If (PRM_Operation == -1) {
+		SendInput, % (PRM_Direction ? "{Left}" : "{Right}")
+		Return, LOC_FinalLength
+	}
+
+	; Reduce selection to its length :
+	If (LOC_FinalLength < LOC_SelectionLength) {
+		SendInput, % (PRM_Operation > 0 ? "+" : "") . "{" . (PRM_Direction ? "Left" : "Right") . " " . LOC_SelectionLength - LOC_FinalLength . "}"
+	} Else If (PRM_Operation == 0) {
+		SendInput, % (PRM_Direction ? "{Left}{Right}" : "{Right}{Left}") ; just to deselect text
+	}
+	
+	If (PRM_Operation == 0) {
+		Return, LOC_FinalLength
+	}
+
+	LOC_Selection := SubStr(LOC_Selection, PRM_Direction ? 1 : LOC_SelectionLength - LOC_FinalLength + 1, LOC_FinalLength) . PRM_AppendedText
+	If (PRM_Operation == 2
+		|| PRM_Operation == 3) { ; erase or cut
+;MsgBox, Coupez !
+		SendInput, {Delete}
+	}
+	If (PRM_Operation == 3) {
+		Clipboard := LOC_Selection
+	}
+	Return, LOC_Selection
+}
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-TXT_GetLineCount(PRM_Text) {
-	
-	StringReplace, LOC_Text, PRM_Text, ž, , All
-	StringReplace, LOC_Text, PRM_Text, `r`n, ž, All
-	StringReplace, LOC_Text, LOC_Text, `n`r, ž, All
-	StringReplace, LOC_Text, LOC_Text, `n, ž, All
-	StringReplace, LOC_Text, LOC_Text, `r, ž, All
-	LOC_Count := 1
-	Loop, Parse, LOC_Text
-	{
-		If (A_LoopField == "ž") {
-			LOC_Count++
+KBD_GetCharType(PRM_Char) {
+	Static STA_NoType := 0, STA_LowerType := 1, STA_UpperType := 2, STA_NumericType := 3, STA_SpaceType := 4, STA_PunctuationType := 5, STA_ApostropheType := 6 ; must be the same as in KBD_WordControl()
+	If (PRM_Char) {
+		If PRM_Char Is Lower
+		{
+			LOC_CharType := STA_LowerType
+		} Else If PRM_Char In á,à,â,ä,ã,å,æ,ç,é,è,ê,ë,í,ì,î,ï,ñ,ó,ò,ô,õ,ö,œ,š,ú,ù,û,ü,ý,ÿ,ž
+		{
+			LOC_CharType := STA_LowerType
+		} Else If PRM_Char Is Upper
+		{
+			LOC_CharType := STA_UpperType
+		} Else If PRM_Char In Á,À,Â,Ä,Ã,Å,Æ,Ç,É,È,Ê,Ë,Í,Ì,Î,Ï,Ñ,Ó,Ò,Ô,Õ,Ö,Œ,Š,Ú,Ù,Û,Ü,Ý,Ÿ,Ž
+		{
+			LOC_CharType := STA_UpperType
+		} Else If PRM_Char Is Digit
+		{
+			LOC_CharType := STA_NumericType
+		} Else If PRM_Char In %A_Space%,`t,`r,`n,`v,`f,-,–,—,_
+		{
+			LOC_CharType := STA_SpaceType
+		} Else If PRM_Char In !,",(,),`,,.,/,:,;,<,=,>,?,[,\,],^,{,|,},‚,„,…,ˆ,‹,“,”,›,¡,¦,«,¶,¸,»,¿
+		{
+			LOC_CharType := STA_PunctuationType
+		} Else If PRM_Char In ',``,‘,’,´
+		{
+			LOC_CharType := STA_ApostropheType
+		} Else {
+			LOC_CharType := STA_NoType
 		}
-		LOC_LastChar := A_LoopField
+		Return, LOC_CharType
 	}
-	If (LOC_LastChar == "ž") {
-		LOC_Count--
-	}
-	Return, %LOC_Count%
+	Return, STA_NoType
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

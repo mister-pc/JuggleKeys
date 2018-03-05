@@ -93,7 +93,7 @@ APP_Run(PRM_ApplicationName, PRM_Process, PRM_Parameters = "", PRM_WorkingDirect
 				AHK_Debug("Run, """ . PRM_Process . """, " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
 			} Else {
 				Run, "%PRM_Process%" %PRM_Parameters%, %PRM_WorkingDirectory%, %PRM_Maximized% UseErrorLevel, LOC_WindowPID
-				; AHK_Debug("Run, """ . PRM_Process . """ " . PRM_Parameters . ", " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
+				AHK_Debug("Run, """ . PRM_Process . """ " . PRM_Parameters . ", " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
 			}
 			RunAs
 			TRY_ShowTrayTip(PRM_ApplicationName . (ErrorLevel ? " not" : "") . " launched")
@@ -538,20 +538,19 @@ APP_Explorer() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Die Or Live { Win + G } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Git { Win + G } :
+;;;;;;;;;;;;;;;;;;;
 
-APP_DieOrLive:
+APP_Git:
 #g::
-If (APP_DieOrLivePath) {
-	APP_Run("DieOrLive", APP_DieOrLivePath, , , false)
-} Else If (APP_GitHubPath) {
-	APP_Run("Git/Hub", APP_GitHubPath, , , false)
-} Else {
-	Hotkey, #g, Off
-	SendInput, #g
-}
+APP_Run("Git", APP_GitPath, , , , , false)
 Return
+
+#IfWinActive, ahk_class mintty
+RButton::
+SendInput, +{Insert}
+Return
+#IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -818,7 +817,7 @@ APP_FirefoxManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunch
 		} Else {
 			SendInput, ^e ; or ^k : Search bar focus
 		}
-		AHK_SendRaw(LOC_Selection)
+		TXT_SendRaw(LOC_Selection)
 		SendInPut, {Enter}
 	}
 }
@@ -827,6 +826,7 @@ APP_FirefoxManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunch
 
 ; Rename image name with Folder.jpg { Ctrl + F | Alt + F } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 #IfWinActive, Enregistrer l'image ahk_class #32770
 ^f::
 !f::
@@ -965,7 +965,7 @@ APP_IE(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedWarning = 
 		} Else {
 			SendInput, !d{Tab 2} ; Search bar focus
 		}
-		AHK_SendRaw(LOC_Selection)
+		TXT_SendRaw(LOC_Selection)
 		SendInput, {Enter}
 	}
 }
@@ -1102,6 +1102,7 @@ APP_KGS(PRM_Relaunch = false) {
 			If (LOC_MainWindowID) {
 				WinWait, KGS : Salles ahk_class SunAwtFrame, , 5
 				WinClose, ahk_id %LOC_MainWindowID%
+				TRY_ShowTrayTip("KGS main window closed")
 			}
 		}
 	}
@@ -1290,6 +1291,7 @@ APP_MediaMonkeyPlayPause(PRM_Launch = false, PRM_PostControl = false) {
 	If (PRM_PostControl) {
 		If (WinExist("MediaMonkey ahk_class #32770", "Access violation at address")) {
 			WinClose
+			TRY_ShowTrayTip("MediaMonkey access violation notification closed")
 			WinGet, LOC_ActiveWindowID, ID, A
 			WinActivate, ahk_id %STA_MediaMonkeyID%
 			ControlGetFocus, LOC_FocusedConstrol
@@ -1616,19 +1618,19 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Easy PHP { Win + P } :
-;;;;;;;;;;;;;;;;;;;;;;;;
-APP_EasyPHP:
-; #p::
+; XAMPP { Win + P } :
+;;;;;;;;;;;;;;;;;;;;;
+APP_XAMPP:
+#p::
 If (APP_ApachePath && APP_MySQLPath) {
-	APP_EasyPHP()
+	APP_XAMPP()
 } Else {
 	HotKey, #p, Off
 	SendInput, #p
 }
 Return
 
-APP_EasyPHP() {
+APP_XAMPP() {
 	Global APP_ApachePath, APP_MySQLPath
 	SplitPath, APP_ApachePath, LOC_ProcessName
 	Process, Exist, %LOC_ProcessName%
@@ -1639,7 +1641,7 @@ APP_EasyPHP() {
 	If (LOC_ApachePID && LOC_MySQLPID) {
 		Process, Close, %LOC_ApachePID%
 		Process, Close, %LOC_MySQLPID%
-		TRY_ShowTrayTip("EasyPHP stopped")
+		TRY_ShowTrayTip("Apache stopped")
 	} Else {
 		If (!LOC_ApachePID) {
 			Run, %APP_ApachePath%, , Hide UseErrorLevel
@@ -1647,22 +1649,9 @@ APP_EasyPHP() {
 		If (!LOC_MySQLPID) {
 			Run, %APP_MySQLPath%, , Hide UseErrorLevel
 		}
-		TRY_ShowTrayTip("EasyPHP launched")
+		TRY_ShowTrayTip("Apache launched")
 	}
 }
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Git Bash :
-;;;;;;;;;;;;
-
-#IfWinActive, ahk_class mintty
-RButton::
-SendInput, +{Insert}
-Return
-#IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1672,7 +1661,7 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 APP_PuTTY:
-#p::
+; #p::
 APP_Run("PuTTY", A_ProgramFiles . "\PuTTY Connection Manager\puttycm.exe")
 Return
 
@@ -1721,14 +1710,6 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, SQL Developer ahk_class SunAwtFrame
-MButton::
-If (WIN_GetTitleBarClickZone()) {
-	WinClose, A
-} Else {
-	PostMessage, 0x111, 136 ; SendInput, ^{F4}
-}
-Return
-
 F5::
 SendInput, ^r
 Return

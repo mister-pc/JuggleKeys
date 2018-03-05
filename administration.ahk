@@ -2,6 +2,401 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; AutoHotKey Memo { Win + F1 } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_InitMemo() {
+
+	Global AHK_ScriptName
+	AHK_Log("> ADM_InitMemo()")
+	Gui, 2:+AlwaysOnTop -Caption +Border -Resize +ToolWindow ; GUI_Memo
+	Gui, 2:Color, FFFFDF, 000000
+	
+	;  text  : red bold
+	; _text_ : underscored
+	; \text\ : italic normal black
+	; <text> : normal black
+	; [text] : italic bold red (inside option)
+	; (text) : normal gray
+	LOC_Text =
+	( LTrim
+		 
+		_Hotstrings_ : { Capslock    }     { A(nt) | (a)B(le) | E(nce) | (a)G(e) | (c)H(ie) | J : <gie> | (e)L(le) | (is)M(e) | N(aison) | (ti)O(n) | (i)Q(ue) | (eu)R | (e)S(se) | (emen)T | Y : <aille> | Z : <euse> }
+		_Login_      : { Win + Enter }     [ Ctrl  \: <No Enter> | Shift : <Windows Login> |  Ctrl + Shift \: <Windows domain Login> ]
+		_Bank_       : { Win + B     }     [ Alt   \: Pro\ | Shift ] \: CB\ ]
+		_Case_       : { Win + F8    }     [ Shift : \To uppercase\    | Ctrl : \Sentence first letter\ | Ctrl + Shift : \Words first letter\ ] [ Alt ] \: Invert\
+		 
+		_Clipboard_   : { Ctrl } { C | X | V }     [ Alt ] \: To alternate buffer\     [ Shift ] \: Plain text mode\     [ { Shift } { Insert <or> Delete } ] \: Append mode\
+		_Audio level_ : { Win  } { Up | Down }     [ Alt ] \: Wave volume\             [ Ctrl  ] \: Fine steps\          [ Shift ] \: Large steps\     _Audio on/off_ : { ScrollLock }
+		 
+		_Screen saver_ : { Ctrl +       Win + L   }     [ Shift ] \: Screen off\
+		_Lock Station_ : {              Win + L   }     [ Shift ] \: Force\
+		_Suspend_      : { Ctrl + Alt + Win + L   }     [ Shift ] \: Hibernate\
+		_Log off_      : { Ctrl +       Win + F12 }     [ Shift ] \: Force\
+		_Shutdown_     : {              Win + F12 }     [ Shift ] \: Force\     [ Alt ] \: Restart\
+		_BSOD_         : { Win + ScrollLock }
+		 
+		_Magnifier_       : { Ctrl + Alt + Win + PrintScreen | Ctrl + Shift + Wheel }
+		_Color selection_ : { Win + C }         { Ctrl : <Hexa mode> | Alt : <RGB mode> }     [ Shift ] \: Color chooser\
+		_Screenshot_      : { PrintScreen }     [ Win : \Active window\ | Ctrl : \Zone\ ]     [ Shift ] \: Include cursor\     [ Alt ] \: To file\     [ AltGr ] \: Text mode\
+		 
+		_Always on top_   : { Win + Click }`t_Transparency_ : { Win + Wheel }`t_Priority_ : { Ctrl + Win + Wheel }`t_Brightness_ : { Win + AltGr + Wheel }
+		_Roll | minimize_ : { RightClick + LeftClick }`t{ <On> TitleBar : <Roll> | "Elsewhere" : <Minimize> }`t_Alt-Tab switch_ : { RightClick + Wheel }
+		_9-square resize_ : { RightDrag }`t`t        [ Ctrl ] \: Force\`t[ Alt ] \: Propotionnally\`t[ Win ] \: Centering\`t[ Shift ] \: Large steps\
+		_Resize_          : { Win }`t`t`t     { PageUp : <Increase> | PageDown : <Decrease> | Enter : <Restore> }`t          [ Shift ] \: Maximize | Minimize\
+		_Resize_          : { Alt + NumPad ± }`t           [ Win ] \: Centering\`t     _Resize proportionnally_ : { Alt + Wheel }
+		 
+		_Close_     : { F4 | MiddleClick }`t{ Ctrl : <Close inner window> | Alt : <Close window> | Win : <Kill window> }
+		_Systray_   : { Win }`t{ End : <Minimize> | Home : <Restore> }
+		_Title bar_ : { MiddleClick }`t{ <On> Minimize : <Systray> | <On> Maximize : <All screens> [ Alt : \Next screen\ | Shift : \Full screens\ ]  | <On> Close : <Kill> | "Elsewhere" : <Close> } 
+		 
+		_Remove programs_     : { Ctrl + Win + Delete }     _Empty recycle bin_ : { Ctrl + Win + Shift + Delete }     _Rootkit Unhooker_ : { Win + Shift + Escape }
+		_System applications_ : { Ctrl + Win          }     { A(dministration) | D(isks) | E(xplorer) | H(ardware) [ Shift : \Rescan\ ] | I(E) | R(egistry) | S(tartup) | (e)V(ents) }
+		_User applications_   : { Win }     { C(alculator) | E (DirectoryOpus) | J(MP) | N(otes) | P(uTTY) | (S)Q(LDeveloper) <or> Q(uintessential) | T(hunderbird) | U(ltraEdit) }
+		                      { Win }     { BackSpace : <SnagIt> | Ctrl + BackSpace : <MP3 Editor> | Ctrl + Alt + BackSpace : <Photoshop> }
+		                      { Win }     { M(ediaMonkey) | W(MP) | I(nternet) | K(GS) | µ(Torrent) }
+		 
+		_%AHK_ScriptName% Options_ : { Ctrl + Win + Shift }`t{ (X-Mouse )F(ocus) | 1..5 : <Mouse button hook> | Q : <Tray Icon> }
+		_%AHK_ScriptName% Options_ : { Ctrl + Win + Shift }`t{ A(udio) | B(alloon messages) | T(ooltips) | (Transparenc)Y | Z(ap wallpaper) }
+		_%AHK_ScriptName% Tools_   :      { Ctrl + Win + Shift }`t{ H(otstring) | R(ecorder) | (Window)S(py) | X : <Winspector> }
+		_%AHK_ScriptName% Scripts_ :   { Ctrl + Win + Shift }`t{ E(dit) | D(ebug) | Escape : <Suspend> | F5 <or> Pause : <Reload> }
+		_Help_ :`t`t  { Win }`t`t            { F1 : <Memo> | Ctrl + F1 : <AHK help> [ Shift : \About\ ] | Ctrl + W(ebsite) }
+		 
+		_Other functionnalities_ : Personalized hotstrings            Longer keypress for F1 and Insert      Web search with selected text     NumLock always active
+		                           Hovering variable speed scroll     Multiple facilities in WMP             Improved consoles                 Non-modal windows
+		                           Time synchronization and chime     Automatic closing of boring popups     Automatic reload after script modification
+	)
+	LOC_NewLine := false
+	Loop, Parse, LOC_Text, `n
+	{
+		LOC_NewLine |= ADM_ParseMemoText(A_LoopField, LOC_NewLine)
+	}
+	AHK_Log("< ADM_InitMemo()")
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_Memo:
+ADM_Memo()
+Return
+
+#F1::
+ADM_Memo()
+ADM_HideMemo(true)
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_HideMemo:
+ADM_HideMemo()
+Return
+
+ADM_HideMemo(PRM_Reinit = false) {
+	Global ZZZ_HideMemoTimer
+	Static STA_HideAfterNoMoreKeyDown := true
+	If (PRM_Reinit) {
+		STA_HideAfterNoMoreKeyDown := true
+	}
+	If (GetKeyState("F1", "P")) {
+		STA_HideAfterNoMoreKeyDown := GetKeyState("LWin", "P") || GetKeyState("RWin", "P")
+		SetTimer, ADM_HideMemo, %ZZZ_HideMemoTimer%
+	} Else {
+		If (GetKeyState("LWin", "P") || GetKeyState("RWin", "P")) {
+			STA_HideAfterNoMoreKeyDown := true
+			SetTimer, ADM_HideMemo, %ZZZ_HideMemoTimer%
+		} Else {
+			If (STA_HideAfterNoMoreKeyDown) {
+				ADM_Memo(PRM_Visible := false)
+			}
+		}
+	}
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_Memo(PRM_Visible = true) {
+
+	Global AHK_ScriptInfo, SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight
+	Static STA_Visible := false, STA_Init := false, STA_InitRunning := false
+
+	If (!STA_Init) {
+		If (STA_InitRunning) {
+			Return
+		}
+		STA_InitRunning := true
+		, ADM_InitMemo()
+		, STA_Init := true
+	}
+
+	If (!PRM_Visible) {
+		SetTimer, ADM_HideMemo, Off
+		STA_Visible := false
+		Gui, 2:Hide ; GUI_Memo
+		Return
+	}
+
+	IfWinExist, GUI_Memo ahk_class AutoHotkeyGUI
+	{
+		If (!STA_Visible) {
+			WinShow
+		}
+	} Else {
+		Gui, 2:+LastFound
+		Gui, 2:Show, AutoSize X%SCR_VirtualScreenWidth% Y%SCR_VirtualScreenHeight%, GUI_Memo
+		WinGetPos, , , LOC_Width, LOC_Height
+		Gui, 2:Show, % "AutoSize X" . (SCR_VirtualScreenWidth + SCR_VirtualScreenX - LOC_Width - 50) . " Y" . (SCR_VirtualScreenHeight + SCR_VirtualScreenY - LOC_Height - 50), GUI_Memo
+	}
+	STA_Visible := true
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_ParseMemoText(PRM_Line, PRM_NewLine, PRM_Normal = false, PRM_Italic = false, PRM_Underlined = false, PRM_Mandatory = false, PRM_Optional = false, PRM_Parenthesis = false) {
+
+	LOC_Text := LOC_Variable := ""
+	, PRM_NormalCount := PRM_ItalicCount := PRM_UnderlinedCount := PRM_MandatoryCount := PRM_OptionalCount := PRM_ParenthesisCount := 0
+	, LOC_UnderlinedCount := LOC_ItalicCount := LOC_NormalCount := LOC_MandatoryCount := LOC_OptionalCount := LOC_ParenthesisCount := 0
+	, LOC_TextWritten := LOC_SectionFound := false
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	Loop, Parse, PRM_Line
+	{
+		LOC_Char := A_LoopField
+
+	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		; Set Variable name :
+		LOC_Variable := ""
+		If (LOC_Char == "_")	{
+			LOC_Variable := "Underlined"
+		} Else If (LOC_Char == "\") {
+			LOC_Variable := "Italic"
+		} Else If LOC_Char In <,>
+		{
+			LOC_Variable := "Normal"
+		} Else If LOC_Char In {,}
+		{
+			LOC_Variable := "Mandatory"
+		} Else If LOC_Char In [,]
+		{
+			LOC_Variable := "Optional"
+		} Else If LOC_Char In (,)
+		{
+			LOC_Variable := "Parenthesis"
+		}
+
+	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		; Opening section ? :
+		If LOC_Char In <,\,_,{,[,(
+		{
+			If (LOC_SectionFound) {
+				If (LOC_Char != "_"
+					&& LOC_Char != "\"
+					|| LOC_%LOC_Variable%Count == 0) {
+					LOC_Text .= LOC_Char
+					If (LOC_%LOC_Variable%Count > 0) {
+						LOC_%LOC_Variable%Count++
+					}
+					Continue
+				}
+			} Else {
+				LOC_SectionFound := true
+				, LOC_%LOC_Variable%Count := 1
+				If (LOC_Text != "") {
+					ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis)
+				}
+				LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
+				If LOC_Char In {,[
+				{
+					LOC_Text := LOC_Char
+					, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis, true)
+					, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
+					, ADM_SetMemoFont(PRM_Normal || LOC_Variable == "Normal", PRM_Italic || LOC_Variable == "Optional", PRM_Underlined || LOC_Variable == "Underlined", PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis || LOC_Variable == "Parenthesis")
+				}
+				Continue
+			}
+		}
+
+	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		; Closing section ? :
+		If LOC_Char In >,\,_,},],)
+		{
+			If (LOC_SectionFound
+				&& LOC_%LOC_Variable%Count > 0) {
+				LOC_%LOC_Variable%Count--
+				If (LOC_%LOC_Variable%Count == 0) {
+					LOC_TextParsed := ADM_ParseMemoText(LOC_Text, PRM_NewLine, LOC_Variable == "Normal", PRM_Italic || LOC_Variable == "Italic", PRM_Underlined || LOC_Variable == "Underlined", LOC_Variable == "Mandatory", LOC_Variable == "Optional", LOC_Variable == "Parenthesis")
+					, PRM_NewLine &= !LOC_TextParsed
+					, LOC_TextWritten |= LOC_TextParsed
+					, LOC_Text := ""
+					If LOC_Char In },]
+					{
+						LOC_Text := LOC_Char
+						, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis, true)
+						, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
+					}
+					ADM_SetMemoFont(PRM_Normal || LOC_Variable == "Normal", PRM_Italic || LOC_Variable == "Optional", PRM_Underlined || LOC_Variable == "Underlined", PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis || LOC_Variable == "Parenthesis")
+					, LOC_SectionFound := false
+				} Else {
+					LOC_Text .= LOC_Char
+				}
+			} Else {
+				LOC_Text .= LOC_Char
+			}
+			Continue
+		}
+
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		; Symbol :
+		If LOC_Char In |,+,:
+		{
+			If (!LOC_SectionFound) {
+				ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis, false)
+				, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
+				, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis, true)
+				; , LOC_Text := (LOC_Char == "|" ? " | " : LOC_Char)
+				, LOC_TextWritten |= ADM_PrintMemoText(LOC_Char, PRM_NewLine)
+				, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis)
+				Continue
+			}
+		}
+
+	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+		; Any other char :
+		LOC_Text .= LOC_Char
+	}
+	If (LOC_Text != "") {
+		ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis)
+	}
+	Return, ADM_PrintMemoText(LOC_Text, PRM_NewLine) || LOC_TextWritten
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_SetMemoFont(PRM_Normal = false, PRM_Italic = false, PRM_Underlined = false, PRM_Mandatory = false, PRM_Optional = false, PRM_Parenthesis = false, PRM_Symbol = false) {
+	LOC_FontAttributes := "Norm cBlack s8"
+	If (!PRM_Normal) {
+		If (PRM_Mandatory
+			&& !PRM_Parenthesis) {
+			LOC_FontAttributes .= " w700 cRed"
+		}
+		If (PRM_Optional
+			&& !PRM_Parenthesis) {
+			LOC_FontAttributes .= " w700 cRed"
+		}
+		If (PRM_Parenthesis) {
+			LOC_FontAttributes .= " cGray"
+		}
+		If (PRM_Symbol) {
+			LOC_FontAttributes .= " w700 cNavy"
+		}
+		If (PRM_Underlined) {
+			LOC_FontAttributes .= " Underline"
+			If (!PRM_Parenthesis) {
+				LOC_FontAttributes .= " w700"
+			}
+		}
+		If (PRM_Optional || PRM_Italic) {
+			LOC_FontAttributes .= " Italic"
+		}
+	}
+	Gui, 2:Font, % LOC_FontAttributes, % "Consolas"
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_PrintMemoText(ByRef PRM_Text, ByRef PRM_NewLine) {
+
+	If (PRM_Text != "") {
+		If (PRM_NewLine) {
+			Gui, 2:Add, Text, xm+10 yp+15, % PRM_Text ; GUI_Memo
+		} Else {
+			Gui, 2:Add, Text, x+1, % PRM_Text
+		}
+		PRM_Text := ""
+		, PRM_NewLine := false
+		Return, true
+	}
+	Return, false
+}
+
+2GuiClose:
+2GuiEscape:
+#IfWinActive, GUI_Memo ahk_class AutoHotkeyGUI
+LButton::
+ADM_Memo(false)
+Return
+#IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; AutoHotKey Help { Ctrl + Win + F1 } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_Help:
+^#F1::
+Suspend, Permit
+ADM_Help()
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ADM_Help() {
+
+	Global ZZZ_ProgramFiles64
+	AHK_KeyWait("#^", "F1")
+	LOC_Selection := TXT_GetSelectedText()
+	IfWinExist, AutoHotkey Help ahk_class HH Parent
+	{
+		WinActivate
+		WinWaitActive, , , 0
+		WinShow
+	}
+	Else {
+		Run, %A_WinDir%\hh.exe "%ZZZ_ProgramFiles64%\AutoHotkey\AutoHotkey.chm", , UseErrorLevel
+		If (ErrorLevel == "ERROR") {
+			TRY_ShowTrayTip("AutoHotKey help not launched", 3)
+		} Else {
+			WinWait, Help ahk_class HH Parent, , 10
+			WinActivate
+			WinWaitActive, , , 0
+			WinMaximize
+			WinShow
+			TRY_ShowTrayTip("AutoHotKey help launched")
+		}
+	}
+	If (LOC_Selection != "") {
+		LOC_MuteVolume := AUD_SoundGet("", "Mute")
+		If (LOC_MuteVolume == "Off") {
+			AUD_SoundSet(1, , "Mute")
+		}
+		SendInput, !r ; select Rechercher tab
+		ControlFocus, Edit1
+		SendInput, {Home}+{End}
+		TXT_SendRaw(LOC_Selection)
+		SendInput, {Enter}
+		Sleep, 100
+		ControlSend, SysListView321, {Enter}
+		If (LOC_MuteVolume == "Off") {
+			Sleep, 300
+			AUD_SoundSet(0, , "Mute")
+		}
+	} Else {
+		TRY_ShowTrayTip("AutoHotKey help already launched", 2)
+	}
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Edit scripts with SciTE { Ctrl + Win + Shift + E} :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -23,7 +418,8 @@ ADM_Edit() {
 		;~ }
 		;~ Sort, LOC_AHKFiles, \ U Z
 		;~ StringReplace, LOC_AHKFiles, LOC_AHKFiles, `n, %A_Space%, All
-		LOC_AHKFiles := """" . A_ScriptDir . "\JuggleKeys.ahk"" """ . A_ScriptDir . "\applications.ahk"" """ . A_ScriptDir . "\text.ahk"" """ . A_ScriptDir . "\login.ahk"" """ . A_ScriptDir . "\keyboard.ahk"" """ . A_ScriptDir . "\hotstrings.ahk"" """ . A_ScriptDir . "\windows.ahk"" """ . A_ScriptDir . "\tray.ahk"" """ . A_ScriptDir . "\system.ahk"" """ . A_ScriptDir . "\audio.ahk"" """ . A_ScriptDir . "\screen.ahk"" """ . A_ScriptDir . "\power.ahk"" """ . A_ScriptDir . "\administration.ahk"""
+		LOC_AHKFiles := """" . A_ScriptDir . "\JuggleKeys.ahk"" """ . A_ScriptDir . "\tools.ahk"" """ . A_ScriptDir . "\administration.ahk"" """ . A_ScriptDir . "\system.ahk"" """ . A_ScriptDir . "\screen.ahk"" """  . A_ScriptDir . "\power.ahk"" """ . A_ScriptDir . "\audio.ahk"" """ . A_ScriptDir . "\keyboard.ahk"" """ . A_ScriptDir . "\mouse.ahk"" """ . A_ScriptDir . "\windows.ahk"" """ . A_ScriptDir . "\applications.ahk"" """ . A_ScriptDir . "\login.ahk"" """ . A_ScriptDir . "\text.ahk"" """ . A_ScriptDir . "\hotstrings.ahk"" """ . A_ScriptDir . "\tray.ahk"""
+		LOC_AHKFiles := ""
 		Run, "%APP_SciTEPath%" %LOC_AHKFiles%, , UseErrorLevel
 		If (ErrorLevel == "ERROR") {
 			TRY_ShowTrayTip("AutoHotKey editor not launched", 3)
@@ -38,7 +434,6 @@ ADM_Edit() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 #IfWinActive, ahk_class SciTEWindow
 
@@ -61,7 +456,7 @@ APP_SciTESearch(PRM_Hotkey) {
 		If (!ErrorLevel) {
 			ControlFocus, Edit1
 			SendInput, {End}+{Home}
-			AHK_SendRaw(LOC_ClipBoard)
+			TXT_SendRaw(LOC_ClipBoard)
 
 			IfInString, PRM_Hotkey , % "+"
 			{
@@ -113,7 +508,7 @@ APP_SciTEFindInFiles() {
 ;;;;;;;;;;;;;;;;;;
 
 ~^s::
-SetTimer, ZZZ_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
+SetTimer, AHK_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
 Return
 
 ^+s::
@@ -124,7 +519,7 @@ Return
 APP_SciTESaveAll() {
 
 	Global ZZZ_CheckModificationsTimer
-	SetTimer, ZZZ_CheckModificationsTimer, Off
+	SetTimer, AHK_CheckModificationsTimer, Off
 	WinGetActiveTitle, LOC_InitialTitle
 	If (InStr(LOC_InitialTitle, " * "))
 	{
@@ -154,7 +549,7 @@ APP_SciTESaveAll() {
 		}
 	}
 	AHK_ShowToolTip("Save all files")
-	SetTimer, ZZZ_CheckModificationsTimer, -1
+	SetTimer, AHK_CheckModificationsTimer, -1
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -988,7 +1383,7 @@ ADM_WindowSpy(PRM_Show = false, PRM_ListViewToActivate = false) {
 		}
 		If (LOC_NewWindow) {
 			GuiControl, 30:, STA_WindowID
-			GuiControl, 30:, STA_Description, % AHK_GetFileInfo(LOC_WindowProcessPath)
+			GuiControl, 30:, STA_Description, % ADM_GetFileInfo(LOC_WindowProcessPath)
 		}
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1729,401 +2124,6 @@ ADM_WinSpector() {
 			&& SubStr(LOC_WindowClass, 1, 21) == "Afx:400000:8:10011:0:") {
 			WinSet, AlwaysOnTop, On
 		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; AutoHotKey Memo { Win + F1 } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_Memo:
-ADM_Memo()
-Return
-
-#F1::
-ADM_Memo()
-ADM_HideMemo(true)
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_HideMemo:
-ADM_HideMemo()
-Return
-
-ADM_HideMemo(PRM_Reinit = false) {
-	Global ZZZ_HideMemoTimer
-	Static STA_HideAfterNoMoreKeyDown := true
-	If (PRM_Reinit) {
-		STA_HideAfterNoMoreKeyDown := true
-	}
-	If (GetKeyState("F1", "P")) {
-		STA_HideAfterNoMoreKeyDown := GetKeyState("LWin", "P") || GetKeyState("RWin", "P")
-		SetTimer, ADM_HideMemo, %ZZZ_HideMemoTimer%
-	} Else {
-		If (GetKeyState("LWin", "P") || GetKeyState("RWin", "P")) {
-			STA_HideAfterNoMoreKeyDown := true
-			SetTimer, ADM_HideMemo, %ZZZ_HideMemoTimer%
-		} Else {
-			If (STA_HideAfterNoMoreKeyDown) {
-				ADM_Memo(PRM_Visible := false)
-			}
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_Memo(PRM_Visible = true) {
-
-	Global AHK_ScriptInfo, SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight
-	Static STA_Visible := false, STA_Init := false, STA_InitRunning := false
-
-	If (!STA_Init) {
-		If (STA_InitRunning) {
-			Return
-		}
-		STA_InitRunning := true
-		, ADM_InitMemo()
-		, STA_Init := true
-	}
-
-	If (!PRM_Visible) {
-		SetTimer, ADM_HideMemo, Off
-		STA_Visible := false
-		Gui, 2:Hide ; GUI_Memo
-		Return
-	}
-
-	IfWinExist, GUI_Memo ahk_class AutoHotkeyGUI
-	{
-		If (!STA_Visible) {
-			WinShow
-		}
-	} Else {
-		Gui, 2:+LastFound
-		Gui, 2:Show, AutoSize X%SCR_VirtualScreenWidth% Y%SCR_VirtualScreenHeight%, GUI_Memo
-		WinGetPos, , , LOC_Width, LOC_Height
-		Gui, 2:Show, % "AutoSize X" . (SCR_VirtualScreenWidth + SCR_VirtualScreenX - LOC_Width - 50) . " Y" . (SCR_VirtualScreenHeight + SCR_VirtualScreenY - LOC_Height - 50), GUI_Memo
-	}
-	STA_Visible := true
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_InitMemo() {
-
-	Global AHK_ScriptName
-	AHK_Log("> ADM_InitMemo()")
-	Gui, 2:+AlwaysOnTop -Caption +Border -Resize +ToolWindow ; GUI_Memo
-	Gui, 2:Color, FFFFDF, 000000
-	
-	;  text  : red bold
-	; _text_ : underscored
-	; \text\ : italic normal black
-	; <text> : normal black
-	; [text] : italic bold red (inside option)
-	; (text) : normal gray
-	LOC_Text =
-	( LTrim
-		 
-		_Hotstrings_ : { Capslock }`t   { A(nt) | (a)B(le) | E(nce) | (a)G(e) | (c)H(ie) | J : <gie> | (e)L(le) | (is)M(e) | N(aison) | (ti)O(n) | (i)Q(ue) | (eu)R | (e)S(se) | (emen)T | Y : <aille> | Z : <euse> }
-		_Login_ :         { Win + Enter }`t[ Ctrl ] : <Windows Login> | [ Ctrl + Shift ] : <Windows domain Login>
-		_Bank_ :          { Win + B }`t    [ Alt ] \: Pro\`t    [ Shift ] \: CB\
-		_Case_ :           { Win + F8 }`t  [ Shift : \To uppercase\ | Ctrl : \Sentence first letter\ | Ctrl + Shift : \Words first letter\ ]`t[ Alt ] \: Invert\
-		 
-		_Clipboard_ :    { Ctrl } { C | X | V }`t    [ Alt ] \: To alternate buffer\`t[ Shift ] \: Plain text mode\`t[ { Shift } { Insert <or> Delete } ] \: Append mode\
-		_Audio level_ : { Win } { Up | Down }`t[ Alt ] \: Wave volume\`t       [ Ctrl ] \: Fine steps\`t       [ Shift ] \: Large steps\`t     _Audio on/off_ : { ScrollLock }
-		 
-		_Screen saver_ :           { Ctrl + Win + L }`t[ Shift ] \: Screen off\
-		_Lock Station_ : `t         { Win + L }`t[ Shift ] \: Force\
-		_Suspend_ :        { Ctrl + Alt + Win + L }`t[ Shift ] \: Hibernate\
-		_Log off_ :`t   { Ctrl + Win + F12 }`t[ Shift ] \: Force\
-		_Shutdown_ :`t          { Win + F12 }`t[ Shift ] \: Force\`t    [ Alt ] \: Restart\
-		_BSOD_ :`t       { Win + ScrollLock }
-		 
-		_Magnifier_ :          { Ctrl + Alt + Win + PrintScreen | Ctrl + Shift + Wheel }
-		_Color selection_ : { Win + C }`t     { Ctrl : <Hexa mode> | Alt : <RGB mode> }`t[ Shift ] \: Color chooser\
-		_Screenshot_ :       { PrintScreen }`t[ Win : \Active window\ | Ctrl : \Zone\ ]`t     [ Shift ] \: Include cursor\`t[ Alt ] \: To file\`t[ AltGr ] \: Text mode\
-		 
-		_Always on top_ :  { Win + Click }`t_Transparency_ : { Win + Wheel }`t_Priority_ : { Ctrl + Win + Wheel }`t_Brightness_ : { Win + AltGr + Wheel }
-		_Roll | minimize_ : { RightClick + LeftClick }`t{ <On> TitleBar : <Roll> | "Elsewhere" : <Minimize> }`t_Alt-Tab switch_ : { RightClick + Wheel }
-		_9-square resize_ : { RightDrag }`t`t        [ Ctrl ] \: Force\`t[ Alt ] \: Propotionnally\`t[ Win ] \: Centering\`t[ Shift ] \: Large steps\
-		_Resize_ :               { Win }`t`t`t     { PageUp : <Increase> | PageDown : <Decrease> | Enter : <Restore> }`t          [ Shift ] \: Maximize | Minimize\
-		_Resize_ :               { Alt + NumPad ± }`t           [ Win ] \: Centering\`t     _Resize proportionnally_ : { Alt + Wheel }
-		 
-		_Close_ : { F4 | MiddleClick }`t{ Ctrl : <Close inner window> | Alt : <Close window> | Win : <Kill window> }
-		_Systray_ : { Win }`t{ End : <Minimize> | Home : <Restore> }
-		_Title bar_ : { MiddleClick }`t{ <On> Minimize : <Systray> | <On> Maximize : <All screens> [ Alt : \Next screen\ | Shift : \Full screens\ ]  | <On> Close : <Kill> | "Elsewhere" : <Close> } 
-		 
-		_Remove programs_ :     { Ctrl + Win + Delete }`t_Empty recycle bin_ : { Ctrl + Win + Shift + Delete }`t_Rootkit Unhooker_ : { Win + Shift + Escape }
-		_System applications_ : { Ctrl + Win }`t   { A(dministration) | D(isks) | E(xplorer) | H(ardware) [ Shift : \Rescan\ ] | I(E) | R(egistry) | S(tartup) | (e)V(ents) }
-		_User applications_ :`t    { Win }`t   { C(alculator) | E (DirectoryOpus) | J(MP) | N(otes) | P(uTTY) | (S)Q(LDeveloper) <or> Q(uintessential) | T(hunderbird) | U(ltraEdit) }
-		 `t`t`t         { Win }`t   { BackSpace : <SnagIt> | Ctrl + BackSpace : <MP3 Editor> | Ctrl + Alt + BackSpace : <Photoshop> }
-		 `t`t`t         { Win }`t   { M(ediaMonkey) | W(MP) | I(nternet) | K(GS) | µ(Torrent) }
-		 
-		_%AHK_ScriptName% Options_ : { Ctrl + Win + Shift }`t{ (X-Mouse )F(ocus) | 1..5 : <Mouse button hook> | Q : <Tray Icon> }
-		_%AHK_ScriptName% Options_ : { Ctrl + Win + Shift }`t{ A(udio) | B(alloon messages) | T(ooltips) | (Transparenc)Y | Z(ap wallpaper) }
-		_%AHK_ScriptName% Tools_ :      { Ctrl + Win + Shift }`t{ H(otstring) | R(ecorder) | (Window)S(py) | X : <Winspector> }
-		_%AHK_ScriptName% Scripts_ :   { Ctrl + Win + Shift }`t{ E(dit) | D(ebug) | Escape : <Suspend> | F5 <or> Pause : <Reload> }
-		_Help_ :`t`t  { Win }`t`t            { F1 : <Memo> | Ctrl + F1 : <AHK help> [ Shift : \About\ ] | Ctrl + W(ebsite) }
-		 
-		_Other functionnalities_ : Personalized hotstrings`t   Longer keypress for F1 and Insert`t`t   Web search with selected text`t`t   NumLock always active
-		 `t`t`t  Hovering variable speed scroll`t`t   Multiple facilities in WMP`t`t   Improved consoles`t`t   Non-modal windows
-		 `t`t`t  Time synchronization and chime`t   Automatic closing of boring popups`t   Automatic reload after script modification
-	)
-	LOC_NewLine := false
-	Loop, Parse, LOC_Text, `n
-	{
-		LOC_NewLine |= ADM_ParseMemoText(A_LoopField, LOC_NewLine)
-	}
-	AHK_Log("< ADM_InitMemo()")
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_ParseMemoText(PRM_Line, PRM_NewLine, PRM_Normal = false, PRM_Italic = false, PRM_Underlined = false, PRM_Mandatory = false, PRM_Optional = false, PRM_Parenthesis = false) {
-
-	LOC_Text := LOC_Variable := ""
-	, PRM_NormalCount := PRM_ItalicCount := PRM_UnderlinedCount := PRM_MandatoryCount := PRM_OptionalCount := PRM_ParenthesisCount := 0
-	, LOC_UnderlinedCount := LOC_ItalicCount := LOC_NormalCount := LOC_MandatoryCount := LOC_OptionalCount := LOC_ParenthesisCount := 0
-	, LOC_TextWritten := LOC_SectionFound := false
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	Loop, Parse, PRM_Line
-	{
-		LOC_Char := A_LoopField
-
-	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-		; Set Variable name :
-		LOC_Variable := ""
-		If (LOC_Char == "_")	{
-			LOC_Variable := "Underlined"
-		} Else If (LOC_Char == "\") {
-			LOC_Variable := "Italic"
-		} Else If LOC_Char In <,>
-		{
-			LOC_Variable := "Normal"
-		} Else If LOC_Char In {,}
-		{
-			LOC_Variable := "Mandatory"
-		} Else If LOC_Char In [,]
-		{
-			LOC_Variable := "Optional"
-		} Else If LOC_Char In (,)
-		{
-			LOC_Variable := "Parenthesis"
-		}
-
-	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-		; Opening section ? :
-		If LOC_Char In <,\,_,{,[,(
-		{
-			If (LOC_SectionFound) {
-				If (LOC_Char != "_"
-					&& LOC_Char != "\"
-					|| LOC_%LOC_Variable%Count == 0) {
-					LOC_Text .= LOC_Char
-					If (LOC_%LOC_Variable%Count > 0) {
-						LOC_%LOC_Variable%Count++
-					}
-					Continue
-				}
-			} Else {
-				LOC_SectionFound := true
-				, LOC_%LOC_Variable%Count := 1
-				If (LOC_Text != "") {
-					ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis)
-				}
-				LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
-				If LOC_Char In {,[
-				{
-					LOC_Text := LOC_Char
-					, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis, true)
-					, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
-					, ADM_SetMemoFont(PRM_Normal || LOC_Variable == "Normal", PRM_Italic || LOC_Variable == "Optional", PRM_Underlined || LOC_Variable == "Underlined", PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis || LOC_Variable == "Parenthesis")
-				}
-				Continue
-			}
-		}
-
-	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-		; Closing section ? :
-		If LOC_Char In >,\,_,},],)
-		{
-			If (LOC_SectionFound
-				&& LOC_%LOC_Variable%Count > 0) {
-				LOC_%LOC_Variable%Count--
-				If (LOC_%LOC_Variable%Count == 0) {
-					LOC_TextParsed := ADM_ParseMemoText(LOC_Text, PRM_NewLine, LOC_Variable == "Normal", PRM_Italic || LOC_Variable == "Italic", PRM_Underlined || LOC_Variable == "Underlined", LOC_Variable == "Mandatory", LOC_Variable == "Optional", LOC_Variable == "Parenthesis")
-					, PRM_NewLine &= !LOC_TextParsed
-					, LOC_TextWritten |= LOC_TextParsed
-					, LOC_Text := ""
-					If LOC_Char In },]
-					{
-						LOC_Text := LOC_Char
-						, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis, true)
-						, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
-					}
-					ADM_SetMemoFont(PRM_Normal || LOC_Variable == "Normal", PRM_Italic || LOC_Variable == "Optional", PRM_Underlined || LOC_Variable == "Underlined", PRM_Mandatory || LOC_Variable == "Mandatory", PRM_Optional || LOC_Variable == "Optional", PRM_Parenthesis || LOC_Variable == "Parenthesis")
-					, LOC_SectionFound := false
-				} Else {
-					LOC_Text .= LOC_Char
-				}
-			} Else {
-				LOC_Text .= LOC_Char
-			}
-			Continue
-		}
-
-		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-		; Symbol :
-		If LOC_Char In |,+,:
-		{
-			If (!LOC_SectionFound) {
-				ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis, false)
-				, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
-				, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis, true)
-				, LOC_Text := (LOC_Char == "|" ? " | " : LOC_Char)
-				, LOC_TextWritten |= ADM_PrintMemoText(LOC_Text, PRM_NewLine)
-				, ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis)
-				Continue
-			}
-		}
-
-	    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-		; Any other char :
-		LOC_Text .= LOC_Char
-	}
-	If (LOC_Text != "") {
-		ADM_SetMemoFont(PRM_Normal, PRM_Italic, PRM_Underlined, PRM_Mandatory, PRM_Optional, PRM_Parenthesis)
-	}
-	Return, ADM_PrintMemoText(LOC_Text, PRM_NewLine) || LOC_TextWritten
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_SetMemoFont(PRM_Normal = false, PRM_Italic = false, PRM_Underlined = false, PRM_Mandatory = false, PRM_Optional = false, PRM_Parenthesis = false, PRM_Symbol = false) {
-	LOC_FontAttributes := "Norm cBlack s7"
-	If (!PRM_Normal) {
-		If (PRM_Mandatory
-			&& !PRM_Parenthesis) {
-			LOC_FontAttributes .= " w700 cRed"
-		}
-		If (PRM_Optional
-			&& !PRM_Parenthesis) {
-			LOC_FontAttributes .= " w700 cRed"
-		}
-		If (PRM_Parenthesis) {
-			LOC_FontAttributes .= " cGray"
-		}
-		If (PRM_Symbol) {
-			LOC_FontAttributes .= " w700 cNavy"
-		}
-		If (PRM_Underlined) {
-			LOC_FontAttributes .= " Underline"
-			If (!PRM_Parenthesis) {
-				LOC_FontAttributes .= " w700"
-			}
-		}
-		If (PRM_Optional || PRM_Italic) {
-			LOC_FontAttributes .= " Italic"
-		}
-	}
-	Gui, 2:Font, % LOC_FontAttributes, % "Verdana"
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_PrintMemoText(ByRef PRM_Text, ByRef PRM_NewLine) {
-
-	If (PRM_Text != "") {
-		If (PRM_NewLine) {
-			Gui, 2:Add, Text, xm+10 yp+15, % PRM_Text ; GUI_Memo
-		} Else {
-			Gui, 2:Add, Text, x+1, % PRM_Text
-		}
-		PRM_Text := ""
-		, PRM_NewLine := false
-		Return, true
-	}
-	Return, false
-}
-
-2GuiClose:
-2GuiEscape:
-#IfWinActive, GUI_Memo ahk_class AutoHotkeyGUI
-LButton::
-ADM_Memo(false)
-Return
-#IfWinActive
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; AutoHotKey Help { Ctrl + Win + F1 } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_Help:
-^#F1::
-Suspend, Permit
-ADM_Help()
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ADM_Help() {
-
-	Global ZZZ_ProgramFiles64
-	AHK_KeyWait("#^", "F1")
-	LOC_Selection := TXT_GetSelectedText()
-	IfWinExist, AutoHotkey Help ahk_class HH Parent
-	{
-		WinActivate
-		WinWaitActive, , , 0
-		WinShow
-	}
-	Else {
-		Run, %A_WinDir%\hh.exe "%ZZZ_ProgramFiles64%\AutoHotkey\AutoHotkey.chm", , UseErrorLevel
-		If (ErrorLevel == "ERROR") {
-			TRY_ShowTrayTip("AutoHotKey help not launched", 3)
-		} Else {
-			WinWait, Help ahk_class HH Parent, , 10
-			WinActivate
-			WinWaitActive, , , 0
-			WinMaximize
-			WinShow
-			TRY_ShowTrayTip("AutoHotKey help launched")
-		}
-	}
-	If (LOC_Selection != "") {
-		LOC_MuteVolume := AUD_SoundGet("", "Mute")
-		If (LOC_MuteVolume == "Off") {
-			AUD_SoundSet(1, , "Mute")
-		}
-		SendInput, !r ; select Rechercher tab
-		ControlFocus, Edit1
-		SendInput, {Home}+{End}
-		AHK_SendRaw(LOC_Selection)
-		SendInput, {Enter}
-		Sleep, 100
-		ControlSend, SysListView321, {Enter}
-		If (LOC_MuteVolume == "Off") {
-			Sleep, 300
-			AUD_SoundSet(0, , "Mute")
-		}
-	} Else {
-		TRY_ShowTrayTip("AutoHotKey help already launched", 2)
 	}
 }
 

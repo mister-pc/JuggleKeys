@@ -2,6 +2,49 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Hotstrings initialization :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HOT_InitGroups() {
+
+	Global
+	; GroupAdd, HOT_HotstringsWindowsGroup, UEStudio ; UltraEdit
+	GroupAdd, HOT_HotstringsWindowsGroup, UltraEdit ; UltraEdit
+	GroupAdd, HOT_HotstringsWindowsGroup, Notepad++ ahk_class Notepad++ ; Notepad++
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class MozillaWindowClass ; Mozilla
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class OpusApp ; Office
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class XLMAIN ; Excel
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
+	GroupAdd, HOT_HotstringsWindowsGroup, KGS ahk_class SunAwtFrame ; KGS
+	GroupAdd, HOT_HotstringsWindowsGroup, évènement ahk_class MozillaDialogClass ; Thunderbird
+	GroupAdd, HOT_HotstringsWindowsGroup, EditEmailSubject - Editer le sujet du message ahk_class MozillaDialogClass ; Thunderbird
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Chrome_WidgetWin_1 ; Chrome
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IEFrame ; IE
+	GroupAdd, HOT_HotstringsWindowsGroup, heure de début ahk_class SWT_Window0 ; Sametime
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IMWindowClass ; Lync
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class HwndWrapper[TabbedConversations.exe;; ; Lync
+	GroupAdd, HOT_HotstringsWindowsGroup, New Defect ahk_class TNewBugForm ; Quality Center
+	GroupAdd, HOT_HotstringsWindowsGroup, Required Defect Fields ahk_class TRequiredFieldsDlg ; Quality Center
+	GroupAdd, HOT_HotstringsWindowsGroup, Edit Text ahk_class #32770 ; SnagIt
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class DSUI:PDFXCViewer ; PDF-XChange
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Sticky_Notes_Note_Window ; Windows 7 Sticky Notes
+	GroupAdd, HOT_HotstringsWindowsGroup, Nox App Player ahk_class Qt5QWindowIcon ; Nox
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class WordPadClass ; WordPad
+	GroupAdd, HOT_HotstringsWindowsGroup, Skype ahk_class tSkMainForm ; Skype
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class TConversationForm ; Skype
+	GroupAdd, HOT_HotstringsWindowsGroup, Create task ahk_class #32770 ; Timecamp create task
+	GroupAdd, HOT_HotstringsWindowsGroup, Task Editor ahk_class #32770 ; Timecamp task editor
+	GroupAdd, HOT_IgnoringWindows, ahk_class Progman
+	GroupAdd, HOT_IgnoringWindows, ahk_class Shell_TrayWnd
+	GroupAdd, HOT_IgnoringWindows, ahk_class VistaSwitcher_SwitcherWnd
+	GroupAdd, HOT_IgnoringWindows, ahk_class AutoHotkeyGUI
+	, AHK_CapsLockTickCount := 0
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Hotstrings :
 ;;;;;;;;;;;;;;
 
@@ -58,7 +101,7 @@ Return
 :C:nya::{BackSpace}{Left 3}il {Right}'{Right} {Right} ; il n'y a
 :C:Nya::{BackSpace}{Left 2}{BackSpace}Il n'{Right} {Right} ; Il n'y a
 :C:nyap::{BackSpace}{Left 4}il {Right}'{Right} {Right} {Right}as ; il n'y a pas
-:C:Nyap::{BackSpace}{Left 2}{BackSpace}Il n'{Right} {Right} {Right}as ; Il n'y a pas
+:C:Nyap::{BackSpace}{Left 3}{BackSpace}Il n'{Right} {Right} {Right}as ; Il n'y a pas
 :*:qny:: ; qu'il n'y (à partir de quelqu'uny)
 SendInput, {Left 2}{BackSpace}{Left 3}{BackSpace 4}{Right 3}il {Right}'{Right}
 Return
@@ -194,7 +237,7 @@ Return
 :*:lrsq'::{Left}{BackSpace}{Right} ; lorsqu' (à partir de lorsque')
 :*:qd::{Left}uan{Right} ; quand
 :*:jqcq:: ; jusqu'à ce que (à partir de jusquecq)
-SendInput, {Left 2}{BackSpace}u'à {Right}e {Right}ue
+SendInput, {Left 2}{BackSpace}'à {Right}e {Right}ue
 Return
 :*:jqcq'::{Left}{BackSpace}{Right} ; jusqu'à ce qu' (à partir de jusqu'à ce que')
 :*:jsqc:: ; jusqu'à ce (à partir de jusquec)
@@ -233,7 +276,7 @@ SendInput, {Left} {Right}ue
 Return
 :*:mgq'::{Left}{BackSpace}{Right} ; malgré qu' (à partir de malgré que')
 :*:sfq:: ; sauf que
-SendInput, {Left 2}au{Right} {Right}ue
+SendInput, {Left} {Right}ue
 Return
 :*:sfq'::{Left}{BackSpace}{Right} ; sauf qu' (à partir de sauf que')
 :*:cmt::{Left}n{Right} ; comment (à partir de commet)
@@ -312,11 +355,11 @@ SendInput, {Left 2}st-{Right}e {Right}ue
 Return
 :*:ecq'::{Left}{BackSpace}{Right} ; est-ce qu' (à partir de est-ce que')
 :C*:qsq:: ; qu'est-ce que
-SendInput, {Left 2}u'e{Right}t-ce {Right}ue{Right}
+SendInput, {Left 2}u'e{Right}t-ce {Right}ue
 Return
 :C*:qsq'::{Left}{BackSpace}{Right} ; qu'est-ce qu' (à partir de qu'est-ce que')
 :C*:Qsq:: ; Qu'est-ce que
-SendInput, {Left 2}u'e{Right}t-ce {Right}ue{Right}
+SendInput, {Left 2}u'e{Right}t-ce {Right}ue
 Return
 :C*:Qsq'::{Left}{BackSpace}{Right} ; Qu'est-ce qu' (à partir de Qu'est-ce que')
 :C*:qcq:: ; qu'est-ce que (à partir de quelque choseq)
@@ -444,14 +487,14 @@ Return
 :*:--)::{Left}{BackSpace 2}moins{Right} ; moins)
 :*:àpp::{Left 2} {Right}eu {Right}rès ; à peu près
 :*:qàpp::{Left 3}u'{Right} {Right}eu {Right}rès ; qu'à peu près
-:C*:vm::{Left]rai{Right}ent ; vraiment
-:C*:Vm::{Left]rai{Right}ent ; vraiment
+:C*:vm::{Left}rai{Right}ent ; vraiment
+:C*:Vm::{Left}rai{Right}ent ; vraiment
 :*:vraimt::{Left}en{Right} ; vraiment
 :*:mx::{Left}ieu{Right} ; mieux
 :*:prsq::{Left 2}e{Right 2}ue ; presque
 :*:tlm::{Left 2}el{Right}e{Right}ent ; tellement
 ::ac::{BackSpace 2}ssez ; assez
-::b::{BackSpace}ien ; bien
+:*:b&::{BackSpace}ien ; bien
 :*:bcp::{Left 2}eau{Right}ou{Right} ; beaucoup
 :*:tàf::{Left 2}out {Right} {Right}ait ; tout à fait
 :*:surtt::{Left}ou{Right} ; surtout
@@ -481,7 +524,7 @@ Return
 :*:pe'::{Left}{BackSpace}'t-êt{Right} ; p't-êt'
 ::pe::{BackSpace}ut-être ; peut-être
 :*:nimp::{Left 3}'{Right 3}orte ; n'importe
-:C*:tjr:: ; toujours
+:C*:tjr:: ; toujoursg
 SendInput, {Left 2}ou{Right}ou{Right}s
 Return
 :C*:tjrs::{BackSpace} ; toujours (à partir de toujourss)
@@ -494,7 +537,9 @@ Return
 :*:p,::{Left}as{Right} ; pas,
 :*:p;::{Left}as{Right}{Space} ; pas ;
 :C*:p.::{Left}as{Right} ; pas.
+:*:hl::{Left}é{Right}as ; hélas
 :*:jms::{Left 2}a{Right}ai{Right} ; jamais
+
 ::h::{BackSpace}ein ; hein
 ::vi::{BackSpace}{Left}{BackSpace}ou{Right} ; oui
 :*:ttf::{Left}e{Right}ois ; toutefois (à partir de toutf)
@@ -575,7 +620,9 @@ Return
 SendInput, {Left} {Right}e
 Return
 :*:vàvd'::{Left}{BackSpace}Right} ; vis-à-vis de (à partir de vis-à-vis de')
-:*:sf::{Left}au{Right} ; sauf
+:*:sf:: ; sauf
+SendInput, {Left}au{Right}
+Return
 :*:ss:: ; sans
 SendInput, {Left}an{Right}
 Return
@@ -590,6 +637,7 @@ Return
 :*:desse::{Left}{BackSpace 3}{Right} ; desse (à partir de dessouse)
 :*:dessi::{Left}{BackSpace 3}{Right} ; dessi (à partir de dessousi)
 :*:dessu::{Left}{BackSpace 3}{Right} ; dessu (à partir de dessousu)
+:*:desso::{BackSpace 3} ; desso (à partir de dessouso)
 ::pr::{BackSpace}{Left}ou{Right} ; pour
 :*:ctre::{Left 3}{BackSpace 5}on{Right 3} ; contre (à partir de c'étaitre)
 ::af::{BackSpace}in ; afin
@@ -648,14 +696,17 @@ Return
 SendInput, {Left}u{Right}
 Return
 :*:qil::{Left 2}'{Right 2} ; qu'il (à partir de quil)
-:?*:qo::{Left}u{Right} ; quo
+:?*:qo:: ; quo
+SendInput, {Left}u{Right}
+Return
+::qon::{BackSpace}{Left 2}'{Right 2} ; qu'on (à partir de quon)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Some :
 ;;;;;;;;
 
-::r::{BackSpace}ien ; rien
+:*:r&::{BackSpace}ien ; rien
 ::ca::{BackSpace}{Left}{BackSpace}ç{Right} ; ça
 ::clc::{BackSpace}{Left 2}e{Right}ui-{Right}i ; celui-ci
 :*:qq:: ; quelque
@@ -753,6 +804,7 @@ Return
 :*:dv:: ; divers
 SendInput, {Left}i{Right}ers
 Return
+:*:dvd::{BackSpace 7}DVD ; DVD (à partir de diversd)
 :*:dx::{Left}eu{Right} ; deux
 :*:trs::{Left}oi{Right} ; trois
 :*:cq::{Left}in{Right} ; cinq
@@ -909,10 +961,14 @@ Return
 ;;;;;;;;;;;
 
 :*:np::{Left}o {Right}roblem ; no problem
-:*:pb::{Left}ro{Right}lème ; problème
-::prob::{BackSpace}lème ; problème
-::probs::{BackSpace}{Left}lème{Right} ; problèmes
-:*:prb::{Left}o{Right}lème ; problème
+:*:pb:: ; problème
+SendInput, {Left}ro{Right}lème
+Return
+:*:pbm:: ; problème (à partir de problèmem)
+SendInput, {BackSpace}
+Return
+:*:pbmt::{Left}{BackSpace}{Left}{BackSpace}é{Right}a{Right}ique ; problématique (à partir de problèmet)
+:*:pbt::{Left}{BackSpace}{Left}{BackSpace}é{Right}a{Right}ique ; problématique (à partir de problèmet)
 :*:fd::{Left}on{Right} ; fond
 :C*:rv::{Left}endez-{Right}ous ; rendez-vous
 :C*:Rv::{Left}endez-{Right}ous ; Rendez-vous
@@ -988,6 +1044,7 @@ Return
 ::appli::{BackSpace}cation ; application
 :*:applis::{Left}cation{Right} ; applications
 :*:cmd::{Left}{BackSpace}an{Right} ; command (à partir de commed)
+:*:cma::{Left}{BackSpace}{Right} ; comma (à partir de commea)
 ::fic::{BackSpace}hier ; fichier
 :*:fics::{Left}hier{Right} ; fichiers
 ::enreg::{BackSpace}istrement ; enregistrement
@@ -1068,7 +1125,10 @@ Return
 :*:smn::{Left 2}e{Right}ai{Right}e ; semaine
 :C?*:Jr::{Left}ou{Right} ; Jour
 :C?*:jr::{Left}ou{Right} ; jour
-:*:hre::{Left 3}{BackSpace}{Right}u{Right 2} ; heure (à partir de hiere)
+:*:hre:: ; heure (à partir de hiere)
+SendInput, {Left 3}{BackSpace}{Right}u{Right 2}
+return
+:*:href::{Left 3}{BackSpace 2}{Right 3} ; href (à partir de heuref)
 :*:dsm::{Left 2}{BackSpace 2}é{Right}or{Right}ais ; désormais (à partir de dansm)
 :C*:dl:: ; dès lors
 SendInput, {Left}ès {right}ors
@@ -1184,9 +1244,9 @@ Return
 :*:bàb:: ; Bande à Balk
 SendInput, {BackSpace}{Left}{BackSpace}Bande {Right} Balk
 Return
-:C*:bb::{Left}Ül{Right}Ül ; bÜlbÜl
+; :C*:bb::{Left}Ül{Right}Ül ; bÜlbÜl
 :*:km.org::{Left 5}amea{Right}eahfilms{Right 4} ; kameameahfilms.org
-:*:kmf::{BackSpace 3}Kamea Meah films ; Kamea Meah films
+:*:kmf::{BackSpace 3}Kamea Meah Films ; Kamea Meah Films
 :*:bàbs::{Left}{BackSpace 3}{Left}{BackSpace}{Left}{BackSpace 5}{Right 3} ; BàBs (à partir de Bande à Balks)
 :C*:alodb:: ; À l'Ouest des Balkans
 SendInput, {BackSpace}{Left}{BackSpace}{Left}{BackSpace}À {Right}'Ouest {Right}es Balkans
@@ -1240,30 +1300,6 @@ HOT_PrintHotstring(PRM_HotString, PRM_BackSpaceCount = 0) {
 	Return
 }
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; CapsLock acting like shift :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-HOT_CapsLock:
-*CapsLock::
-SetCapsLockState, Off
-SetStoreCapslockMode, Off
-SendInput, {Blind}{Shift DownTemp}
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-*CapsLock Up::
-;SetCapsLockState, Off
-;SetStoreCapslockMode, Off
-SendInput, {Blind}{Shift Up}
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #Hotstring C
@@ -3998,7 +4034,7 @@ Return
 :?*:sM::
 :?*:tM::
 :?*:uM::
-:?*:vM::
+; :?*:vM::
 :?*:wM::
 :?*:xM::
 :?*:zM::
@@ -6609,10 +6645,6 @@ Return
 HOT_PrintHotstring("euse")
 Return
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 #Hotstring C0 B0
 #IfWinActive
 
@@ -6620,112 +6652,24 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; New hotstring { Win + H } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; CapsLock acting like shift :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-HOT_NewHotstring:
-^+#h::
-HOT_NewHotstring()
+HOT_CapsLock:
+*CapsLock::
+SetCapsLockState, Off
+SetStoreCapslockMode, Off
+SendInput, {Blind}{Shift DownTemp}
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-HOT_NewHotstring() {
-	
-	Global AHK_ScriptInfo
-	AutoTrim, Off
-	LOC_ClipBoard := ClipBoardAll
-	If (!TXT_SelectToClipBoard(PRM_Copy := 1)) {
-		TXT_SetClipBoard(LOC_ClipBoard)
-		AutoTrim, On
-		Return
-	}
-
-	; Replace CRLF and/or LF with `n for use in a "send-raw" hotstring:
-	StringReplace, LOC_Hotstring, ClipBoard, ``, ````, All  ;
-	StringReplace, LOC_Hotstring, LOC_Hotstring, `r`n, ``r, All
-	StringReplace, LOC_Hotstring, LOC_Hotstring, `n, ``r, All
-	StringReplace, LOC_Hotstring, LOC_Hotstring, %A_Tab%, ``t, All
-	StringReplace, LOC_Hotstring, LOC_Hotstring, `;, ```;, All
-	TXT_SetClipBoard(LOC_ClipBoard)
-	AutoTrim, On
-
-	; Show the InputBox, providing the default hotstring :
-	SetTimer, HOT_MoveCaretTimer, -50 ; Will simply move cursor at the 3rd position in the input box
-	InputBox, LOC_HotstringDefinition, New Hotstring, Type your abreviation at the indicated insertion point. You can also edit the replacement text if you wish.`n`nExample entry: :R:btw`::by the way,,,,,,,, :R:`::%LOC_Hotstring%
-	If (ErrorLevel != 0) {
-		Return
-	}
-	IfInString, LOC_HotstringDefinition, % ":R`:::"
-	{
-		MsgBox, 48, Wrong hotstring - %AHK_ScriptInfo%, You didn't provide a correct hotstring, 4 ; Exclamation & OK button
-		Return
-	}
-
-	Try {
-		FileAppend, `n%LOC_HotstringDefinition%, %A_ScriptDir%\hotstrings.ahk ; Put a `n at the beginning in case file lacks a blank line at its end
-	} Catch LOC_Exception {
-		AHK_Catch(LOC_Exception, "HOT_NewHotstring")
-	}
-	ADM_Reload()
-	Sleep, 200
-	MsgBox, 36, Hotstring improperly formatted - %AHK_ScriptInfo%, Would you like to edit the end part of the script ?, 10 ; Question & Yes/No buttons
-	IfMsgBox, Yes, GoSub, ADM_Edit
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-HOT_MoveCaretTimer:
-IfWinActive, New Hotstring ahk_class #32770
-{
-	SendInput, {Home}{Right 3}
-}
+*CapsLock Up::
+;SetCapsLockState, Off
+;SetStoreCapslockMode, Off
+SendInput, {Blind}{Shift Up}
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Hotstrings initialization :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-HOT_InitGroups() {
-
-	Global
-	; GroupAdd, HOT_HotstringsWindowsGroup, UEStudio ; UltraEdit
-	GroupAdd, HOT_HotstringsWindowsGroup, UltraEdit ; UltraEdit
-	GroupAdd, HOT_HotstringsWindowsGroup, Notepad++ ahk_class Notepad++ ; Notepad++
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class MozillaWindowClass ; Mozilla
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class OpusApp ; Office
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class XLMAIN ; Excel
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
-	GroupAdd, HOT_HotstringsWindowsGroup, KGS ahk_class SunAwtFrame ; KGS
-	GroupAdd, HOT_HotstringsWindowsGroup, évènement ahk_class MozillaDialogClass ; Thunderbird
-	GroupAdd, HOT_HotstringsWindowsGroup, EditEmailSubject - Editer le sujet du message ahk_class MozillaDialogClass ; Thunderbird
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Chrome_WidgetWin_1 ; Chrome
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IEFrame ; IE
-	GroupAdd, HOT_HotstringsWindowsGroup, heure de début ahk_class SWT_Window0 ; Sametime
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IMWindowClass ; Lync
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class HwndWrapper[TabbedConversations.exe;; ; Lync
-	GroupAdd, HOT_HotstringsWindowsGroup, New Defect ahk_class TNewBugForm ; Quality Center
-	GroupAdd, HOT_HotstringsWindowsGroup, Required Defect Fields ahk_class TRequiredFieldsDlg ; Quality Center
-	GroupAdd, HOT_HotstringsWindowsGroup, Edit Text ahk_class #32770 ; SnagIt
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class DSUI:PDFXCViewer ; PDF-XChange
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Sticky_Notes_Note_Window ; Windows 7 Sticky Notes
-	GroupAdd, HOT_HotstringsWindowsGroup, Nox App Player ahk_class Qt5QWindowIcon ; Nox
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class WordPadClass ; WordPad
-	GroupAdd, HOT_HotstringsWindowsGroup, Skype ahk_class tSkMainForm ; Skype
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class TConversationForm ; Skype
-	GroupAdd, HOT_IgnoringWindows, ahk_class Progman
-	GroupAdd, HOT_IgnoringWindows, ahk_class Shell_TrayWnd
-	GroupAdd, HOT_IgnoringWindows, ahk_class VistaSwitcher_SwitcherWnd
-	GroupAdd, HOT_IgnoringWindows, ahk_class AutoHotkeyGUI
-	, AHK_CapsLockTickCount := 0
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Ajouts automatiques :
-;;;;;;;;;;;;;;;;;;;;;;;;

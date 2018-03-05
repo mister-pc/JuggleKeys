@@ -93,11 +93,14 @@ Return
 AUD_Level(PRM_HotKey, PRM_ShowVolumeBar = true) {
 
 	Global AUD_MasterVolume, AUD_WaveVolume, AUD_Step, AUD_BigStep, AUD_NoMasterVolume
+	
+	; Setting Wave / Master :
 	LOC_AltGrDown := GetKeyState("RAlt")
 	, LOC_CtrlDown := LOC_AltGrDown && GetKeyState("RCtrl")
 						|| !LOC_AltGrDown && GetKeyState("Ctrl")
 	, LOC_Delta := (InStr(PRM_HotKey, "Up") ? "+" : "-")
 	
+	; Setting Step :
 	If (InStr(PRM_HotKey, "+"))	{
 		LOC_Delta .= (LOC_CtrlDown ? AUD_Step : AUD_BigStep)
 	} Else {
@@ -117,7 +120,9 @@ AUD_Level(PRM_HotKey, PRM_ShowVolumeBar = true) {
 	LOC_Current%LOC_Component%Volume := Round(Max(0, Min(AUD_%LOC_Component%Volume + LOC_Delta, 100)))
 
 	If (LOC_Delta > 0) {
+		; Increase volume :
 		If (LOC_InitialMuteState == "On") {
+			; From mute state :
 			If (AUD_%LOC_OtherComponent%Volume > 0) {
 				If (AUD_%LOC_Component%Volume > 0) {
 					AUD_SetVolume(LOC_Component, AUD_%LOC_Component%Volume)
@@ -137,8 +142,10 @@ AUD_Level(PRM_HotKey, PRM_ShowVolumeBar = true) {
 			Return
 		}
 	} Else {
+		; Decrease volume :
 		If (LOC_Current%LOC_Component%Volume == 0
 			&& LOC_InitialMuteState == "Off") {
+			; To mute state :
 			AUD_SetVolume(LOC_Component, LOC_Current%LOC_Component%Volume)
 			If (PRM_ShowVolumeBar) {
 				AUD_ShowVolumeBar(PRM_MuteState := "On")
@@ -147,6 +154,7 @@ AUD_Level(PRM_HotKey, PRM_ShowVolumeBar = true) {
 			Return
 		}
 	}
+	
 	AUD_SetVolume(LOC_Component, LOC_Current%LOC_Component%Volume)
 	If (PRM_ShowVolumeBar) {
 		AUD_ShowVolumeBar(LOC_InitialMuteState)
@@ -158,6 +166,7 @@ AUD_Level(PRM_HotKey, PRM_ShowVolumeBar = true) {
 AUD_SetVolume(PRM_Component, PRM_Volume) {
 
 	Global AUD_MasterVolume, AUD_WaveVolume
+	AHK_Debug("AUD_SetVolume(" . PRM_Component . ", " . PRM_Volume . ")")
 	PRM_Volume := Round(PRM_Volume)
 	AUD_SoundSet(PRM_Volume, PRM_Component)
 	Loop
@@ -228,7 +237,12 @@ AUD_Init() {
 	GroupAdd, AUD_MediaWindowsGroup, ahk_class WMPTransition
 	GroupAdd, AUD_MediaWindowsGroup, ahk_class ShockwaveFlashFullScreen
 	GroupAdd, AUD_MediaWindowsGroup, GUI_VolumeBar ahk_class AutoHotkeyGUI
-	AUD_WaveVolume := Round(AUD_SoundGet("Wave"))
+	AUD_WaveVolume := AUD_SoundGet("Wave")
+	If (AUD_WaveVolume == "") {
+		AUD_WaveVolume := 0
+	} Else {
+		AUD_WaveVolume := Round(AUD_WaveVolume)
+	}
 	AUD_MasterVolume := AUD_SoundGet()
 	If (AUD_MasterVolume == "") {
 		AUD_NoMasterVolume := true
@@ -458,7 +472,8 @@ AUD_SoundSet(PRM_Value, PRM_Component = "", PRM_Control = "") {
 		&& LOC_Component == "Master") {
 		LOC_Component := "Wave"
 	}
-	SoundSet, %PRM_Value%, %LOC_Component%, %LOC_Control%
+	SoundSet, % Round(PRM_Value), %LOC_Component%, %LOC_Control%
+	AHK_Debug("SoundSet,", Round(PRM_Value), ",", LOC_Component, ",", LOC_Control)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

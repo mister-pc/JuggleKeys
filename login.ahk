@@ -274,7 +274,7 @@ LOG_MailEncryptedAddressesManager(PRM_HotKey = false, PRM_SelectedIndex = 0) {
 			Loop, Parse, LOG_MailEncryptedAddresses, |
 			{
 				If (A_Index == STA_MailAddress) {
-					AHK_SendRaw(LOG_Decrypt(A_LoopField))
+					TXT_SendRaw(LOG_Decrypt(A_LoopField))
 					Return
 				}
 			}
@@ -438,7 +438,7 @@ LOG_BankEncryptedAccount() {
 	IniRead, LOG_BankEncryptedAccount, %AHK_IniFile%, Text, BankEncryptedAccount, %A_Space%
 	LOG_FieldsManager(PRM_Title := "Enregistement du compte en banque", PRM_Text := "Numéro de compte en &banque", PRM_TextWidth := 0, PRM_VariableNames := "LOG_BankEncryptedAccount", PRM_VariableWidth := 180)
 	If (LOG_BankEncryptedAccount) {
-		AHK_SendRaw(LOG_Decrypt(LOG_BankEncryptedAccount))
+		TXT_SendRaw(LOG_Decrypt(LOG_BankEncryptedAccount))
 		SendInput, {Tab}
 	}
 	IniWrite, %LOG_BankEncryptedAccount%, %AHK_IniFile%, Text, BankEncryptedAccount
@@ -471,7 +471,7 @@ LOG_BankEncryptedProAccount() {
 	IniRead, LOG_BankEncryptedProAccount, %AHK_IniFile%, Text, BankEncryptedProAccount, %A_Space%
 	LOG_FieldsManager(PRM_Title := "Enregistement du compte en banque pro", PRM_Text := "Numéro de compte en &banque", PRM_TextWidth := 0, PRM_VariableNames := "LOG_BankEncryptedProAccount", PRM_VariableWidth := 180)
 	If (LOG_BankEncryptedProAccount) {
-		AHK_SendRaw(LOG_Decrypt(LOG_BankEncryptedProAccount))
+		TXT_SendRaw(LOG_Decrypt(LOG_BankEncryptedProAccount))
 		SendInput, {Tab}
 	}
 	IniWrite, %LOG_BankEncryptedProAccount%, %AHK_IniFile%, Text, BankEncryptedProAccount
@@ -505,7 +505,7 @@ LOG_CB() {
 	LOG_FieldsManager(PRM_Title := "Enregistrement de la Carte Bleue", PRM_Text := "Numéro de Carte &Bleue", PRM_TextWidth := 0, PRM_VariableNames := "LOG_CBEncryptedNumber", PRM_VariableWidth := 150)
 	If (LOG_CBEncryptedNumber) {
 		
-		AHK_SendRaw(LOG_Decrypt(LOG_CBEncryptedNumber))
+		TXT_SendRaw(LOG_Decrypt(LOG_CBEncryptedNumber))
 		SendInput, {Tab}
 	}
 	IniWrite, %LOG_CBEncryptedNumber%, %AHK_IniFile%, Text, CBEncryptedNumber
@@ -527,6 +527,7 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 +#Enter::
++#NumPadEnter::
 AHK_KeyWait("#")
 LOG_WindowsLogin()
 Return
@@ -541,12 +542,12 @@ LOG_WindowsLogin() {
 	LOG_FieldsManager(PRM_Title := "Informations d'identification à Windows", PRM_Text := "&Login Windows,&Mot de passe", PRM_TextWidth := 90, PRM_VariableNames := "LOG_DomainLogin,LOG_DomainEncryptedPassword", PRM_VariableWidth := 120)
 	If (LOG_DomainLogin) {
 		SendInput, ^a
-		AHK_SendRaw(LOG_Decrypt(LOG_DomainLogin))
+		TXT_SendRaw(LOG_Decrypt(LOG_DomainLogin))
 		SendInput, {Tab}
 		If (LOG_DomainEncryptedPassword) {
 			Sleep, 200
 			SendInput, ^a
-			AHK_SendRaw(LOG_Decrypt(LOG_DomainEncryptedPassword))
+			TXT_SendRaw(LOG_Decrypt(LOG_DomainEncryptedPassword))
 			SendInput, {Enter}
 		}
 	}
@@ -571,6 +572,8 @@ Return
 
 <^+#Enter::
 >^+#Enter::
+<^+#NumpadEnter::
+>^+#NumpadEnter::
 AHK_KeyWait("#+")
 LOG_DNSLogin()
 Return
@@ -589,12 +592,12 @@ LOG_DNSLogin() {
 	If (LOG_DomainName
 		&& LOG_DomainLogin) {
 		SendInput, ^a
-		AHK_SendRaw(LOG_Decrypt(LOG_DomainName) . "\" . LOG_Decrypt(LOG_DomainLogin))
+		TXT_SendRaw(LOG_Decrypt(LOG_DomainName) . "\" . LOG_Decrypt(LOG_DomainLogin))
 		SendInput, {Tab}
 		If (LOG_DomainEncryptedPassword) {
 			Sleep, 200
 			SendInput, ^a
-			AHK_SendRaw(LOG_Decrypt(LOG_DomainEncryptedPassword))
+			TXT_SendRaw(LOG_Decrypt(LOG_DomainEncryptedPassword))
 			SendInput, {Enter}
 		}
 	}
@@ -624,6 +627,8 @@ LOG_TrayMenuPassword() {
 
 <^#Enter::
 >^#Enter::
+<^#NumpadEnter::
+>^#NumpadEnter::
 LOG_MainEncryptedPasswordThenNoEnter()
 Return
 
@@ -635,6 +640,7 @@ LOG_MainEncryptedPasswordThenNoEnter() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #Enter::
+#NumpadEnter::
 LOG_MainEncryptedPasswordThenEnter()
 Return
 
@@ -654,7 +660,7 @@ LOG_MainEncryptedPassword(PRM_PressEnterKey = true) {
 	LOG_FieldsManager(PRM_Title := "Identification locale", PRM_Text := "Mot de &passe local", PRM_TextWidth := 0, PRM_VariableNames := "LOG_MainEncryptedPassword", PRM_VariableWidth := 150)
 	If (LOG_MainEncryptedPassword) {
 		SendInput, ^a
-		AHK_SendRaw(LOG_Decrypt(LOG_MainEncryptedPassword))
+		TXT_SendRaw(LOG_Decrypt(LOG_MainEncryptedPassword))
 		If (PRM_PressEnterKey) {
 			SendInput, {Enter}
 		}

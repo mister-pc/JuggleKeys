@@ -136,8 +136,10 @@ Return
 
 SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 
-	Global LOG_DomainLogin, LOG_DomainEncryptedPassword, ZZZ_KillRegServerTimer
+	Global AHK_SSD, LOG_DomainLogin, LOG_DomainEncryptedPassword, TRY_TrayTipEnabled, ZZZ_KillRegServerTimer
 	Static STA_RegServer1 := 0, STA_RegServer2 := 0
+	
+	; Kill unclosed regserver commands :
 	If (PRM_KillRegServer) {
 		Loop, 2 {
 			Process, Exist, % STA_RegServer%A_Index%
@@ -147,6 +149,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 		}
 		Return
 	}
+	
 	RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  icofile\DefaultIcon,               Default, % "%1"
 	RegWrite, REG_BINARY, HKEY_CLASSES_ROOT,  icofile\DefaultIcon,               EditFlags, % "00000100"
 	RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  .ico,                              Default, icofile
@@ -162,6 +165,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  MIME\Database\Content Type\image/jpeg, Extension, .jpg
 	RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  MIME\Database\Content Type\image/jpeg, Image Filter CLSID, {607fd4e8-0a03-11d1-ab1d-00c04fc9b304}
 	RegWrite, REG_BINARY, HKEY_CLASSES_ROOT,  MIME\Database\Content Type\image/jpeg\Bits, 0, % "02000000ffffffd8"
+	
 	; RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  *\shellex\ContextMenuHandlers\{645FF040-5081-101B-9F08-00AA002F954E}, Default, Empty Recycle Bin
 	; RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  *\shellex\ContextMenuHandlers\Empty Recycle Bin, Default, {645FF040-5081-101B-9F08-00AA002F954E}
 	; RegWrite, REG_SZ,     HKEY_CLASSES_ROOT,  Directory\Background\shellex\ContextMenuHandlers\Empty Recycle Bin, Default, {645FF040-5081-101B-9F08-00AA002F954E}
@@ -217,6 +221,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu, {645FF040-5081-101B-9F08-00AA002F954E}, 1 ; hide recycle bin from desktop
 	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel, {645FF040-5081-101B-9F08-00AA002F954E}, 1 ; hide recycle bin from desktop
 
+	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Explorer,                    DesktopProcess, 1 ; Open separate explorer processes
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced,           TaskbarGroupSize, 0x00000010 ; group taskbar when > 9
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced,           StartMenuFavorites, 0 ; no favorites menu
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced,           ListviewShadow, 1 ; rop shadows for icon labels on the desktop
@@ -306,11 +311,11 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\PriorityControl,             Win32PrioritySeparation, 26 ; set CPU priority
 	RegWrite, REG_BINARY, HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\Update,                      UpdateMode, % "00" ; Explorer fast update
 	RegWrite, REG_SZ,     HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\Session Manager\Environment, DEVMGR_SHOW_NONPRESENT_DEVICES, 1 ; show hidden devices in device manager
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters, EnablePrefetcher, 0 ; disable prefetch for ssd system drive
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters, EnableSuperfetch, 0 ; disable prefetch for ssd system drive
+	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters, EnablePrefetcher, % (AHK_SSD ? 0 : 1) ; disable prefetch for ssd system drive
+	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters, EnableSuperfetch, % (AHK_SSD ? 0 : 1) ; disable prefetch for ssd system drive
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\SessionManager\Memory Management, ClearPageFileAtShutdown, 0
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\SessionManager\Memory Management, LargeSystemCache, 0
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\WMI\Autologger\ReadyBoot,    Start, 0 ; for SSD system drive
+	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Control\WMI\Autologger\ReadyBoot,    Start, % (AHK_SSD ? 0 : 1) ; for SSD system drive
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\Cdrom,                      Autorun, 0 ; no CD autoplay
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\upnphost,                   Start, 4 ; disable UPNP service
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SYSTEM\CurrentControlSet\Services\cisvc,                      Start, 4 ; disable indexing service
@@ -353,6 +358,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+	; Set logon background from media\logon*.jpg :
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background, OEMBackground, 1 ; change logon background
 	LOC_BackgroundA := Array()
 	, LOC_LogonCount := 0
@@ -368,15 +374,70 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 		APP_RunAs()
 		Try {
 			Run, xcopy /r /h /y "%LOC_File%" "%A_WinDir%\System32\oobe\info\backgrounds\backgroundDefault.jpg", , Hide
+			; AHK_Debug("FileCopy, ", LOC_BackgroundA[LOC_LogonIndex] . ", " . A_WinDir . "\System32\oobe\info\backgrounds\backgroundDefault.jpg, 1")
 		} Catch LOC_Exception {
 			AHK_Catch(LOC_Exception, "SYS_WriteRegistryOptions", PRM_KillRegServer)
 		}
 		RunAs
-		; AHK_Debug("FileCopy, ", LOC_BackgroundA[LOC_LogonIndex] . ", " . A_WinDir . "\System32\oobe\info\backgrounds\backgroundDefault.jpg, 1")
 	}
 
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+	; Hide usual files & folders :
+	Try {
+		FileSetAttrib, -RSH, %A_AppData%, 2
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+	}
+	Try {
+		FileSetAttrib, +SH, %A_Startup%, 2
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+	}
+	Try {
+		FileSetAttrib, +SH, %A_StartupCommon%, 2
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+	}
+	Try {
+		FileSetAttrib, +SH, C:\service.log
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+	}
+	
+	EnvGet, LOC_ProgramData, ProgramData
+	If (LOC_ProgramData
+		&& FileExist(LOC_ProgramData)) {
+		Try {
+			FileSetAttrib, +H, %LOC_ProgramData%, 2
+		} Catch LOC_Exception {
+			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+		}
+	}
+	If (!A_Is64bitOS) {
+		Try {
+			FileSetAttrib, -RSH, %A_AppDataCommon%, 2
+		} Catch LOC_Exception {
+			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+		}
+		Try {
+			FileSetAttrib, -RSH, %A_AppData%\..\Local Settings, 2
+		} Catch LOC_Exception {
+			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+		}
+		Try {
+			FileSetAttrib, -RSH, %A_AppData%\..\Local Settings\Application Data, 2
+		} Catch LOC_Exception {
+			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+		}
+	}
+	RegWrite, REG_DWORD, HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, EnableBalloonTips, % (TRY_TrayTipEnabled ? 1 : 0)
+	RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, EnableBalloonTips, % (TRY_TrayTipEnabled ? 1 : 0)
+	SendMessage, 0x001A, , , , ahk_id 0xFFFF ; 0x001A is WM_SETTINGCHANGE ; 0xFFFF is HWND_BROADCAST
+	
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	; RegServer & Windows update commands :
 	RegRead, LOC_LastExecutionDay, HKEY_LOCAL_MACHINE, SOFTWARE\AutoHotkey, LastExecutionDay
 	If (ErrorLevel) {
 		LOC_LastExecutionDay := 0
@@ -406,10 +467,10 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 		SetTimer, SYS_WindowsUpdate, -1
 		RegWrite, REG_DWORD, HKEY_LOCAL_MACHINE, SOFTWARE\AutoHotkey, LastExecutionDay, %A_YDay%
 	} Else {
-		Run, %A_WinDir%\system32\sc.exe stop trustedinstaller, , Hide UseErrorLevel
-		Run, %A_WinDir%\system32\sc.exe config trustedinstaller start= disabled, , Hide UseErrorLevel
-		Run, %A_WinDir%\system32\sc.exe stop wuauserv, , Hide UseErrorLevel
-		Run, %A_WinDir%\system32\sc.exe config wuauserv start= disabled, , Hide UseErrorLevel
+		;~ Run, %A_WinDir%\system32\sc.exe stop trustedinstaller, , Hide UseErrorLevel
+		;~ Run, %A_WinDir%\system32\sc.exe config trustedinstaller start= disabled, , Hide UseErrorLevel
+		;~ Run, %A_WinDir%\system32\sc.exe stop wuauserv, , Hide UseErrorLevel
+		;~ Run, %A_WinDir%\system32\sc.exe config wuauserv start= disabled, , Hide UseErrorLevel
 	}
 	RegDelete, HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion, HWID ; prevent Microsoft from reading HardWare ID
 	RegDelete, HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RemoteComputer\NameSpace, {D6277990-4C6A-11CF-8D87-00AA0060F5BF} ; speed up access to network shares
@@ -448,172 +509,6 @@ SYS_WindowsUpdate() {
 	Run, %A_WinDir%\system32\wuapp.exe startmenu, , Maximize UseErrorLevel
 	TRY_ShowTrayTip("Windows Update launched")
 	RunAs
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Hovering scroll :
-;;;;;;;;;;;;;;;;;;;
-
-SYS_InitWheel() {
-	Global ZZZ_ScrollAcceleration := 1
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SYS_WheelAccelerate() {
-	
-	Global ZZZ_ScrollAcceleration, SYS_ScroolBoost, SYS_ScrollLimit, SYS_ScrollTimeOut
-	Static STA_ScrollDistance := 0, STA_ScrollMaxAcceleration := 1
-
-	LOC_TimeSincePriorHotkey := A_TimeSincePriorHotkey
-	If (A_PriorHotkey == A_ThisHotkey
-		&& LOC_TimeSincePriorHotkey < SYS_ScrollTimeOut
-		&& !WinActive("Pale Moon ahk_class MozillaWindowClass")) {
-		
-		; Remember how many times we've scrolled in the current direction
-		STA_ScrollDistance++
-
-		; Calculate acceleration factor using a 1/x curve
-		, ZZZ_ScrollAcceleration := (1 < LOC_TimeSincePriorHotkey && LOC_TimeSincePriorHotkey < 80) ? (250.0 / LOC_TimeSincePriorHotkey) - 1 : 1
-		MouseGetPos, , , , LOC_ControlClass
-		If (SubStr(LOC_ControlClass, 1, 17) == "dopus.filedisplay") {
-			ZZZ_ScrollAcceleration := min(ZZZ_ScrollAcceleration, 3)
-		}
-
-		; Apply boost
-		If (SYS_ScroolBoost > 1
-			&& STA_ScrollDistance > SYS_ScroolBoost) {
-			; Hold onto the highest speed we've achieved during this boost
-			If (ZZZ_ScrollAcceleration > STA_ScrollMaxAcceleration) {
-				STA_ScrollMaxAcceleration := ZZZ_ScrollAcceleration
-			} Else {
-				ZZZ_ScrollAcceleration := STA_ScrollMaxAcceleration
-			}
-			ZZZ_ScrollAcceleration *= STA_ScrollDistance / SYS_ScroolBoost
-		}
-
-		; Validate
-		ZZZ_ScrollAcceleration := (ZZZ_ScrollAcceleration > 1) ? ((ZZZ_ScrollAcceleration > SYS_ScrollLimit) ? SYS_ScrollLimit : Floor(ZZZ_ScrollAcceleration)) : 1
-		If (ZZZ_ScrollAcceleration > 1) {
-			AHK_ShowToolTip("× " . ZZZ_ScrollAcceleration)
-		}
-	} Else {
-		STA_ScrollDistance := 0
-		, ZZZ_ScrollAcceleration := STA_ScrollMaxAcceleration := 1
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SYS_WheelUp(PRM_Cancel = false) {
-	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
-	STA_Cancel := PRM_Cancel
-	If (PRM_Cancel) {
-		Return
-	}
-
-	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_HoveredWindowID, LOC_ControlClass
-	WinGetClass, LOC_WindowClass, ahk_id %LOC_HoveredWindowID%
-	WinGetTitle, LOC_WindowTitle, ahk_id %LOC_HoveredWindowID%
-	SYS_WheelAccelerate()
-	, SYS_WheelDown(PRM_Cancel := true)
-	, LOC_UltraEdit := (SubStr(LOC_WindowClass, 1, 4) == "Afx:" && InStr(LOC_WindowTitle, "UltraEdit") == "")
-	Loop, %ZZZ_ScrollAcceleration% {
-		If (STA_Cancel) {
-			Return
-		}
-		If (LOC_UltraEdit) {
-			ControlSend, %LOC_ControlClass%, {WheelUp}, ahk_id %LOC_HoveredWindowID%
-		} Else {
-			PostMessage, 0x20A, 120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
-			Sleep, 10
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SYS_WheelDown(PRM_Cancel = false) {
-	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
-	STA_Cancel := PRM_Cancel
-	If (PRM_Cancel) {
-		Return
-	}
-	
-	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_HoveredWindowID, LOC_ControlClass
-	WinGetClass, LOC_WindowClass, ahk_id %LOC_HoveredWindowID%
-	WinGetTitle, LOC_WindowTitle, ahk_id %LOC_HoveredWindowID%
-	SYS_WheelAccelerate()
-	, SYS_WheelUp(PRM_Cancel := true)
-	, LOC_UltraEdit := (SubStr(LOC_WindowClass, 1, 4) == "Afx:" && InStr(LOC_WindowTitle, "UltraEdit") == "")
-	Loop, %ZZZ_ScrollAcceleration% {
-		If (STA_Cancel) {
-			Return
-		}
-		If (LOC_UltraEdit) {
-			ControlSend, %LOC_ControlClass%, {WheelDown}, ahk_id %LOC_HoveredWindowID%
-		} Else {
-			PostMessage, 0x20A, -120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
-			Sleep, 10
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WheelLeft::
-^WheelUp::
-SYS_WheelLeft()
-Return
-
-SYS_WheelLeft(PRM_Cancel = false) {
-	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
-	STA_Cancel := PRM_Cancel
-	If (PRM_Cancel) {
-		Return
-	}
-	
-	MouseGetPos, , , LOC_HoveredWindowID, LOC_ControlClass
-	SYS_WheelAccelerate()
-	, SYS_WheelRight(PRM_Cancel := true)
-	Loop, %ZZZ_ScrollAcceleration% {
-		If (STA_Cancel) {
-			Return
-		}
-		SendMessage, 0x114, 0, 0, %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WheelRight::
-^WheelDown::
-SYS_WheelRight()
-Return
-
-SYS_WheelRight(PRM_Cancel = false) {
-	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
-	STA_Cancel := PRM_Cancel
-	If (PRM_Cancel) {
-		Return
-	}
-	
-	MouseGetPos, , , LOC_HoveredWindowID, LOC_ControlClass
-	SYS_WheelAccelerate()
-	, SYS_WheelLeft(PRM_Cancel := true)
-	Loop, %ZZZ_ScrollAcceleration% {
-		If (STA_Cancel) {
-			Return
-		}
-		SendMessage, 0x114, 1, 0, %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
-	}
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -661,8 +556,9 @@ Return
 
 SYS_StartMenuDisplayTimer(PRM_WinKeyDown = false) {
 	
-	Global WIN_MenusTransparency, SCR_VirtualScreenX, SCR_VirtualScreenY
-	Static STA_StartMenuTransparency := 0, STA_InitialTransparency := 225, STA_StartMenuActive := false, STA_InitialMouseX := SCR_VirtualScreenX - 1, STA_InitialMouseY := SCR_VirtualScreenY - 1
+	Global SCR_VirtualScreenX, SCR_VirtualScreenY
+	Static STA_InitialMouseX := SCR_VirtualScreenX - 1, STA_InitialMouseY := SCR_VirtualScreenY - 1, STA_InitialCountdown := 10, STA_StartMenuCountdown := STA_InitialCountdown
+
 	CoordMode, Mouse, Screen
 	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_HoveredWindowID
 	WinGetClass, LOC_HoveredClass, ahk_id %LOC_HoveredWindowID%
@@ -672,11 +568,9 @@ SYS_StartMenuDisplayTimer(PRM_WinKeyDown = false) {
 	If (LOC_HoveredClass == "ClassicShell.CMenuContainer"
 		|| LOC_HoveredClass == "ClassicShell.CStartButton"
 		|| LOC_HoveredClass == "Button" && LOC_HoveredTitle == "Démarrer") {
-		WinSet, Transparent, %WIN_MenusTransparency%, ahk_group WIN_MenusGroup ; start menu transparency
-		WinSet, Transparent, %STA_InitialTransparency%, ahk_id %LOC_HoveredWindowID% ; start menu item initial transparency
-		, STA_InitialMouseX := LOC_MouseX
+		STA_InitialMouseX := LOC_MouseX
 		, STA_InitialMouseY := LOC_MouseY
-		, STA_StartMenuTransparency := STA_InitialTransparency
+		, STA_StartMenuCountDown := STA_InitialCountdown
 		Return
 	}
 
@@ -685,23 +579,23 @@ SYS_StartMenuDisplayTimer(PRM_WinKeyDown = false) {
 		&& STA_InitialMouseY == SCR_VirtualScreenY - 1) {
 		STA_InitialMouseX := LOC_MouseX
 		, STA_InitialMouseY := LOC_MouseY
-		, STA_StartMenuTransparency := STA_InitialTransparency
+		, STA_StartMenuCountDown := STA_InitialCountdown
 		Return
 	}
 	
 	; Not hovering start menu, and mouse has moved :
 	If (LOC_MouseX != STA_InitialMouseX
 		|| LOC_MouseY != STA_InitialMouseY
-		|| STA_StartMenuTransparency != STA_InitialTransparency) {
-		If (STA_StartMenuTransparency) {
+		|| STA_StartMenuCountDown != STA_InitialCountdown) {
+		If (STA_StartMenuCountDown) {
 			If (WinExist("ahk_group WIN_StartMenuGroup")) {
 				If (WinExist("ahk_class #32768")) {
-					STA_StartMenuTransparency := STA_InitialTransparency
+					STA_StartMenuCountDown := STA_InitialCountdown
 					Return
 				}
 				
-				STA_StartMenuTransparency := max(0, STA_StartMenuTransparency - max(37, 255 - WIN_MenusTransparency))
-				If (STA_StartMenuTransparency) {
+				STA_StartMenuCountDown--
+				If (STA_StartMenuCountDown) {
 					WinSet, Transparent, Transparent, %STA_StartMenuTransparency%, ahk_group WIN_StartMenuGroup
 					Return
 				}
@@ -709,7 +603,7 @@ SYS_StartMenuDisplayTimer(PRM_WinKeyDown = false) {
 			}
 		}
 		
-		STA_StartMenuTransparency := 0
+		STA_StartMenuCountDown := 0
 		, STA_InitialMouseX := SCR_VirtualScreenX - 1
 		, STA_InitialMouseY := SCR_VirtualScreenY - 1
 	}
@@ -1044,21 +938,18 @@ SYS_TaskbarColorPeriodicTimer:
 SYS_TaskbarColorPeriodicTimer()
 Return
 
-SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionExists = -1) {
+SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionID = 0) {
 
     Global AHK_ScriptInfo
 	Static STA_InitialCount := 20, STA_Colors := "Red|Green|Blue"
     Static STA_OldRed := 255, STA_Red := 255, STA_RedStep := 0
     Static STA_OldGreen := 255, STA_Green := 255, STA_GreenStep := 0,
     Static STA_OldBlue := 255, STA_Blue := 255, STA_BlueStep := 0
-    Static STA_Count := STA_InitialCount, STA_DisplayFusionExists := false, STA_ShellTrayID := false
+    Static STA_Count := STA_InitialCount, STA_DisplayFusionID := 0, STA_ShellTrayID := 0
 
-    If (PRM_DisplayFusionExists != -1) {
-        STA_DisplayFusionExists := PRM_DisplayFusionExists
-    }
-
-    If (STA_Count == STA_InitialCount) {
-        Loop, Parse, STA_Colors, |
+    ; Colors :
+	If (STA_Count == STA_InitialCount) {
+        Loop, Parse, STA_Colors, | ; Red|Green|Blue
         {
             Random, LOC_New%A_LoopField%, 0, 255
             STA_%A_LoopField%Step := (LOC_New%A_LoopField% - STA_Old%A_LoopField%) / STA_InitialCount
@@ -1066,12 +957,10 @@ SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionExists = -1) {
             STA_Old%A_LoopField% := LOC_New%A_LoopField%
         }
     }
-
     STA_Count--
     If (STA_Count < 0) {
         STA_Count := STA_InitialCount
     }
-
     Loop, Parse, STA_Colors, |
     {
         Transform, LOC_Hexa%A_LoopField%, Floor, STA_%A_LoopField%
@@ -1084,9 +973,11 @@ SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionExists = -1) {
         }
         STA_%A_LoopField% += STA_%A_LoopField%Step
     }
+	
+	; Shell tray :
 	If (STA_ShellTrayID) {
 		If (!WinExist("ahk_id " . STA_ShellTrayID)) {
-			STA_ShellTrayID := false
+			STA_ShellTrayID := 0
 		}
 	} Else {
 		STA_ShellTrayID := WinExist("ahk_class Shell_TrayWnd")
@@ -1095,19 +986,24 @@ SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionExists = -1) {
         Gui, 18:+LastFound ; GUI_ColoredTaskbar
 		Gui, 18:Color, %LOC_HexaRed%%LOC_HexaGreen%%LOC_HexaBlue%
         Gui, 18:Show, NoActivate, GUI_ColoredTaskbar
-        WinSetTitle, %AHK_ScriptInfo%
+        WinSetTitle, GUI_ColoredTaskbar
     } Else {
         Gui, 18:Cancel
     }
-    If (STA_DisplayFusionExists) {
-        Process, Exist, DisplayFusion.exe
-        If (ErrorLevel) {
+	
+    ; DisplayFusion tray :
+	If (PRM_DisplayFusionID) {
+        STA_DisplayFusionID := PRM_DisplayFusionID
+    }
+    If (STA_DisplayFusionID) {
+        If (WinExist("ahk_id " . STA_DisplayFusionID)) {
 			Gui, 19:+LastFound ; GUI_DisplayFusionColoredTaskbar
             Gui, 19:Color, %LOC_HexaRed%%LOC_HexaGreen%%LOC_HexaBlue%
             Gui, 19:Show, NoActivate, GUI_DisplayFusionColoredTaskbar
-			WinSetTitle, %AHK_ScriptInfo%
+			WinSetTitle, GUI_DisplayFusionColoredTaskbar
         } Else {
             Gui, 19:Cancel
+			STA_DisplayFusionID := 0
         }
     }
 }

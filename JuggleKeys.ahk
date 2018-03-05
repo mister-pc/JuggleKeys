@@ -9,7 +9,19 @@
 ; Bugs :
 ;;;;;;;;
 
+; Supprimer LOG_DomainLogin pr le remplacer par A_Username automatiquement
+
+; Modif .ini non prise en cpte
+
+; Propriété d'une tâche planifiée se ferme immédiatement
+
+; Refaire disparaitre la règle avec la mm combinaison de touches (attention à la fermeture avec mbutton)
+
+; Revoir les agrandissements sur l'autre écran, surtt lrsq la fenêtre est dj agrandie ou pas
+
 ; StripMyRights (av IE) ne se lance pas !
+
+; Revoir ds le presse-papiers les fics enregs av des trous ds les noms (parex, 01 qui saute)
 
 ; KBD_WordControl : gérer les multiples retours-chariots, qui ne st p pris en cpte ds la sélection naturelle
 ;                    gérer le cut
@@ -65,7 +77,11 @@
 ; Évolutions :
 ;;;;;;;;;;;;;;
 
+; Les titres des fenêtres matchent aves des regex (chercher RegEx ds l'aide) 
+
 ; Faire un pense-bête (avec alarme ?)
+
+; Mesure d'angle
 
 ; Faire un chrono, un cpte à rebours & des alarmes
 
@@ -80,6 +96,8 @@
 ; http://mizage.com/divvy/
 
 ; Icônes : explorer.exe, compstui.dll & icmui.dll (couleurs), mmsys.cpl (sound on/off), mspaint.exe (pinceaux), rasdlg.dll 1 & 2 (pr les checkboxes)
+
+
 
 ; SysMenu personnalisé (Kill, AOT, Trans, ...)
 ; Touches mortes avec accents : écrire les séquences directement ? genre ’+e => é
@@ -273,14 +291,14 @@ AHK_FadeSplashScreen(PRM_Visible = true) {
 
 AHK_Init:
 AHK_RunLockManager()
-SetTimer, ZZZ_CheckModificationsTimer, -1
+SetTimer, AHK_CheckModificationsTimer, -1
 
-AHK_LoadIniFile(true)
+AHK_InitTimers()
+, AHK_LoadIniFile(true)
+, AHK_SetExecutionMode()
 , AHK_Log()
 , AHK_InitLibraries()
-, AHK_InitTimers()
 , AHK_ResetControlKeys()
-, AHK_ParseCommandLineParameters()
 , WIN_Init()
 , APP_Init()
 , SCR_Init()
@@ -317,8 +335,8 @@ ADM_ApplyMouseHooks()
 , APP_InitAndroidCursorTimer()
 , SYS_SetClassicStartMenu()
 , SCR_InitWallpapers()
-; , AHK_BackupScripts()
-SetTimer, TRY_CheckTrayIconStateTimer, %ZZZ_CheckTrayIconStateTimer%
+, AHK_BackupScripts()
+SetTimer, TRY_CheckTrayIconStatePeriodicTimer, %ZZZ_CheckTrayIconStatePeriodicTimer%
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -331,10 +349,12 @@ Return
 #Include %A_ScriptDir%\hotstrings.ahk
 #Include %A_ScriptDir%\keyboard.ahk
 #Include %A_ScriptDir%\login.ahk
+#Include %A_ScriptDir%\mouse.ahk
 #Include %A_ScriptDir%\power.ahk
 #Include %A_ScriptDir%\screen.ahk
 #Include %A_ScriptDir%\system.ahk
 #Include %A_ScriptDir%\text.ahk
+#Include %A_ScriptDir%\tools.ahk
 #Include %A_ScriptDir%\tray.ahk
 #Include %A_ScriptDir%\windows.ahk
 
@@ -344,7 +364,7 @@ Return
 
 AHK_RunLockManager(PRM_Active = true) {
 	Global AHK_ScriptName
-	LOC_File := A_ScriptDir . "\conf\" . AHK_ScriptName . ".lock"
+	LOC_File := A_Temp . "\" . AHK_ScriptName . ".lock"
 	
 	If (PRM_Active) {
 		If (FileExist(LOC_File)) {
@@ -377,13 +397,12 @@ AHK_RunLockManager(PRM_Active = true) {
 AHK_InitTimers() {
 	Global
 	
-	; les périodiques st +, les non- st -
+	; Periodic timers are positive, non-periodic ones are negative :
 	ZZZ_SuspendingWindowsPeriodicTimer := 994
 	, ZZZ_BoringPopUpsPeriodicTimer := 247
 	, ZZZ_ShowDialogsPeriodicTimer := 259
 	, ZZZ_OpenSaveDialogsPeriodicTimer := 252
 	, ZZZ_XWindowFocusPeriodicTimer := 487
-
 
 	, ZZZ_StartButtonTooltipPeriodicTimer := 248
 	, ZZZ_StartMenuDisplayTimer := 202
@@ -391,7 +410,7 @@ AHK_InitTimers() {
 	, ZZZ_TaskbarColorPeriodicTimer := 106
 	, ZZZ_TransparencyPeriodicTimer := 99
 	, ZZZ_TaskbarCalendarPeriodicTimer := 505
-	, ZZZ_CheckTrayIconStateTimer := 501
+	, ZZZ_CheckTrayIconStatePeriodicTimer := 501
 	
 	, ZZZ_MouseAxisLockPeriodicTimer := -253
 	, ZZZ_MouseAxisUnlockPeriodicTimer := -47
@@ -437,7 +456,6 @@ AHK_DisplayDisabledOptions() {
 			, AHK_AudioEnabled: "     - Audio effects disabled`n"
 			, SCR_MouseTracesEnabled: "     - Mouse trace disabled`n"
 			, WIN_FocusFollowsMouseEnabled: "     - X-Mouse focus enabled`n"
-			, WIN_TransparencyEnabled: "     - Automatic window transparency enabled`n"
 			, SCR_WallpaperRotationEnabled: "     - Automatic wallpaper rotation disabled`n"
 			, SCR_WallpaperFolder: "     - Wallpaper folder not defined`n"
 			, LOG_BankEncryptedAccount: "     - Bank encrypted account not defined`n"
@@ -452,7 +470,6 @@ AHK_DisplayDisabledOptions() {
 			, AHK_AudioEnabled: false
 			, SCR_MouseTracesEnabled: false
 			, WIN_FocusFollowsMouseEnabled: true
-			, WIN_TransparencyEnabled: true
 			, SCR_WallpaperRotationEnabled: false }
 
 	; Mouse button hooks :
@@ -469,7 +486,10 @@ AHK_DisplayDisabledOptions() {
 		}
 	}
 	
-	LOC_Variables := "TRY_TrayTipEnabled|AHK_TooltipsEnabled|AHK_DebugEnabled|SCR_MouseTracesEnabled|WIN_FocusFollowsMouseEnabled|WIN_TransparencyEnabled|SCR_WallpaperRotationEnabled"
+	LOC_Variables := (AHK_Experimental
+		? "TRY_TrayTipEnabled|AHK_TooltipsEnabled|AHK_DebugEnabled|SCR_MouseTracesEnabled|WIN_FocusFollowsMouseEnabled|SCR_WallpaperRotationEnabled"
+		: "TRY_TrayTipEnabled|AHK_TooltipsEnabled|SCR_MouseTracesEnabled|WIN_FocusFollowsMouseEnabled|SCR_WallpaperRotationEnabled")
+		
 	Loop, Parse, LOC_Variables, |
 	{
 		If (%A_LoopField% == LOC_VariableWarningStateA[A_LoopField]) {
@@ -509,7 +529,6 @@ AHK_DisplayDisabledOptions() {
 	If (LOC_ToolTip) {
 		TRY_ShowTrayTip("`nConfiguration not optimized :`n`n" . LOC_ToolTip . "`nCheck the file " . AHK_IniFile, - Round(1.5 * max(2, LOC_WarningCount)))
 	}
-	; AHK_Debug(LOC_ToolTip)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -558,28 +577,6 @@ AHK_LogOffTimer() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Command line parameters :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_ParseCommandLineParameters() {
-
-	Local LOC_Index
-	AHK_Log("> AHK_ParseCommandLineParameters()")
-	Loop, %0% {
-		StringLower, LOC_Index, A_Index
-		If (LOC_Index == "/x"
-			|| LOC_Index == "/exit") {
-			ExitApp
-		}
-	}
-	AHK_Log("< AHK_ParseCommandLineParameters()")
-	Return
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Low memory usage :
 ;;;;;;;;;;;;;;;;;;;;
 
@@ -601,48 +598,48 @@ AHK_FreeMemory() {
 AHK_LoadIniFile(PRM_FirstLoad = false) {
 
 	Global
-	Static STA_DefaultValuesA := { "WIN_Brightness": 128, "WIN_Transparency": 220, "WIN_MenusTransparency": 230, "WIN_TransparencyEnabled": 0, "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AUD_Step": 5, "AUD_BigStep": 10, "SYS_CPURefreshTime": 1000, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_ChangeWallPaperTimer": 3600, "SCR_PixelsPerMillimeter": 3.5, "APP_AndroidActivityEnabled": 0, "SCR_MouseRings": 20 }
-	Static STA_ApplicationDefaultPathA := { "Apache": "" ; EasyPHP-Devserver-16.1\eds-binaries\httpserver\apache2418vc11x86x170131170253\bin\eds-httpserver.exe
-		, "AutoScriptWriter": "" ; AutoHotkey\AutoScriptWriter\AutoScriptWriter.exe
-		, "Android": "Nox\bin\Nox.exe"
-		, "CDBurner": "CDBurnerXP\cdbxpp.exe"
-		, "ClassicStartMenu": "Classic Shell\ClassicStartMenu.exe"
-		, "CygWin": "CygWin\Cygwin.bat"
-		, "DieOrLive": ""
-		, "DirectoryOpus": "GPSoftware\Directory Opus\dopus.exe"
-		, "DirectoryOpusRT": "GPSoftware\Directory Opus\dopusrt.exe"
-		, "Eclipse": "Eclipse\eclipse.exe"
-		, "Firefox": "Pale Moon\palemoon.exe"
-		, "GitHub": "" ; C:\Users\<userName>\AppData\Local\Apps\2.0\6606GGNH.N77\W7TJK2BM.OBG\gith..tion_317444273a93ac29_0003.0003_5794af8169eeff14\GitHub.exe
-		, "InternetExplorer": "Internet Explorer\iexplore.exe"
-		, "JavaWebStart": "Java\jre\bin\javaws.exe"
+	Static STA_DefaultValuesA := { "WIN_Brightness": 128, "WIN_MenusTransparency": 230, "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_Admin": 1, "AHK_Experimental": 0, "AHK_SSD": 1, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AUD_Step": 5, "AUD_BigStep": 10, "SYS_CPURefreshTime": 1000, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_ChangeWallPaperTimer": 3600, "SCR_PixelsPerMillimeter": 3.5, "APP_AndroidActivityEnabled": 0, "SCR_MouseRings": 20 }
+	Static STA_ApplicationDefaultPathA := { "Apache": "G:\xamp\apache\bin\httpd.exe" ; APP_ApachePath
+		, "AutoScriptWriter": "AutoHotkey\AutoScriptWriter\AutoScriptWriter.exe" ; APP_AutoScriptWriterPath
+		, "Android": "Nox\bin\Nox.exe" ; APP_AndroidPath
+		, "CDBurner": "CDBurnerXP\cdbxpp.exe" ; APP_CDBurnerPath
+		, "ClassicStartMenu": "Classic Shell\ClassicStartMenu.exe" ; APP_ClassicStartMenuPath
+		, "CygWin": "CygWin\Cygwin.bat" ; APP_CygWinPath
+		, "DirectoryOpus": "GPSoftware\Directory Opus\dopus.exe" ; APP_DirectoryOpusPath
+		, "DirectoryOpusRT": "GPSoftware\Directory Opus\dopusrt.exe" ; APP_DirectoryOpusRTPath
+		, "DisplayFusion": "DisplayFusion\DisplayFusion.exe" ; APP_DisplayFusionPath
+		, "Eclipse": "Eclipse\eclipse.exe" ; APP_EclipsePath
+		, "Firefox": "Pale Moon\palemoon.exe" ; APP_FirefoxPath
+		, "Git": "Git\git-bash.exe" ; APP_GitPath
+		, "InternetExplorer": "Internet Explorer\iexplore.exe" ; APP_InternetExplorerPath
+		, "JavaWebStart": "Java\jre\bin\javaws.exe" ; APP_JavaWebStartPath
 		, "MP3Editor": "Mp3 Editor Pro\Mp3EditorPro.exe"
-		, "MailApplication": "Mozilla Thunderbird\thunderbird.exe"
-		, "MediaMonkey": "MediaMonkey\MediaMonkey.exe"
-		, "MySQL": "" ; EasyPHP-Devserver-16.1\eds-binaries\dbserver\mysql5711x86x170131170253\bin\eds-dbserver.exe
-		, "Photoshop": "Adobe\Adobe Photoshop CS2\Photoshop.exe"
-		, "Quintessential": "Quintessential Media Player\QMPlayer.exe"
-		, "RegistryManager": "Registrar Registry Manager\rr.exe"
-		, "SQLDeveloper": ""
-		, "SciTE": "" ; AutoHotkey\SciTE\SciTE.exe
-		, "SnagIt": "TechSmith\Snagit 10\Snagit32.exe"
-		, "StartupDelayer": "r2 Studios\Startup Delayer\Startup Delayer.exe"
-		, "TextEditor": "IDM Computer Solutions\UltraEdit\uedit64.exe"
-		, "VideoConverter": "Freemake\Freemake Video Converter\FreemakeVC.exe"
-		, "VisionGo": "Vision Go 0.5\VisionGo.exe"
-		, "WinSpector": "Winspector\WinspectorU.exe"
-		, "WindowsMediaPlayer": "Windows Media Player\wmplayer.exe"
-		, "uTorrent": "uTorrent\uTorrent.exe" }
-	Local LOC_Exception, LOC_VariableName, LOC_DefaultValue, LOC_Directories, LOC_Attributes, LOC_Exception
+		, "MailApplication": "Mozilla Thunderbird\thunderbird.exe" ; APP_MailApplicationPath
+		, "MediaMonkey": "MediaMonkey\MediaMonkey.exe" ; APP_MediaMonkeyPath
+		, "MySQL": "G:\xamp\mysql\bin\mysqld.exe" ; APP_MySQLPath ; APP_MySQLPath
+		, "Photoshop": "Adobe\Adobe Photoshop CS2\Photoshop.exe" ; APP_PhotoshopPath
+		, "Quintessential": "Quintessential Media Player\QMPlayer.exe" ; APP_QuintessentialPath
+		, "RegistryManager": "Registrar Registry Manager\rr.exe" ; APP_RegistryManagerPath
+		, "SQLDeveloper": "" ; APP_SQLDeveloperPath
+		, "SciTE": "AutoHotkey\SciTE\SciTE.exe" ; APP_SciTEPath
+		, "SnagIt": "TechSmith\Snagit 13\Snagit32.exe" ; APP_SnagItPath
+		, "StartupDelayer": "r2 Studios\Startup Delayer\Startup Delayer.exe" ; APP_StartupDelayerPath
+		, "TextEditor": "IDM Computer Solutions\UltraEdit\uedit64.exe" ; APP_TextEditorPath
+		, "VideoConverter": "Freemake\Freemake Video Converter\FreemakeVC.exe" ; APP_VideoConverterPath
+		, "VisionGo": "Vision Go 0.5\VisionGo.exe" ; APP_VisionGoPath
+		, "WinSpector": "Winspector\WinspectorU.exe" ; APP_WinSpectorPath
+		, "WindowsMediaPlayer": "Windows Media Player\wmplayer.exe" ; APP_WindowsMediaPlayerPath
+		, "uTorrent": "uTorrent\uTorrent.exe" } ; APP_uTorrentPath
+	Static STA_FirstLoad := true
+	Local LOC_Exception, LOC_VariableName, LOC_DefaultValue, LOC_ApplicationName, LOC_DefaultPath, LOC_Directories, LOC_Attributes, LOC_Exception
 
+	; Create specific working directories :
 	LOC_Directories := "\conf|\clip|\media"
 	Loop, Parse, LOC_Directories, |
 	{
 		LOC_Attributes := FileExist(A_ScriptDir . A_LoopField)
 		If (LOC_Attributes) {
-			If (InStr(LOC_Attributes, "D")) {
-				LOC_Attributes := "D"
-			} Else {
+			If (!InStr(LOC_Attributes, "D")) {
 				Try {
 					FileDelete, % A_ScriptDir . A_LoopField
 				} Catch LOC_Exception {
@@ -660,8 +657,9 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 		}
 	}
 	
+	; Get suspend state & set program files variable :
 	If (PRM_FirstLoad) {
-		AHK_IniFile := A_ScriptDir . "\conf\" . AHK_ScriptName . ".ini"
+		AHK_IniFile := A_ScriptDir . "\conf\" . A_Username . ".ini"
 		IniRead, AHK_Suspended, %AHK_IniFile%, Main, Suspended, % STA_DefaultValuesA["AHK_Suspended"]
 		If (A_Is64bitOS) {
 			EnvGet, ZZZ_ProgramFiles32, ProgramFiles(x86)
@@ -671,10 +669,12 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 		}
 	}
 
+	; Load general variables :
+	IniRead, AHK_Experimental, %AHK_IniFile%, Main, Experimental, % STA_DefaultValuesA["AHK_Experimental"]
+	IniRead, AHK_Admin, %AHK_IniFile%, Main, Admin, % STA_DefaultValuesA["AHK_Admin"]
+	IniRead, AHK_SSD, %AHK_IniFile%, Main, SSD, % STA_DefaultValuesA["AHK_SSD"]
 	IniRead, WIN_Brightness, %AHK_IniFile%, Main, Brightness, % STA_DefaultValuesA["WIN_Brightness"]
-	IniRead, WIN_Transparency, %AHK_IniFile%, Main, Transparency, % STA_DefaultValuesA["WIN_Transparency"]
 	IniRead, WIN_MenusTransparency, %AHK_IniFile%, Main, MenusTransparency, % STA_DefaultValuesA["WIN_MenusTransparency"]
-	IniRead, WIN_TransparencyEnabled, %AHK_IniFile%, Main, TransparencyEnabled, % STA_DefaultValuesA["WIN_TransparencyEnabled"]
 	IniRead, AHK_LogsEnabled, %AHK_IniFile%, Main, LogsEnabled, % STA_DefaultValuesA["AHK_LogsEnabled"]
 	IniRead, AHK_DebugEnabled, %AHK_IniFile%, Main, DebugEnabled, % STA_DefaultValuesA["AHK_DebugEnabled"]
 	IniRead, AHK_ToolTipsEnabled, %AHK_IniFile%, Main, ToolTipsEnabled, % STA_DefaultValuesA["AHK_ToolTipsEnabled"]
@@ -699,36 +699,44 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 	IniRead, SYS_ScroolBoost, %AHK_IniFile%, Mouse, ScroolBoost, % STA_DefaultValuesA["SYS_ScroolBoost"] ; If you scroll a long distance in one session, apply additional boost factor. The higher the value, the longer it takes to activate, and the slower it accumulates. Set to zero to disable completely. Default: 30.
 	IniRead, SYS_ScrollLimit, %AHK_IniFile%, Mouse, ScrollLimit, % STA_DefaultValuesA["SYS_ScrollLimit"] ; Spamming applications with hundreds of individual scroll events can slow them down. This sets the maximum number of scrolls sent per click, i.e. max velocity. Default: 60.
 	IniRead, APP_AndroidActivityEnabled, %AHK_IniFile%, Applications, AndroidActivityEnabled, % STA_DefaultValuesA["APP_AndroidActivityEnabled"]
-
 	For LOC_VariableName, LOC_DefaultValue In STA_DefaultValuesA
 	{
-		If (StrLen(%LOC_VariableName%) == 0) {
+		If (StrLen(%LOC_VariableName%) == 0) { ; set unset (but existing) global variables to their default value
 			%LOC_VariableName% := LOC_DefaultValue
 		}
 	}
 
-	; Applications :
-	For LOC_VariableName, LOC_DefaultValue In STA_ApplicationDefaultPathA
+	If (AHK_Admin && !A_IsAdmin) {
+		AHK_Admin := false
+	}
+
+	; Load application path variables :
+	For LOC_ApplicationName, LOC_DefaultPath In STA_ApplicationDefaultPathA
 	{
-		IniRead, APP_%LOC_VariableName%Path, %AHK_IniFile%, Applications, %LOC_VariableName%Path, %LOC_DefaultValue%
-		If (APP_%LOC_VariableName%Path) {
-			If (!FileExist(APP_%LOC_VariableName%Path)) {
-				If (FileExist(ZZZ_ProgramFiles32 . "\" . APP_%LOC_VariableName%Path)) {
-					APP_%LOC_VariableName%Path := ZZZ_ProgramFiles32 . "\" . APP_%LOC_VariableName%Path
-				} Else If (FileExist(ZZZ_ProgramFiles64 . "\" . APP_%LOC_VariableName%Path)) {
-					APP_%LOC_VariableName%Path := ZZZ_ProgramFiles64 . "\" . APP_%LOC_VariableName%Path
+		IniRead, APP_%LOC_ApplicationName%Path, %AHK_IniFile%, Applications, %LOC_ApplicationName%Path, %LOC_DefaultPath%
+		If (!APP_%LOC_ApplicationName%Path) {
+			APP_%LOC_ApplicationName%Path := LOC_DefaultPath
+		}
+		If (APP_%LOC_ApplicationName%Path) {
+			If (!FileExist(APP_%LOC_ApplicationName%Path)) {
+				If (FileExist(ZZZ_ProgramFiles32 . "\" . APP_%LOC_ApplicationName%Path)) {
+					APP_%LOC_ApplicationName%Path := ZZZ_ProgramFiles32 . "\" . APP_%LOC_ApplicationName%Path
+				} Else If (FileExist(ZZZ_ProgramFiles64 . "\" . APP_%LOC_ApplicationName%Path)) {
+					APP_%LOC_ApplicationName%Path := ZZZ_ProgramFiles64 . "\" . APP_%LOC_ApplicationName%Path
 				} Else {
-					APP_%LOC_VariableName%Path := ""
+					APP_%LOC_ApplicationName%Path := ""
 				}
 			}
 		} Else {
-			APP_%LOC_VariableName%Path := ""
+			APP_%LOC_ApplicationName%Path := ""
 		}
 	}
-	For LOC_VariableName, LOC_DefaultValue In STA_ApplicationDefaultPathA
+	SetTimer, AHK_CheckModificationsTimer, Off
+	For LOC_ApplicationName, LOC_DefaultPath In STA_ApplicationDefaultPathA
 	{
-		IniWrite, % APP_%LOC_VariableName%Path, %AHK_IniFile%, Applications, %LOC_VariableName%Path
+		IniWrite, % APP_%LOC_ApplicationName%Path, %AHK_IniFile%, Applications, %LOC_ApplicationName%Path
 	}
+	SetTimer, AHK_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
 
 	; Android :
 	If (PRM_FirstLoad) {
@@ -744,10 +752,11 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 			}
 		}
 	}
-	
+
+	; Load alternate clipboard from file :
 	Try {
-		If (FileExist(A_ScriptDir . "\clip\" . AHK_ScriptName . ".clip")) {
-			FileRead, TXT_ClipBoard, *c %A_ScriptDir%\clip\%AHK_ScriptName%.clip
+		If (FileExist(A_ScriptDir . "\clip\alternate.clip")) {
+			FileRead, TXT_ClipBoard, *c %A_ScriptDir%\clip\alternate.clip
 		}
 	} Catch LOC_Exception {
 		AHK_Catch(LOC_Exception, "AHK_LoadIniFile", PRM_FirstLoad)
@@ -769,8 +778,11 @@ Return
 AHK_SaveIniFile() {
 	Global
 	Local LOC_LogFile := A_ScriptDir . "\conf\" . AHK_ScriptName . ".log", LOC_Exception := false
-	SetTimer, ZZZ_CheckModificationsTimer, Off
+	SetTimer, AHK_CheckModificationsTimer, Off
 	
+	IniWrite, %AHK_Admin%, %AHK_IniFile%, Main, Admin
+	IniWrite, %AHK_Experimental%, %AHK_IniFile%, Main, Experimental
+	IniWrite, %AHK_SSD%, %AHK_IniFile%, Main, SSD
 	IniWrite, %AHK_LogsEnabled%, %AHK_IniFile%, Main, LogsEnabled
 	IniWrite, %AHK_DebugEnabled%, %AHK_IniFile%, Main, DebugEnabled
 	IniWrite, %AHK_ToolTipsEnabled%, %AHK_IniFile%, Main, ToolTipsEnabled
@@ -780,8 +792,6 @@ AHK_SaveIniFile() {
 	IniWrite, %AUD_Step%, %AHK_IniFile%, Main, AudioStep
 	IniWrite, %AUD_BigStep%, %AHK_IniFile%, Main, AudioBigStep
 	IniWrite, %WIN_Brightness%, %AHK_IniFile%, Main, Brightness
-	IniWrite, %WIN_TransparencyEnabled%, %AHK_IniFile%, Main, TransparencyEnabled
-	IniWrite, %WIN_Transparency%, %AHK_IniFile%, Main, Transparency
 	IniWrite, %WIN_MenusTransparency%, %AHK_IniFile%, Main, MenuTransparency
 	IniWrite, %SCR_WallpaperRotationEnabled%, %AHK_IniFile%, Main, WallpaperRotationEnabled
 	IniWrite, %SCR_ChangeWallPaperTimer%, %AHK_IniFile%, Main, WallpaperTimer
@@ -821,6 +831,7 @@ AHK_SaveIniFile() {
 	IniWrite, %LOG_DomainEncryptedPassword%, %AHK_IniFile%, Text, DomainEncryptedPassword
 	IniRead, LOG_MainEncryptedPassword, %AHK_IniFile%, Text, MainEncryptedPassword, %A_Space%
 	IniWrite, %LOG_MainEncryptedPassword%, %AHK_IniFile%, Text, MainEncryptedPassword
+
 	Try {
 		FileSetAttrib, -A, %AHK_IniFile%
 	} Catch LOC_Exception {
@@ -838,58 +849,7 @@ AHK_SaveIniFile() {
 		FileRecycle, %LOC_LogFile%
 	}
 
-	Try {
-		FileSetAttrib, -RSH, %A_AppData%, 2
-	} Catch LOC_Exception {
-		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-	}
-	Try {
-		FileSetAttrib, +SH, %A_Startup%, 2
-	} Catch LOC_Exception {
-		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-	}
-	Try {
-		FileSetAttrib, +SH, %A_StartupCommon%, 2
-	} Catch LOC_Exception {
-		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-	}
-	Try {
-		FileSetAttrib, +SH, C:\service.log
-	} Catch LOC_Exception {
-		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-	}
-	
-	Local LOC_ProgramData
-	EnvGet, LOC_ProgramData, ProgramData
-	If (LOC_ProgramData
-		&& FileExist(LOC_ProgramData)) {
-		Try {
-			FileSetAttrib, +H, %LOC_ProgramData%, 2
-		} Catch LOC_Exception {
-			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-		}
-	}
-	If (!A_Is64bitOS) {
-		Try {
-			FileSetAttrib, -RSH, %A_AppDataCommon%, 2
-		} Catch LOC_Exception {
-			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-		}
-		Try {
-			FileSetAttrib, -RSH, %A_AppData%\..\Local Settings, 2
-		} Catch LOC_Exception {
-			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-		}
-		Try {
-			FileSetAttrib, -RSH, %A_AppData%\..\Local Settings\Application Data, 2
-		} Catch LOC_Exception {
-			AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
-		}
-	}
-	RegWrite, REG_DWORD, HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, EnableBalloonTips, % (TRY_TrayTipEnabled ? 1 : 0)
-	RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, EnableBalloonTips, % (TRY_TrayTipEnabled ? 1 : 0)
-	SendMessage, 0x001A, , , , ahk_id 0xFFFF ; 0x001A is WM_SETTINGCHANGE ; 0xFFFF is HWND_BROADCAST
-	SetTimer, ZZZ_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
+	SetTimer, AHK_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
 	Return
 }
 
@@ -900,14 +860,14 @@ AHK_SaveIniFile() {
 ; Check script modifications :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ZZZ_CheckModificationsTimer:
-SetTimer, ZZZ_CheckModificationsTimer, Off
+AHK_CheckModificationsTimer:
+SetTimer, AHK_CheckModificationsTimer, Off
 If (AHK_CheckModifications()) {
 	AHK_BackupScripts()
 	, ADM_Reload()
 } Else
 If (!A_IsSuspended) {
-	SetTimer, ZZZ_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
+	SetTimer, AHK_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
 }
 Return
 
@@ -918,7 +878,7 @@ AHK_CheckModifications() {
 	Global AHK_ScriptName
 	
 	; Close current script if bad PID :
-	LOC_LockFile := A_ScriptDir . "\conf\" . AHK_ScriptName . ".lock"
+	LOC_LockFile := A_Temp . "\" . AHK_ScriptName . ".lock"
 	If (FileExist(LOC_LockFile)) {
 		FileRead, LOC_ScriptID, %LOC_LockFile%
 		If (LOC_ScriptID != A_ScriptHwnd) {
@@ -987,7 +947,7 @@ AHK_SetPeriodicCkeckTimers(PRM_Active = true) {
 	SetTimer, SYS_TaskbarCalendarPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_TaskbarCalendarPeriodicTimer)
 	SetTimer, SYS_GetCPUAndMemoryInfosPeriodicTimer, % (A_IsSuspended ? "Off" : SYS_CPURefreshTime)
 	SetTimer, SYS_StartButtonTooltipPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_StartButtonTooltipPeriodicTimer)
-	SetTimer, SYS_TaskbarClockPeriodicTimer, % ZZZ_TaskbarClockPeriodicTimer
+	SetTimer, SYS_TaskbarClockPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_TaskbarClockPeriodicTimer)
 	SetTimer, WIN_TransparencyPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_TransparencyPeriodicTimer)
 	SetTimer, SYS_StartMenuDisplayTimer, % (A_IsSuspended ? "Off" : ZZZ_StartMenuDisplayTimer)
 	SetTimer, WIN_OpenSaveDialogsPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_OpenSaveDialogsPeriodicTimer)
@@ -1019,8 +979,8 @@ AHK_Exit() {
 	BlockInput, Off
 	SetTimer, AHK_ClosePreviousAHKInstanceTimer, %ZZZ_ClosePreviousAHKInstanceTimer%
 	AHK_SetPeriodicCkeckTimers(false)
-	SetTimer, ZZZ_CheckModificationsTimer, Off
-	SetTimer, TRY_CheckTrayIconStateTimer, Off
+	SetTimer, AHK_CheckModificationsTimer, Off
+	SetTimer, TRY_CheckTrayIconStatePeriodicTimer, Off
 	AHK_ResetControlKeys()
 	, WIN_RollDownAll()
 	, WIN_MinimizeToTray(, PRM_Flags := -1)
@@ -1068,281 +1028,11 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Tooltips :
-;;;;;;;;;;;;
-
-AHK_ToggleToolTip:
-AHK_ToggleToolTip()
-Menu, Options, Show
-Return
-
-^+#t::
-AHK_ToggleToolTip()
-, TRY_ShowTrayTip("Tooltips " . (AHK_ToolTipsEnabled ? "enabled" : "disabled"), (AHK_ToolTipsEnabled ? 1 : 2))
-Return
-
-AHK_ToggleToolTip() {
-	Global
-	AHK_ToolTipsEnabled := !AHK_ToolTipsEnabled
-	, TRY_UpdateMenus()
-	, AHK_SaveIniFile()
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_ToggleTrayTip:
-AHK_ToggleTrayTip()
-Menu, Options, Show
-Return
-
-^+#b::
-AHK_ToggleTrayTip()
-, TRY_ShowTrayTip("Tray tips: " . (TRY_TrayTipEnabled ? "Enabled" : "Disabled"))
-Return
-
-AHK_ToggleTrayTip() {
-	Global
-	TRY_TrayTipEnabled := !TRY_TrayTipEnabled
-	, TRY_UpdateMenus()
-	, AHK_SaveIniFile()
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_ShowToolTip(PRM_ToolTipText = "", PRM_ToolTipSeconds = 0.75, PRM_Transparency = 180, PRM_ToolTipX = 99999, PRM_ToolTipY = 99999, PRM_ToolTipWidth = 0, PRM_ToolTipHeight = 0, PRM_Bold = true) {
-	Global AHK_ToolTipsEnabled, SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight
-	Static STA_ToolTipBuffered = false
-	If (AHK_ToolTipsEnabled) {
-		If (PRM_ToolTipText) {
-			LOC_CurrentGUI := (STA_ToolTipBuffered ? 45 : 44)
-			, LOC_NextGUI := (STA_ToolTipBuffered ? 44 : 45)
-			, LOC_NextGUITitle := (STA_ToolTipBuffered ? "GUI_ToolTip" : "GUI_BufferedToolTip")
-			Gui, %LOC_NextGUI%:Destroy ; GUI_ToolTip | GUI_BufferedToolTip
-			Gui, %LOC_NextGUI%:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound
-			Gui, %LOC_NextGUI%:Color, FFFFDF, 000000
-			Gui, %LOC_NextGUI%:Margin, 5, 5
-			If (PRM_Bold) {
-				Gui, %LOC_NextGUI%:Font, Bold
-			}
-			Gui, %LOC_NextGUI%:Add, Text, , %PRM_ToolTipText%
-			Gui, %LOC_NextGUI%:Show, % "x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth) . " y" . (SCR_VirtualScreenY + SCR_VirtualScreenHeight) . " AutoSize NA NoActivate", %LOC_NextGUITitle%
-			WinSet, Transparent, %PRM_Transparency%
-			WinSet, ExStyle, +0x00000020
-			WinGetPos, , , LOC_Width, LOC_Height
-			CoordMode, Mouse, Screen
-			MouseGetPos, LOC_MouseX, LOC_MouseY
-			LOC_ToolTipX := min(max(PRM_ToolTipX != 99999 ? PRM_ToolTipX : LOC_MouseX + 24, SCR_VirtualScreenX), SCR_VirtualScreenX + SCR_VirtualScreenWidth - LOC_Width)
-			, LOC_ToolTipY := min(max(PRM_ToolTipY != 99999 ? PRM_ToolTipY : LOC_MouseY + 34, SCR_VirtualScreenY), SCR_VirtualScreenY + SCR_VirtualScreenHeight - LOC_Height)
-			If (LOC_ToolTipX != ""
-				&& LOC_ToolTipY != "") { ; sometimes values are not affected : why ???
-				Gui, %LOC_NextGUI%:Show, % "x" . LOC_ToolTipX . " y" . LOC_ToolTipY . (PRM_ToolTipWidth > 0 ? " w" . PRM_ToolTipWidth : "") . (PRM_ToolTipHeight > 0 ? " h" . PRM_ToolTipHeight : "") . " NA NoActivate", %LOC_NextGUITitle%
-				Gui, %LOC_CurrentGUI%:Destroy
-				If (PRM_ToolTipSeconds) {
-					SetTimer, AHK_HideToolTipTimer, % - PRM_ToolTipSeconds * 1000
-				}
-			}
-			STA_ToolTipBuffered := !STA_ToolTipBuffered
-		} Else {
-			AHK_HideToolTip()
-		}
-	}
-	Return
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_HideToolTipTimer:
-AHK_HideToolTip()
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_HideToolTip() {
-	Gui, 44:Destroy ; GUI_ToolTip
-	Gui, 45:Destroy ; GUI_BufferedToolTip
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_ShowWindowToolTip(PRM_X, PRM_Y, PRM_Width, PRM_Height, PRM_Prefix = "", PRM_Suffix = "", PRM_Text = "", PRM_HiddenWindowEnabled = false, PRM_Transparency = 180, PRM_Distance = false) {
-
-	Global 	SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, ZZZ_HideWindowToolTipTimer
-	Static STA_Width41 = 0, STA_Height41 = 0, STA_Width42 = 0, STA_Height42 = 0, STA_Width43 = 0, STA_Height43 = 0, STA_Margin = 10, STA_LeftTop, STA_WidthHeight, STA_RightBottom, STA_Prefix = "", STA_Suffix = "", STA_Text = "", STA_Distance = false, STA_Initializing := false
-
-	LOC_Prefix := (PRM_Prefix ? PRM_Prefix . ": " : "")
-	, LOC_Suffix := (PRM_Suffix ? " " . PRM_Suffix : "")
-	SetTimer, AHK_HideWindowToolTip, Off
-	If (STA_Width41 == 0) {
-		If (STA_Initializing) {
-			Return
-		}
-		STA_Initializing := true
-		Gui, 41:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound ; GUI_LeftTopToolTip
-		Gui, 41:Color, FFFFDF, 000000
-		Gui, 41:Margin, 0, 5
-		Gui, 41:Font, Bold
-		Gui, 41:Add, Text, Center vSTA_LeftTop, % "(mmmm, mmmm)"
-		Gui, 41:Show, % "AutoSize NoActivate y200 x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth), GUI_LeftTopToolTip
-		WinSet, Transparent, %PRM_Transparency%
-		WinSet, ExStyle, +0x00000020
-		WinGetPos, , , STA_Width41, STA_Height41
-
-		LOC_PixelUnit := (PRM_Distance ? "px" : "")
-		Gui, 42:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound ; GUI_WidthHeightToolTip
-		Gui, 42:Color, FFFFDF, 000000
-		Gui, 42:Margin, 5, 5
-		Gui, 42:Font, Bold
-		Gui, 42:Add, Text, % (PRM_Text ? "" : "Center ") . "vSTA_WidthHeight", % LOC_Prefix . (PRM_Distance ? "mmmm px × mmmm px     –     [mm.m cm × mm.m cm]`nÐ = mmmm px     –     [mm.m cm]     –     mmm %" : "mmmm × mmmm") . LOC_Suffix
-		If (PRM_Text) {
-			Gui, 42:Add, Text, , %PRM_Text%
-		}
-		Gui, 42:Show, % "AutoSize NoActivate y400 x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth), GUI_WidthHeightToolTip
-		WinSet, Transparent, %PRM_Transparency%
-		WinSet, ExStyle, +0x00000020
-		WinGetPos, , , STA_Width42, STA_Height42
-
-		Gui, 43:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound ; GUI_RightBottomToolTip
-		Gui, 43:Color, FFFFDF, 000000
-		Gui, 43:Margin, 0, 5
-		Gui, 43:Font, Bold
-		Gui, 43:Add, Text, Center vSTA_RightBottom, % "(mmmm, mmmm)"
-		Gui, 43:Show, % "AutoSize NoActivate y600 x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth), GUI_RightBottomToolTip
-		WinSet, Transparent, %PRM_Transparency%
-		WinSet, ExStyle, +0x00000020
-		WinGetPos, , , STA_Width43, STA_Height43
-
-		STA_Distance := PRM_Distance
-		, STA_Prefix := PRM_Prefix
-		, STA_Suffix := PRM_Suffix
-		, STA_Initializing := false
-	} Else
-	
-	If (PRM_Text != STA_Text
-		|| STA_Distance != PRM_Distance
-		|| PRM_Prefix != STA_Prefix
-		|| PRM_Suffix != STA_Suffix) {
-		Gui, 42:Destroy ; GUI_WidthHeightToolTip
-		Gui, 42:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound
-		Gui, 42:Color, FFFFDF, 000000
-		Gui, 42:Margin, 5, 5
-		Gui, 42:Font, Bold
-		Gui, 42:Add, Text, % (PRM_Text ? "" : "Center ") . "vSTA_WidthHeight", % LOC_Prefix . (PRM_Distance ? "mmmm px × mmmm px     –     [mm.m cm × mm.m cm]`nÐ = mmmm px     –     [mm.m cm]     –     mmm %" : "mmmm × mmmm") . LOC_Suffix
-		If (PRM_Text) {
-			Gui, 42:Add, Text, , %PRM_Text%
-		}
-		Gui, 42:Show, % "AutoSize NoActivate y400 x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth), GUI_WidthHeightToolTip
-		WinSet, Transparent, %PRM_Transparency%
-		WinSet, ExStyle, +0x00000020
-		WinGetPos, , , STA_Width42, STA_Height42
-
-		STA_Text := PRM_Text
-		, STA_Distance := PRM_Distance
-		, STA_Prefix := PRM_Prefix
-		, STA_Suffix := PRM_Suffix
-	}
-
-	LOC_X41 := (PRM_Width > 0 ? PRM_X + STA_Margin : PRM_X - STA_Width41 - STA_Margin)
-	, LOC_Y41 := (PRM_Height > 0 ? PRM_Y + STA_Margin : PRM_Y - STA_Height41 - STA_Margin)
-	, LOC_X43 := (PRM_Width > 0 ? PRM_X + PRM_Width - STA_Width43 - STA_Margin : PRM_X + PRM_Width + STA_Margin)
-	, LOC_Y43 := (PRM_Height > 0 ? PRM_Y + PRM_Height - STA_Height43 - STA_Margin : PRM_Y + PRM_Height + STA_Margin)
-
-	Loop, 3 {
-		If (A_Index != 2) {
-			LOC_X4%A_Index% := min(max(LOC_X4%A_Index%, SCR_VirtualScreenX + STA_Margin), SCR_VirtualScreenX + SCR_VirtualScreenWidth - STA_Width4%A_Index% - STA_Margin)
-			, LOC_Y4%A_Index% := min(max(LOC_Y4%A_Index%, SCR_VirtualScreenY + STA_Margin), SCR_VirtualScreenY + SCR_VirtualScreenHeight - STA_Height4%A_Index% - STA_Margin)
-		}
-	}
-
-	If ((LOC_Y41 - LOC_Y43) * PRM_Height > 0
-		|| Abs(LOC_Y43 - LOC_Y41) - (PRM_Height > 0 ? STA_Height41 : STA_Height43) <= STA_Height42 + 1
-			&& Abs(LOC_X43 - LOC_X41) - (PRM_Width > 0 ? STA_Width41 : STA_Width43) <= STA_Width42 + 1) {
-		LOC_Y41 := (PRM_Height > 0 ? PRM_Y - STA_Height41 - STA_Margin : PRM_Y + STA_Margin)
-		, LOC_Y43 := (PRM_Height > 0 ? PRM_Y + PRM_Height + STA_Margin : PRM_Y + PRM_Height - STA_Height43 - STA_Margin)
-		Loop, 3 {
-			If (A_Index != 2) {
-				LOC_Y4%A_Index% := min(max(LOC_Y4%A_Index%, SCR_VirtualScreenY + STA_Margin), SCR_VirtualScreenY + SCR_VirtualScreenHeight - STA_Height4%A_Index% - STA_Margin)
-			}
-		}
-	}
-
-	If ((LOC_X41 - LOC_X43) * PRM_Width > 0
-		|| Abs(LOC_X43 - LOC_X41) - (PRM_Width > 0 ? STA_Width41 : STA_Width43) <= STA_Width42 + 1
-			&& Abs(LOC_Y43 - LOC_Y41) - (PRM_Height > 0 ? STA_Height41 : STA_Height43) <= STA_Height42 + 1) {
-		LOC_X41 := (PRM_Width > 0 ? PRM_X - STA_Width41 - STA_Margin : PRM_X + STA_Margin)
-		, LOC_X43 := (PRM_Width > 0 ? PRM_X + PRM_Width + STA_Margin : PRM_X + PRM_Width - STA_Width43 - STA_Margin)
-		Loop, 3 {
-			If (A_Index != 2) {
-				LOC_X4%A_Index% := min(max(LOC_X4%A_Index%, SCR_VirtualScreenX + STA_Margin), SCR_VirtualScreenX + SCR_VirtualScreenWidth - STA_Width4%A_Index% - STA_Margin)
-			}
-		}
-	}
-
-	LOC_X42 := (LOC_X43 > LOC_X41 ? LOC_X41 + (LOC_X43 + STA_Width43 - LOC_X41 - STA_Width42) // 2 : LOC_X43 + (LOC_X41 + STA_Width41 - LOC_X43 - STA_Width42) // 2)
-	, LOC_Y42 := (LOC_Y43 > LOC_Y41 ? LOC_Y41 + (LOC_Y43 + STA_Height43 - LOC_Y41 - STA_Height42) // 2 : LOC_Y43 + (LOC_Y41 + STA_Height41 - LOC_Y43 - STA_Height42) // 2)
-	LOC_X42 := min(max(LOC_X42, SCR_VirtualScreenX + STA_Margin), SCR_VirtualScreenX + SCR_VirtualScreenWidth - STA_Width42 - STA_Margin)
-	, LOC_Y42 := min(max(LOC_Y42, SCR_VirtualScreenY + STA_Margin), SCR_VirtualScreenY + SCR_VirtualScreenHeight - STA_Height42 - STA_Margin)
-	, LOC_Width := Abs(PRM_Width)
-	, LOC_Height := Abs(PRM_Height)
-	, LOC_Distance := Round(Sqrt(PRM_Width * PRM_Width + PRM_Height * PRM_Height))
-	
-
-	If ((Abs(LOC_X43 - LOC_X41) > STA_Width41 + STA_Width42 + 1
-			|| Abs(LOC_Y43 - LOC_Y41) > STA_Height41 + STA_Height42 + 1)
-		&& (PRM_HiddenWindowEnabled
-			|| STA_Width42 < Abs(PRM_Width) - 20
-			|| STA_Height42 < Abs(PRM_Height) - 20)) {
-		GuiControl, 41:, STA_LeftTop, % "(" . (PRM_X + 0) . ", " . (PRM_Y + 0) . ")"
-		GuiControl, 42:, STA_WidthHeight, % LOC_Prefix . (PRM_Distance ? LOC_Width . " px × " . LOC_Height . " px     –     [" . AHK_Px2Cm(LOC_Width) . " × " . AHK_Px2Cm(LOC_Height) . "]`nÐ = " . LOC_Distance . " px     –     [" . AHK_Px2Cm(LOC_Distance) . "]     –     " . (LOC_Height ? Round(100 * LOC_Width / LOC_Height) . " %" : "") : LOC_Width . " × " . LOC_Height) . LOC_Suffix
-		
-		GuiControl, 43:, STA_RightBottom, % "(" . (PRM_X + PRM_Width) . ", " . (PRM_Y + PRM_Height) . ")"
-		AHK_HideToolTip()
-		Try {
-			Gui, 41:Show, x%LOC_X41% y%LOC_Y41% w%STA_Width41% h%STA_Height41% NoActivate, GUI_LeftTopToolTip
-			Gui, 42:Show, x%LOC_X42% y%LOC_Y42% w%STA_Width42% h%STA_Height42% NoActivate, GUI_WidthHeightToolTip
-			Gui, 43:Show, x%LOC_X43% y%LOC_Y43% w%STA_Width43% h%STA_Height43% NoActivate, GUI_RightBottomToolTip
-		} Catch LOC_Exception {
-			AHK_Catch(LOC_Exception, "AHK_ShowWindowToolTip", PRM_X, PRM_Y, PRM_Width, PRM_Height, PRM_Prefix, PRM_Suffix, PRM_Text, PRM_HiddenWindowEnabled, PRM_Transparency, PRM_Distance)
-		}
-		SetTimer, AHK_HideWindowToolTip, %ZZZ_HideWindowToolTipTimer%
-	} Else {
-		Gui, 41:Hide
-		Gui, 42:Hide
-		Gui, 43:Hide
-		LOC_ToolTipText := LOC_Prefix . "(" . PRM_X . ", " . PRM_Y . ") » (" . (PRM_X + PRM_Width) . ", " . (PRM_Y + PRM_Height) . ")`n"
-			. (PRM_Distance ? "`n" : "") . LOC_Width . " px × " . LOC_Height . " px     –     [" . AHK_Px2Cm(LOC_Width) . " × " . AHK_Px2Cm(LOC_Height) . "]" . LOC_Suffix
-			. (PRM_Distance ? "`nÐ = " . LOC_Distance . " px     –     [" . AHK_Px2Cm(LOC_Distance) . "]     –     " . (LOC_Height ? Round(100 * LOC_Width / LOC_Height) . " %" : "") : "")
-			. (PRM_Text ? "`n`n" . PRM_Text : "")
-		, AHK_ShowToolTip(LOC_ToolTipText, PRM_Seconds := 1, PRM_Transparency)
-	}
-}
-
-AHK_Px2Cm(PRM_Pixels, PRM_Suffix = " cm") {
-	Global SCR_PixelsPerMillimeter
-	LOC_Millimeters := Round(Abs(PRM_Pixels) / SCR_PixelsPerMillimeter)
-	Return, (LOC_Millimeters > 9 ? SubStr(LOC_Millimeters, 1, StrLen(LOC_Millimeters) - 1) : "0") . "." . SubStr(LOC_Millimeters, 0) . PRM_Suffix
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_HideWindowToolTip:
-AHK_HideWindowToolTip()
-Return
-
-AHK_HideWindowToolTip() {
-	Gui, 41:Hide ; GUI_LeftTopToolTip
-	Gui, 42:Hide ; GUI_WidthHeightToolTip
-	Gui, 43:Hide ; GUI_RightBottomToolTip
-	AHK_HideToolTip()
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Shell hook to minimize to tray :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 AHK_InitLibraries() {
+	; TODO : Shell hook to minimize to tray
 	Global
 	AHK_Log("> AHK_InitLibraries()")
 	, AHK_Suspended := false
@@ -1363,7 +1053,6 @@ AHK_InitLibraries() {
 
 AHK_WindowsTimeSynchronization(PRM_Action = false) {
 
-	Global LOG_DomainLogin, LOG_DomainEncryptedPassword
 	If (PRM_Action) {
 		If (FileExist(A_ScriptDir . "\bin\Time.exe")) {
 			APP_RunAs()
@@ -1392,24 +1081,6 @@ AHK_KillTimeProcess() {
 	If (ErrorLevel) {
 		Process, Close, %ErrorLevel%
 	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Excluded system windows :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_SystemWindowClass(PRM_WindowClass = "") {
-	If (PRM_WindowClass == "") {
-		WinGetClass, PRM_WindowClass, A
-	}
-	Return, (PRM_WindowClass == "Progman"
-			|| PRM_WindowClass == "WorkerW"
-			|| PRM_WindowClass == "Shell_TrayWnd"
-			|| PRM_WindowClass == "VistaSwitcher_SwitcherWnd"
-			|| PRM_WindowClass == "ThunderRT6Main")
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1455,6 +1126,7 @@ AHK_ResetCursor() {
 
 ; Audio activation :
 ;;;;;;;;;;;;;;;;;;;;
+
 AHK_ToggleAudio:
 AHK_ToggleAudio()
 , TRY_ShowTrayTip("Audio: " . (AHK_AudioEnabled ? "On" : "Off"))
@@ -1492,7 +1164,7 @@ AHK_ToggleSuspend(PRM_NewValue = -1) {
 	Global
 	AHK_Suspended := (PRM_NewValue == -1 ? !AHK_Suspended : (PRM_NewValue ? true : false))
 	If (!AHK_Suspended) {
-		SetTimer, ZZZ_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
+		SetTimer, AHK_CheckModificationsTimer, %ZZZ_CheckModificationsTimer%
 		AHK_SetPeriodicCkeckTimers()
 	} Else {
 		AUD_Beep()
@@ -1547,24 +1219,6 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Send straight raw text :
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_SendRaw(PRM_Text = "") {
-
-	If (PRM_Text) {
-		LOC_ClipBoard := ClipBoardAll
-		TXT_SetClipBoard(PRM_Text)
-		SendInput, ^v
-		Sleep, 200
-		TXT_SetClipBoard(LOC_ClipBoard)
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Script Backup :
 ;;;;;;;;;;;;;;;;;
 
@@ -1599,228 +1253,6 @@ AHK_BackupScripts() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Generic AHK Trace :
-;;;;;;;;;;;;;;;;;;;;;
-
-AHK_Trace(PRM_SecondLevelLog = false, PRM_String1 = "", PRM_String2 = "", PRM_String3 = "", PRM_String4 = "", PRM_String5 = "", PRM_String6 = "", PRM_String7 = "", PRM_String8 = "", PRM_String9 = "") {
-	
-	Global AHK_ScriptName, AHK_LogsEnabled, AHK_DebugEnabled, ZZZ_HideDebugTimer
-	Static STA_QueryPerformanceCounter := AHK_GetFunction("kernel32", "QueryPerformanceCounter"), STA_Frequency := 0, STA_CounterInit := false
-	
-	If (!STA_CounterInit) {
-		DllCall("kernel32.dll\QueryPerformanceFrequency", "Int64*", STA_Frequency)
-		, STA_Frequency /= 1000
-		, STA_CounterInit := true
-	}
-
-	; Log :
-	If (AHK_LogsEnabled
-		|| AHK_DebugEnabled) {
-		LOC_FormatedLog := LOC_RawLog := LOC_Debug := ""
-		Loop, 9 {
-			If (IsObject(PRM_String%A_Index%)) {
-				LOC_String := ""
-				For LOC_Key, LOC_Value In PRM_String%A_Index%
-				{
-					LOC_String .= (LOC_String == "" ? "[`t" : ",`n`t") . LOC_Key . " => " . LOC_Value
-				}
-				LOC_String .= (LOC_String ? " ]" : "")
-			} Else {
-				LOC_String := PRM_String%A_Index%
-			}
-			If (LOC_String != "") {
-				If (LOC_RawLog != "") {
-					LOC_LastChar := SubStr(LOC_RawLog, 0)
-					If LOC_LastChar Not In %A_Space%,`t,`n,`r,`v,`f
-					{
-						LOC_RawLog .= " "
-					}
-				}
-				LOC_Debug := LOC_RawLog .= LOC_String
-			}
-		}
-
-		FormatTime, LOC_Time, , % "dd/MM/yyyy HH:mm:ss"
-		If (STA_Frequency) {
-			DllCall(STA_QueryPerformanceCounter, "Int64*", LOC_Counter)
-			, LOC_Time .= "." . SubStr(Round(LOC_Counter / STA_Frequency), -2)
-		}
-		LOC_Time .= " - "
-		If (LOC_RawLog == "") { 
-			LOC_RawLog := "`n"
-		}
-		Loop, Parse, LOC_RawLog, `n, `r
-		{
-			LOC_FormatedLog .= LOC_Time . A_LoopField . "`r`n"
-		}
-		Try {
-			FileAppend, % LOC_FormatedLog, % A_ScriptDir . "\conf\" . AHK_ScriptName . ".log"
-		}
-	}
-	
-	; Debug :
-	If (AHK_DebugEnabled
-		&& PRM_SecondLevelLog
-		&& LOC_Debug != "") {
-		ToolTip, %LOC_Debug%, , , 20
-		SetTimer, ZZZ_HideDebugTimer, %ZZZ_HideDebugTimer%
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; AHK log :
-;;;;;;;;;;;
-
-AHK_Log(PRM_String1 = "", PRM_String2 = "", PRM_String3 = "", PRM_String4 = "", PRM_String5 = "", PRM_String6 = "", PRM_String7 = "", PRM_String8 = "", PRM_String9 = "") {
-
-	AHK_Trace(PRM_SecondLevelLog := false, PRM_String1, PRM_String2, PRM_String3, PRM_String4, PRM_String5, PRM_String6, PRM_String7, PRM_String8, PRM_String9)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_ToggleLogs:
-AHK_ToggleLogs()
-Menu, Options, Show
-Return
-
-^+#g::
-AHK_ToggleLogs()
-, TRY_ShowTrayTip("Logs: " . (AHK_LogsEnabled ? "Enabled" : "Disabled"))
-Return
-
-AHK_ToggleLogs() {
-	Global
-	AHK_LogsEnabled := !AHK_LogsEnabled
-	, TRY_UpdateMenus()
-	, AHK_SaveIniFile()
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; AHK_Debug :
-;;;;;;;;;;;;;
-
-AHK_ToggleDebug:
-AHK_ToggleDebug()
-Menu, Options, Show
-Return
-
-^+#o::
-AHK_ToggleDebug()
-, TRY_ShowTrayTip("Debug: " . (AHK_DebugEnabled ? "Enabled" : "Disabled"))
-Return
-
-AHK_ToggleDebug() {
-	Global
-	AHK_DebugEnabled := !AHK_DebugEnabled
-	, TRY_UpdateMenus()
-	, AHK_SaveIniFile()
-}
-
-AHK_Debug(PRM_String1 = "", PRM_String2 = "", PRM_String3 = "", PRM_String4 = "", PRM_String5 = "", PRM_String6 = "", PRM_String7 = "", PRM_String8 = "", PRM_String9 = "") {
-
-	AHK_Trace(PRM_SecondLevelLog := true, PRM_String1, PRM_String2, PRM_String3, PRM_String4, PRM_String5, PRM_String6, PRM_String7, PRM_String8, PRM_String9)
-}
-
-ZZZ_HideDebugTimer:
-ToolTip, , , , 20
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; AHK_Catch :
-;;;;;;;;;;;;;
-
-AHK_Catch(PRM_Exception, PRM_FunctionName, PRM_Parameter1 = "<noValue>", PRM_Parameter2 = "<noValue>", PRM_Parameter3 = "<noValue>", PRM_Parameter4 = "<noValue>", PRM_Parameter5 = "<noValue>", PRM_Parameter6 = "<noValue>", PRM_Parameter7 = "<noValue>", PRM_Parameter8 = "<noValue>", PRM_Parameter9 = "<noValue>", PRM_Parameter10 = "<noValue>") {
-	
-	Global AHK_DebugEnabled
-	LOC_Parameters := ""
-	Loop, 10 {
-		If (PRM_Parameter%A_Index% != "<noValue>") {
-			LOC_Parameters .= (A_Index > 1 ? ", " : "") . PRM_Parameter%A_Index%
-		} Else {
-			Break
-		}
-	}
-	LOC_File := PRM_Exception["File"]
-	SplitPath, LOC_File, LOC_File
-	LOC_Message := "! " . PRM_FunctionName . "(" . LOC_Parameters . ") : Exception on " . PRM_Exception["What"] . " in " . LOC_File . " (" . PRM_Exception["Line"] . ")"
-	AHK_Debug(LOC_Message)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Do Nothing :
-;;;;;;;;;;;;;;
-
-AHK_DoNothing:
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; File Windows information :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_GetFileInfo(PRM_File) {
-;	FileDescription — v<ProductVersion> — © CompanyName
-
-	Static STA_GetFileVersionInfoSizeAFunction := AHK_GetFunction("Version", "GetFileVersionInfoSizeA")
-	, STA_GetFileVersionInfoAFunction := AHK_GetFunction("Version", "GetFileVersionInfoA")
-	, STA_VerQueryValueAFunction := AHK_GetFunction("Version", "VerQueryValueA")
-	, STA_sprintfFunction := AHK_GetFunction("msvcrt", "sprintf")
-	, STA_lstrlenFunction := AHK_GetFunction("kernel32", "lstrlen")
-	, STA_lstrcpyFunction := AHK_GetFunction("kernel32", "lstrcpy")
-	LOC_Size := DllCall(STA_GetFileVersionInfoSizeAFunction, "Str", PRM_File, "UInt", 0)
-	If (LOC_Size < 1)
-	{
-		Return, ""
-	}
-	VarSetCapacity(LOC_FileVersionInfo, LOC_Size, 0)
-	, VarSetCapacity(LOC_Translation, 8)
-	, DllCall(STA_GetFileVersionInfoAFunction, "Str", PRM_File, "Int", 0, "Int", LOC_Size, "UInt", &LOC_FileVersionInfo)
-	If (!DllCall(STA_VerQueryValueAFunction, "UInt", &LOC_FileVersionInfo, "Str", "\VarFileInfo\Translation", "UIntP", LOC_Translation, "UInt", 0)
-		|| !DllCall(STA_sprintfFunction, "Str", LOC_Translation, "Str", "%08X", "UInt", NumGet(LOC_Translation + 0)))
-	{
-		Return, ""
-	}
-	LOC_ReturnedInfos := ""
-	, LOC_Infos := "FileDescription|ProductVersion|CompanyName"
-	, LOC_InfoPointer := 0
-	, LOC_SubBlock := "\StringFileInfo\" . SubStr(LOC_Translation, -3) . SubStr(LOC_Translation, 1, 4)
-	Loop, Parse, LOC_Infos, |
-	{
-		If (!DllCall(STA_VerQueryValueAFunction, "UInt", &LOC_FileVersionInfo, "Str", LOC_SubBlock . "\" . A_LoopField, "UIntP", LOC_InfoPointer, "UInt", 0)) {
-			Return, ""
-		}
-		VarSetCapacity(LOC_Info, DllCall(STA_lstrlenFunction, "UInt", LOC_InfoPointer))
-		, DllCall(STA_lstrcpyFunction, "Str", LOC_Info, "UInt", LOC_InfoPointer)
-		If (LOC_Info) {
-			If (A_Index == 2) {
-				LOC_ReturnedInfos .= "—  v"
-			} Else
-			If (A_Index == 3) {
-				LOC_ReturnedInfos .= "—  © "
-			}
-			LOC_ReturnedInfos .= LOC_Info . "  "
-		}
-	}
-	Return, LOC_ReturnedInfos
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 AHK_ResetControlKeys:
 ^#F5::
 AHK_ResetControlKeys()
@@ -1838,162 +1270,6 @@ AHK_ResetControlKeys() {
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-Min(PRM_X, PRM_Y) {
-	Return, (PRM_X < PRM_Y ? PRM_X : PRM_Y)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-Max(PRM_X, PRM_Y) {
-	Return, (PRM_X > PRM_Y ? PRM_X : PRM_Y)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-Pow(PRM_X, PRM_n) {
-	Transform, LOC_Return, Pow, PRM_X, PRM_n
-	Return LOC_Return
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_AdjustString(PRM_String, PRM_Length, PRM_Alignement = true, PRM_Char = "") {
-
-	; PRM_Alignement : true : left-aligned, false : right-aligned
-	LOC_Char := (StrLen(PRM_Char) == 0 ? " " : SubStr(PRM_Char, 1, 1))
-	, LOC_Length := StrLen(PRM_String)
-	, LOC_String := PRM_String
-
-	; Right length :
-	If (LOC_Length == PRM_Length) {
-		Return, LOC_String
-	}
-
-	; Length to increase :
-	If (LOC_Length < PRM_Length) {
-		Loop, % PRM_Length - LOC_Length
-		{
-			If (PRM_Alignement) {
-				LOC_String .= LOC_Char
-			} Else {
-				LOC_String := LOC_Char . LOC_String
-			}
-		}
-	} Else
-
-	; Length to decrease :
-	If (LOC_Length > PRM_Length) {
-		LOC_String := SubStr(LOC_String, 1 + (PRM_Alignement ? 0 : LOC_Length - PRM_Length), PRM_Length)
-	}
-
-	Return, LOC_String
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_KeyWait(PRM_Key1 = false, PRM_Key2 = false, PRM_Key3 = false, PRM_Key4 = false, PRM_Key5 = false, PRM_Key6 = false, PRM_Key7 = false, PRM_Key8 = false, PRM_Key9 = false) {
-
-	Loop, 9 {
-		If (PRM_Key%A_Index% == false) {
-			Continue
-		}
-		If PRM_Key%A_Index% contains #,!,+,^
-		{
-			LOC_Keys := PRM_Key%A_Index%
-			Loop, % StrLen(LOC_Keys)
-			{
-				LOC_Char := Substr(LOC_Keys, %A_Index%, 1)
-				If (LOC_Char == "#") {
-					KeyWait, LWin
-					KeyWait, RWin
-					Continue
-				}
-				If (LOC_Char == "!") {
-					KeyWait, LAlt
-					KeyWait, RAlt
-					KeyWait, Alt
-					Continue
-				}
-				If (LOC_Char == "+") {
-					KeyWait, LShift
-					KeyWait, RShift
-					KeyWait, Shift
-					Continue
-				}
-				If (LOC_Char == "^") {
-					KeyWait, LCtrl
-					KeyWait, RCtrl
-					KeyWait, Ctrl
-					Continue
-				}
-				KeyWait, % LOC_Char
-			}
-		} Else {
-			KeyWait, % PRM_Key%A_Index%
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_RGBToBGR(PRM_RGB) {
-	If (StrLen(PRM_RGB) != 6) {
-		Return, false
-	}
-
-	Loop, Parse, PRM_RGB
-	{
-		If A_LoopField Not In 0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,a,b,c,d,e,f
-		Return, false
-	}
-
-	StringMid, LOC_R, PRM_RGB, 1, 2
-	StringMid, LOC_G, PRM_RGB, 3, 2
-	StringMid, LOC_B, PRM_RGB, 5, 2
-
-	Return, LOC_B . LOC_G . LOC_R
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_MsgBox(PRM_Value1 = "", PRM_Value2 = "", PRM_Value3 = "", PRM_Value4 = "", PRM_Value5 = "", PRM_Value6 = "", PRM_Value7 = "", PRM_Value8 = "", PRM_Value9 = "") {
-	LOC_Text := ""
-	Loop, 9 {
-		If (IsObject(PRM_Value%A_Index%)) {
-			For LOC_Index, LOC_Value in PRM_Value%A_Index%
-			{
-				LOC_Text .= (LOC_Text != "" ? "`n" : "") . LOC_Index . " --> " . LOC_Value
-			}
-		} Else If (PRM_Value%Index% != "") {
-			LOC_Text .= (LOC_Text != "" ? "`n" : "") . PRM_Value%A_Index%
-		}
-	}
-	MsgBox, %LOC_Text%
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_NotInArray(ByRef PRM_Text, PRM_Object) {
-	For LOC_Key, LOC_Value In PRM_Object {
-		If (LOC_Value == PRM_Text) {
-			Return, false
-		}
-	}
-	Return, true
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_PointerDelta(PRM_Pointer, PRM_Delta) {
-	Return, NumGet(NumGet(PRM_Pointer + 0, "Ptr") + PRM_Delta * A_PtrSize, "Ptr")
-}
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 AHK_SetProcessAffinity(PRM_PID = 0x0, PRM_CPU = 2) {
@@ -2026,93 +1302,8 @@ AHK_SetProcessAffinity(PRM_PID = 0x0, PRM_CPU = 2) {
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-AHK_GetFunction(PRM_DLL, PRM_Function) {
-	Static STA_GetProcAddressFunction := false, STA_LoadLibraryFunction := false, STA_GetModuleHandleFunction := false
-	If (!STA_GetProcAddressFunction) {
-		STA_GetProcAddressFunction := DllCall("kernel32.dll\GetProcAddress", "Ptr", DllCall("kernel32.dll\GetModuleHandle", "Str", "kernel32"), "AStr", "GetProcAddress")
-	}
-	If (!DllCall("kernel32.dll\GetModuleHandle", "Str", PRM_DLL, "Ptr")) {
-		DllCall("kernel32.dll\LoadLibrary", "Str", PRM_DLL)
-	}
-	Return, DllCall(STA_GetProcAddressFunction, "Ptr", DllCall("kernel32.dll\GetModuleHandle", "Str", PRM_DLL), "AStr", PRM_Function)
+AHK_SetExecutionMode() {
+	Global AHK_Admin, AHK_Experimental
 }
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_AdjustListView(PRM_FinalWidth, PRM_ColumnsNumber, PRM_ColumnsToAdjust := false, PRM_ListViewIndex = 1, PRM_WindowID = false) {
-
-	; PRM_ColumnsToAdjust : indexes, separated by '|'
-
-	LOC_CurrentWidth := 0
-	Loop, %PRM_ColumnsNumber% {
-		LV_ModifyCol(A_Index, "AutoHdr")
-	}
-
-	LOC_ColumnsToKeepA := {}
-	, LOC_ColumnsToAdjust := PRM_ColumnsToAdjust
-	Loop, %PRM_ColumnsNumber% {
-		SendMessage, 0x1000+29, A_Index - 1, 0, SysListView32%PRM_ListViewIndex%, % (PRM_WindowID ? "ahk_id " . PRM_WindowID : "A")
-		If (ErrorLevel == "FAIL") {
-			Break
-		}
-		LOC_Width%A_Index% := ErrorLevel
-		, LOC_CurrentWidth += LOC_Width%A_Index%
-		, LOC_ColumnsToKeepA[A_Index] := true
-		If (!PRM_ColumnsToAdjust) {
-			LOC_ColumnsToAdjust .= "|" . A_Index
-		}
-	}
-
-	LOC_TotalWidthToAdjust := 0
-	Loop, Parse, PRM_ColumnsToAdjust, |
-	{
-		If (LOC_ColumnsToKeepA[A_LoopField]) {
-			LOC_ColumnsToKeepA[A_LoopField] := false
-			, LOC_TotalWidthToAdjust += LOC_Width%A_LoopField%
-		}
-	}
-
-	If (LOC_CurrentWidth > PRM_FinalWidth) {
-		For LOC_ColumnIndex In LOC_ColumnsToKeepA
-		{
-			If (!LOC_ColumnsToKeepA[LOC_ColumnIndex]) {
-				LV_ModifyCol(LOC_ColumnIndex, LOC_Width%LOC_ColumnIndex% * LOC_TotalWidthToAdjust // LOC_CurrentWidth)
-				AHK_Debug("LV_ModifyCol(" . LOC_ColumnIndex . ", " . LOC_Width%LOC_ColumnIndex% . " * " . LOC_TotalWidthToAdjust . " // " . LOC_CurrentWidth . ")")
-			}
-		}
-		If (LOC_ColumnsToKeepA[PRM_ColumnsNumber]) {
-			LV_ModifyCol(PRM_ColumnsNumber, "AutoHdr")
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_CreateBMPGradient(PRM_ToFile, PRM_RGB1, PRM_RGB2, PRM_Vertical = true) {
-
-	Global ZZZ_CloseHandleFunction
-	Static STA_WriteFileFunction := AHK_GetFunction("kernel32", "WriteFile")
-	LOC_BGR1 := AHK_RGBToBGR(PRM_RGB1)
-	, LOC_BGR2 := AHK_RGBToBGR(PRM_RGB2)
-	If (!LOC_BGR1
-		|| !LOC_BGR2) {
-		AHK_Debug("Error < AHK_CreateBMPGradient(" . PRM_ToFile . ", " . PRM_RGB1 . ", " . PRM_RGB2 . ", " . PRM_Vertical . ")")
-		Return, false
-	}
-	LOC_Handler := DllCall("kernel32.dll\CreateFile", "Str", PRM_ToFile, "UInt", 0x40000000, "UInt", 0, "UInt", 0, "UInt", 4, "UInt", 0, "UInt", 0)
-	, LOC_FileString := "424d3e00000000000000360000002800000" . (PRM_Vertical ? "0010000000200000" : "0020000000100000") . "001001800000000000800000000000000000000000000000000000000" . LOC_BGR1 . (PRM_Vertical ? "00" : "") . LOC_BGR2 . (PRM_Vertical ? "00" : "0000")
-
-	Loop, 62 {
-		StringLeft, LOC_HexaChar, LOC_FileString, 2
-		StringTrimLeft, LOC_FileString, LOC_FileString, 2
-		LOC_HexaChar := "0x" . LOC_HexaChar
-		DllCall(STA_WriteFileFunction, "UInt", LOC_Handler, "UChar *", LOC_HexaChar, "UInt", 1, "UInt *", LOC_Unused, "UInt", 0)
-	}
-
-	DllCall(ZZZ_CloseHandleFunction, "UInt", LOC_Handler)
-	Return, PRM_ToFile
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

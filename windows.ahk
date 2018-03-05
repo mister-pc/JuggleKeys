@@ -12,76 +12,706 @@ WIN_Init() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-WIN_GetTitleBarClickZone() {
-;	  't' : title
-;	  'm' : minimize
-;	  'M' : maximize
-;	  'x' : close
-;	false : other
+; Close Object { MiddleClick } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+MButton::
++MButton::
+!MButton::
+WIN_MiddleButton()
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_MiddleButton() {
+
+	Global SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight
+	WinGet, LOC_ActiveWindowID, ID
+	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_WindowID, LOC_ControlClass
+	If (LOC_WindowID) {
+		WinActivate, ahk_id %LOC_WindowID%
+		WinWaitActive, ahk_id %LOC_WindowID%
+	} Else {
+		LOC_WindowID := LOC_ActiveWindowID
+	}
+	WinActive("A")
+	WinGetClass, LOC_WindowClass
+	WinGetTitle, LOC_WindowTitle
+	WinGet, LOC_ProcessName, ProcessName
 	CoordMode, Mouse, Screen
-	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_ActiveWindowID
-	If (!LOC_ActiveWindowID) {
-		Return, false
+	LOC_TitleBarClickZone := WIN_GetTitleBarClickZone()
+
+	; Close window after title bar click :
+	If (LOC_TitleBarClickZone == "t") {
+		If (LOC_WindowClass == "TConversationForm") { ; Skype
+			SendInput, {Ctrl Up}{Esc}
+		} Else If (LOC_WindowClass == "tSkMainForm") { ; Skype
+			SendInput, {Alt Down}s{Alt Up}f
+		} Else If (LOC_WindowClass == "AutoHotkey" && InStr(LOC_WindowTitle, A_ScriptFullPath . " - AutoHotkey")) { ; AutoHotKey debug window
+			WinMinimize
+		;~ } Else 	If (LOC_WindowClass == "CommunicatorMainWindowClass") { ; Lync main window
+			;~ WinHide
+		} Else {
+			WinClose
+			LOC_WindowTitle := WIN_GetWindowTitle(LOC_WindowID)
+			TRY_ShowTrayTip(LOC_WindowTitle . " closed")
+			, AUD_Beep()
+		}
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
 	}
 
-	WinGetClass, LOC_WindowClass, ahk_id %LOC_ActiveWindowID%
-	SendMessage, 0x84, 0, (LOC_MouseX & 0xFFFF) | (LOC_MouseY & 0xFFFF) << 16, , ahk_id %LOC_ActiveWindowID%
-	LOC_ErrorLevel := ErrorLevel
-	If (LOC_ActiveWindowID && !AHK_SystemWindowClass(LOC_WindowClass)) {
-		If (LOC_ErrorLevel == 2) { ; Title bar
-			Return, "t"
+	; Minimize to tray after minimize click :
+	If (LOC_TitleBarClickZone == "m") {
+		WIN_MinimizeToTray(LOC_WindowID)
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Maximize window after maximize click :
+	If (LOC_TitleBarClickZone == "M") {
+		If (A_ThisHotkey == "+MButton") {
+			WIN_MaximizeOnAllScreens()
+		} Else If (A_ThisHotkey == "!MButton") {
+			WIN_MaximizeOnNextScreen()
+		} Else If (A_ThisHotKey == "MButton") {
+			Win_MaximizeVertically()
 		}
-		If (LOC_ErrorLevel == 3) { ; System menu
-			Return, "s"
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Kill window after title bar click :
+	If (LOC_TitleBarClickZone == "x") {
+		If (AHK_SystemWindowClass(LOC_WindowClass)) {
+			PRM_PowerManager(PRM_Submit := false, PRM_State := 3, , PRM_YesDefaultButton := false)
+			Return
 		}
-		If (LOC_ErrorLevel == 8) { ; Minimize button
-			Return, "m"
+		WinGet, LOC_KillWindowPID, PID
+		LOC_WindowTitle := WIN_GetWindowTitle(LOC_WindowID)
+		WinKill
+		Process, Close, %LOC_ActiveWindowPID%
+		SendMessage, 0x02
+		AUD_Beep()
+		, TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Kill window from everywhere { Shift | Alt } + { Middle Button } :
+	If (A_ThisHotkey == "!MButton"
+		|| A_ThisHotkey == "+MButton") {
+		WIN_Close()
+		, AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Defined actions :
+	;;;;;;;;;;;;;;;;;;;
+	
+	; Escape action :
+	If (LOC_WindowClass == "ytWindow" && LOC_ProcessName == "PicasaPhotoViewer.exe" ; Picasa
+		|| LOC_WindowClass == "WMPTransition" ; WMP
+		|| LOC_WindowClass == "ShockwaveFlashFullScreen" ; Flash
+		|| LOC_WindowClass == "#32770" && LOC_WindowTitle == "Process Explorer Search" ; Process Explorer search
+		|| LOC_WindowClass == "#32770" && LOC_WindowTitle == "Rechercher - Directory Opus" ; Directory Opus search
+		|| LOC_WindowClass == "screenClass" && InStr(LOC_WindowTitle, "PowerPoint") ; PowerPoint
+		|| LOC_WindowClass == "TFNewPlayer") { ; MediaMonkey player
+		SendInput, {Esc}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Hide window action :
+	If (LOC_WindowClass == "CommunicatorMainWindowClass") { ; Lync main window
+		WinHide
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Control-W action :
+	If (LOC_WindowClass == "CabinetWClass" ; Shell
+		|| LOC_WindowClass == "PSDocC" ; Photoshop
+		|| LOC_WindowClass == "Photoshop" && LOC_WindowTitle != "Adobe Photoshop" ; Photoshop
+		|| LOC_WindowClass == "XLMAIN" && LOC_WindowTitle != "Excel (Utilisation non commerciale)" && LOC_WindowTitle != "Excel" && LOC_WindowTitle != "Microsoft Excel" && LOC_WindowTitle != "Microsoft Excel (Échec de l’activation du produit)" && LOC_WindowTitle != "Excel (Échec de l’activation du produit)" ; Excel
+		|| LOC_WindowClass == "Notepad++") { ; Notepad++
+		SendInput, ^w
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Control-F4 action :
+	If (LOC_WindowClass == "IEFrame" ; IE
+		|| LOC_WindowClass == "Console_2_Main" ; Console²
+		|| LOC_WindowClass == "PPTFrameClass" && LOC_WindowTitle != "PowerPoint" && LOC_WindowTitle != "PowerPoint (Échec de l’activation du produit)" ; PowerPoint
+		|| LOC_WindowClass == "SnagIt9Editor" && LOC_WindowTitle != "Editeur Snagit" ; Snag-It document
+		|| LOC_WindowClass == "SciTEWindow" ; SCiTE editor
+		|| LOC_WindowClass == "SunAwtFrame" && InStr(LOC_WindowTitle, "SQL Developer")) { ; SQL Developer
+		SendInput, ^{F4}
+		AUD_Beep()
+		; AHK_Debug("Ctrl-F4 sur " . LOC_WindowTitle . " ahk_class " . LOC_WindowClass)
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Alt-F4 action :
+	If (LOC_WindowClass == "SunAwtFrame" && ((LOC_KGSTitle := SubStr(LOC_WindowTitle, 1, 6)) == "KGS : " || LOC_KGSTitle == "CGoban") ; KGS
+		|| LOC_WindowClass == "PlayerCanvas" && (InStr(LOC_WindowTitle, "QMP") || LOC_WindowTitle == "Quintessential Media Player") ; Quintessential
+		|| LOC_WindowClass == "ExtPlayerCanvas" ; Quintessential
+		|| LOC_WindowClass == "PROCEXPL" ; Process Explorer
+		|| LOC_WindowClass == "ProcessHacker" ; Process Hacker
+		|| LOC_WindowClass == "TMainForm" ; Media Monkey
+		|| LOC_WindowClass == "TFMainWindow" ; Media Monkey
+		|| LOC_WindowClass == "TFImage" ; Media Monkey album image
+		|| LOC_WindowClass == "TkTopLevel" ; GitK
+		|| LOC_WindowClass == "HH Parent" ; Windows CHTML file
+		|| LOC_WindowClass == "AutoHotkeyGUI" ; AHK self windows
+			&& (LOC_WindowTitle == "WindowSpy"
+				|| LOC_WindowTitle == "About"
+				|| LOC_WindowTitle == "GUI_Memo"
+				|| LOC_WindowTitle == "GUI_Magnifier"
+				|| LOC_WindowTitle == "Lock Keyboard"
+				|| LOC_WindowTitle == "Unlock Keyboard"
+				|| LOC_WindowTitle == "Text Capture"
+				|| LOC_WindowTitle == "Unicode Art Capture"
+				|| LOC_WindowTitle == "ASCII Art Capture"
+				|| LOC_WindowTitle == "Clipboard history")
+		|| LOC_WindowClass == "MMCMainFrame" ; Management console
+		|| LOC_WindowClass == "mintty" ; Git-bash
+		|| LOC_WindowClass == "TAppForm" && InStr(LOC_WindowTitle, "Registrar Registry Manager") ; Registry Manager
+		|| LOC_WindowClass == "MozillaWindowClass" && (LOC_WindowTitle == "Enregistrement des mots de passe" || LOC_WindowTitle == "Carnet d'adresses" || SubStr(LOC_WindowTitle, 1, 12) == "Diaporama - " || SubStr(LOC_WindowTitle, 1, 12) == "Source de : " || SubStr(LOC_WindowTitle, 1, 11) == "Source of: ")
+		|| LOC_WindowClass == "OpusApp" && (LOC_WindowTitle == "Word" || LOC_WindowTitle == "Microsoft Word" || LOC_WindowTitle == "Microsoft Word (Échec de l’activation du produit)" || LOC_WindowTitle == "Word (Échec de l’activation du produit)") ; Word
+		|| LOC_WindowClass == "XLMAIN" && (LOC_WindowTitle == "Excel" || LOC_WindowTitle == "Excel (Utilisation non commerciale)" || LOC_WindowTitle == "Microsoft Excel" || LOC_WindowTitle == "Microsoft Excel (Échec de l’activation du produit)" || LOC_WindowTitle == "Excel (Échec de l’activation du produit)") ; Excel
+		|| LOC_WindowClass == "PPTFrameClass" && (LOC_WindowTitle == "PowerPoint" || LOC_WindowTitle == "PowerPoint (Échec de l’activation du produit)") ; PowerPoint
+		|| LOC_WindowClass == "SnagIt9Editor" && LOC_WindowTitle == "Editeur Snagit" ; Snag-It Editor with no more document
+		|| LOC_WindowClass == "SnagIt5UI" && LOC_WindowTitle == "Snagit" ; Snag-It
+		|| LOC_WindowClass == "CisMainWizard" ; Comodo
+		|| LOC_ProcessName == "Startup Delayer.exe"
+		|| LOC_ProcessName == "DuplicateCleaner.exe" ; Duplicate Cleaner
+		|| LOC_WindowClass == "Photoshop" && LOC_WindowTitle == "Adobe Photoshop" ; Photoshop
+		|| LOC_ProcessName == "screamer.exe" ; Screamer Radio
+		|| LOC_WindowClass == "MozillaWindowClass" && LOC_WindowTitle == "Bibliothèque" ; Firefox history
+		|| LOC_WindowClass == "CalcFrame"
+		|| LOC_WindowClass == "PuTTY" ; PuTTY
+		|| LOC_WindowClass == "AU3Reveal" ; Window Spy
+		|| LOC_WindowClass == "TAIDA64" ; Aida 64
+		|| LOC_WindowClass == "rctrl_renwnd32" ; Outlook message view
+		|| LOC_WindowClass == "IMWindowClass" ; Lync chat window
+		|| LOC_WindowClass == "SWT_Window0" && InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect") ; Sametime
+		|| LOC_WindowClass == "tSkMainForm" ; Skype
+		|| LOC_WindowClass == "TConversationForm") { ; Skype
+		SendInput, !{F4}
+		AUD_Beep()
+		AHK_Debug("Alt-F4 sur " . LOC_WindowTitle . " ahk_class " . LOC_WindowClass)
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+	
+	; Close window action :
+	If (LOC_WindowClass == "WMPlayerApp" ; WMP
+		|| LOC_WindowClass == "WMP Skin Host" ; WMP
+		|| LOC_ProcessName == "uTorrent.exe" ; µTorrent
+		|| LOC_WindowTitle == "Freemake Video Converter" && SubStr(LOC_WindowClass, 1, 26) == "HwndWrapper[FreemakeVC.exe" ; Video Converter
+		|| LOC_WindowClass == "AutoHotkey" && SubStr(LOC_WindowTitle, 1, StrLen(A_ScriptFullPath)) == A_ScriptFullPath ; Debug
+		|| LOC_WindowClass == "NativeHWNDHost" && InStr(LOC_WindowTitle, "Ajouter ou supprimer des programmes")) { ; Ajout/Suppression de programmes
+		WinClose
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Kill window action :
+	If (LOC_WindowClass == "PlatformViewClassSession0" && LOC_WindowTitle == "Uplay" ; Rayman
+		|| LOC_WindowClass == "uplay_main" && LOC_WindowTitle == "Uplay" ; Rayman
+		|| LOC_WindowClass == "uplay_spotlight" && LOC_WindowTitle == "Spotlight" ; Rayman
+		|| LOC_WindowClass == "SunAwtFrame" && LOC_WindowTitle == "CGoban : Fenêtre Principale" ; KGS
+		|| InStr(LOC_WindowTitle, "DAMN NFO Viewer")) { ; NFO viewer
+		WinKill
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Specific defined actions :
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	; Systray :
+	If (LOC_WindowClass == "Shell_TrayWnd") {
+		SendInput, ^+{Esc}
+		Return
+	}
+	
+	; Directory Opus :
+	If (LOC_WindowClass == "dopus.lister") {
+		If (LOC_WindowTitle == "Corbeille"
+			|| LOC_WindowTitle == "Ordinateur") {
+			SendInput, {Ctrl Up}{Esc}^{F4}
+		} Else If (InStr(LOC_ControlClass, "dopus.filedisplay")
+			|| InStr(LOC_ControlClass, "dopus.iconfiledisplay")) {
+			ControlGet, LOC_SecondFileDisplayID, Hwnd, , dopus.filedisplay2
+			If (LOC_SecondFileDisplayID) {
+				SendInput, {Ctrl Up}{Esc}^{F4}
+			} Else {
+				SendInput, {Ctrl Up}{Esc}!{F4}
+			}
+		} Else If (InStr(LOC_ControlClass, "RICHEDIT") ; Viewer txt
+			|| InStr(LOC_ControlClass, "SysListView") ; Viewer zip
+			|| InStr(LOC_ControlClass, "dopus.viewpic") ; Viewer images
+			|| InStr(LOC_ControlClass, "dopus.listerviewpane") ; Viewer images
+			|| InStr(LOC_ControlClass, "dopusviewerplugin.liv.viewer") ; Viewer gif
+			|| InStr(LOC_ControlClass, "_WwG") ; Viewer docx
+			|| InStr(LOC_ControlClass, "EVRVideoHandler") ; Viewer video
+			|| InStr(LOC_ControlClass, "Internet Explorer_Server") ; Viewer html & xml
+			|| InStr(LOC_ControlClass, "EXCEL7") ; Viewer video
+			|| InStr(LOC_ControlClass, "childclass") ; Viewer ppt
+			|| InStr(LOC_ControlClass, "PDFPreview")) { ; Viewer pdf
+			CoordMode, Mouse, Relative
+			MouseGetPos, LOC_MouseX, LOC_MouseY
+			ControlGetPos, LOC_ControlX, LOC_ControlY, LOC_ControlWidth, , dopus.listerviewpane1
+			If (LOC_ControlWidth) {
+				LOC_ClickX := LOC_ControlX + LOC_ControlWidth - 10
+				, LOC_ClickY := LOC_ControlY + 10
+				Click, %LOC_ClickX%, %LOC_ClickY%
+				MouseMove, LOC_MouseX, LOC_MouseY
+			} Else {
+				Click, % SubStr(A_ThisHotkey, 1, 1)
+			}
+		} Else {
+			Click, % SubStr(A_ThisHotkey, 1, 1)
 		}
-		If (LOC_ErrorLevel == 9) { ; Maximize button
-			Return, "M"
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Firefox & Chrome :
+	If (LOC_WindowClass == "MozillaWindowClass"
+			&& (LOC_ProcessName == "firefox.exe"
+				|| LOC_ProcessName == "palemoon.exe")
+		|| LOC_WindowClass == "Chrome_WidgetWin_1") {
+		If (InStr(LOC_WindowTitle, "- Ecosia -")) {
+			SendInput, %A_Space%^w
+		} Else If (SubStr(LOC_ControlClass, 1, 5) == "DSUI:" ; PDF X-Change plug-in
+			|| InStr(LOC_WindowTitle, "WeTransfer")) {
+			WinActivate, ahk_class Shell_TrayWnd
+			WinActivate, ahk_id %LOC_WindowID%
+			SendInput, ^{F4}
+		} Else {
+			WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
+			If (LOC_Width == SCR_VirtualScreenWidth
+				&& LOC_Height == SCR_VirtualScreenHeight) { ; Full video screen
+				SendInput, {Esc}
+			} Else {
+				MouseClick, Left, LOC_X + 10, LOC_Y + 2 * LOC_Height // 3
+				Sleep, 10
+				SendInput, ^w
+				MouseMove, LOC_MouseX, LOC_MouseY
+			}
 		}
-		If (LOC_ErrorLevel == 20) { ; Close button
-			Return, "x"
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Thunderbird :
+	If (LOC_WindowClass == "MozillaWindowClass"
+		&& LOC_ProcessName == "thunderbird.exe") {
+		If (LOC_WindowTitle == "Agenda - Mozilla Thunderbird") { ; calendar
+			Return
 		}
-		If (LOC_ErrorLevel == 21) { ; Help button
-			Return, "h"
+		If (RegExMatch(LOC_WindowTitle, "^[0-9]{1,} rappels?$")) { ; Thunderbird meeting recall
+			WinClose
+			AUD_Beep()
+			WinActivate, ahk_id %LOC_ActiveWindowID%
+			Return
+		}
+		If (RegExMatch(LOC_WindowTitle, "^Rédaction")) { ; mail edition to close
+			SendInput, ^w
+			AUD_Beep()
+			WinActivate, ahk_id %LOC_ActiveWindowID%
+			Return
+		}
+		
+		SendInput, {Esc}^{F4}
+		Sleep, 500
+		WinGet, LOC_NewProcessName, ProcessName, A
+		WinGetTitle, LOC_NewWindowTitle, A
+		If (LOC_NewProcessName == LOC_ProcessName
+			&& LOC_NewWindowTitle == LOC_WindowTitle) { ; Still the same panel open ? Then it's not a single mail window => delete mail
+			SendInput, {Esc}{Delete}
+			AHK_ShowToolTip("Mail deleted")
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; PDF Exchange 5.5 :
+	Try {
+		If (InStr(LOC_WindowTitle, "PDF-XChange Editor")
+			&& RegExMatch(LOC_WindowClass, "PXE:\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\}")) {
+			If (LOC_ControlClass != "UIX:Window1") {
+				SendInput, {Ctrl Up}{Esc 2}^w
+				TRY_ShowTrayTip("PDF closed")
+			} Else {
+				SendInput, {Ctrl Up}{Esc 2}!{F4}
+				TRY_ShowTrayTip("PDF application closed")
+			}
+			AUD_Beep()
+			Sleep, 50
+			WinActivate, ahk_id %LOC_ActiveWindowID%
+			Return
+		}
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "WIN_MiddleButton")
+	}
+	
+	; PDF Exchange 5.0 & UltraEdit :
+	Try {
+		If (LOC_WindowClass == "DSUI:PDFXCViewer" ; PDF X-Change 5.0
+			|| RegExMatch(LOC_WindowClass, "PXE:{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}}") && InStr(LOC_WindowTitle, "PDF-XChange Editor")
+			|| RegExMatch(LOC_WindowClass, "S)^Afx:[0-9]{16}:8:[0-9]{16}:0000000000000000:[A-F0-9]{16}$")) { ; UltraEdit
+			If (LOC_ControlClass == "MDIClient1") {
+				SendInput, {Ctrl Up}{Esc 2}!{F4}
+			} Else {
+				SendInput, {Ctrl Up}{Esc 2}^{F4}
+			}
+			AUD_Beep()
+			WinActivate, ahk_id %LOC_ActiveWindowID%
+			Return
+		}
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "WIN_MiddleButton")
+	}
+
+	; UltraEdit :
+	If (WinActive("UltraEdit ahk_class #32770", "Enregistrer les modifications apportées à...")
+		|| WinActive("recharger le fichier ahk_class #32770")) {
+ 		SendInput, !n
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; WinMerge :
+	If (LOC_WindowClass == "WinMergeWindowClassW") {
+		ControlGet, LOC_Edit1ID, Hwnd, , Edit1
+		If (LOC_Edit1ID) {
+			SendInput, ^{F4}
+		} Else {
+			WinClose
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Araxis Merge :
+	If (InStr(LOC_WindowTitle, "Araxis Merge")) {
+		If (LOC_WindowTitle == "Araxis Merge") {
+			SendInput, !{F4}
+		} Else {
+			SendInput, ^{F4}
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+	
+	; Many Faces of Go :
+	If (SubStr(LOC_WindowTitle, 1, 20) == "The Many Faces of Go" 
+		&& RegExMatch(LOC_WindowClass, "S)^Afx:00400000:8:00010003:00000000:[A-F0-9]{8}$")) {
+		If (SubStr(LOC_WindowTitle, 21, 4) == " - [") {
+			SendInput, ^{F4}
+		} Else {
+			WinClose
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+	
+	; Nox :
+	If (LOC_WindowTitle == "Nox App Player" 
+		&& LOC_WindowClass == "Qt5QWindowIcon") {
+		SetTimer, APP_AndroidActivityTimer, Off
+		Loop, 5 { ; GUI_AndroidActivity*
+			LOC_GuiID := 51 + A_Index
+			Gui, %LOC_GuiID%:Destroy
+		}
+		SendInput, !{F4}
+		WinWait, Dialog ahk_class Qt5QWindowIcon, , 3
+		If (!ErrorLevel) {
+			WinActivate
+			SendInput, {Enter}
+		}
+		AHK_HideToolTip()
+		, AUD_Beep()
+		, AHK_ResetCursor()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; MPC :
+	If (LOC_WindowClass == "MediaPlayerClassicW") {
+		WinGetPos, , , LOC_Width, LOC_Height, A
+		If (LOC_Width == SCR_VirtualScreenWidth
+			&& LOC_Height == SCR_VirtualScreenHeight) {
+			SendInput, {Esc}
+		} Else {
+			SendInput, !x
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+	
+	; VLC :
+	If (WinActive("Lecteur multimédia VLC ahk_class QWidget")) {
+		WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
+		If (LOC_X == SCR_VirtualScreenX
+			&& LOC_Y == SCR_VirtualScreenY
+			&& LOC_Width == SCR_VirtualScreenWidth
+			&& LOC_Height == SCR_VirtualScreenHeight) {
+			SendInput, {Esc}
+		} Else {
+			SendInput, !{F4}
+		}
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Registry Manager :
+	If (LOC_WindowClass == "TEditDockForm"
+		&& LOC_WindowTitle == "Registry and Tool Windows") {
+		WinGet, LOC_WindowPID, PID
+		WinKill
+		Process, Close, %LOC_WindowPID%
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; Video Converter :
+	If (SubStr(LOC_WindowClass, 1, 28) == "HwndWrapper[FreemakeVC.exe;;") {
+		If (LOC_WindowTitle != "Freemake Video Converter"
+			&& SubStr(LOC_WindowTitle, -9) != "% terminés") {
+			WinKill
+			AUD_Beep()
+			WinActivate, ahk_id %LOC_ActiveWindowID%
+			Return
 		}
 	}
-	Return false
+	
+	; Window Spy :
+	If (LOC_WindowClass == "AutoHotkeyGUI"
+		&& LOC_WindowTitle == "WindowSpy — by BeLO.") {
+		SetTimer, ADM_WindowSpyRefreshTimer, Off
+		Gui, 31:Hide ; GUI_WindowSpyHoveredColor
+		Gui, 30:Hide ; Window Spy
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; AHK Calendar :
+	If (LOC_WindowClass == "AutoHotkeyGUI"
+		&& LOC_WindowTitle == "GUI_Calendar") {
+		SYS_TaskbarCalendarPeriodicTimer(PRM_Hide := true)
+		, AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+	
+	; Ruler :
+	If (LOC_WindowClass == "AutoHotkeyGUI"
+		&& LOC_WindowTitle == "GUI_HorizontalRuler") {
+		Gui, 8:Destroy
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+	If (LOC_WindowClass == "AutoHotkeyGUI"
+		&& LOC_WindowTitle == "GUI_VerticalRuler") {
+		Gui, 9:Destroy
+		AUD_Beep()
+		WinActivate, ahk_id %LOC_ActiveWindowID%
+		Return
+	}
+
+	; No defined action :
+	Click, % SubStr(A_ThisHotkey, 1, 1)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-WIN_GetWindowTitle(PRM_WindowID) {
+; Close window { [ Ctrl + ] [ Alt + ] Win + F4 } or { Win + Esc } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	AutoTrim, On
-	If (!PRM_WindowID) {
-		WinGet, PRM_WindowID, ID, A
-	}
-	WinGetTitle, LOC_Title, ahk_id %PRM_WindowID%
-	LOC_Title = %LOC_Title%
-	LOC_LastDash := InStr(LOC_Title, "-", false, 0)
-	If (LOC_LastDash) {
-		LOC_NewTitle := SubStr(LOC_Title, LOC_LastDash + 1)
-		LOC_NewTitle = %LOC_NewTitle%
-		If (LOC_NewTitle) {
-			LOC_Title := LOC_NewTitle
+#Esc::
+WIN_EscKill()
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_EscKill() {
+
+	Global 	AHK_AudioEnabled
+	WinActive("A")
+	WinGet, LOC_ActiveWindowID, ID
+	If (LOC_ActiveWindowID) {
+		WinGetClass, LOC_WindowClass
+		If (AHK_SystemWindowClass(LOC_WindowClass)) {
+			SendInput, {LWin Down}{Esc}{LWin Up}
+		} Else {
+			LOC_WindowTitle := WIN_GetWindowTitle(LOC_ActiveWindowID)
+			If (LOC_WindowClass == "MozillaWindowClass"
+				|| LOC_WindowClass == "IEFrame"
+				|| LOC_WindowClass == "Photoshop"
+				|| LOC_WindowClass == "dopus.lister") {
+				SendInput, ^{F4}
+			} Else {
+				WinClose
+				AUD_Beep()
+				TRY_ShowTrayTip(LOC_WindowTitle . " closed")
+			}
 		}
 	}
-	If (LOC_Title == "") {
-		WinGet, LOC_Title, ProcessName, ahk_id %PRM_WindowID%
-		LOC_Dot := InStr(LOC_Title, ".", false, 0)
-		If (LOC_Dot) {
-			LOC_Title := SubStr(LOC_Title, 1, LOC_Dot - 1)
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_TrayMenuKill:
+WIN_FocusLastWindow()
+#F4::
+^#F4::
+!#F4::
+^!#F4::
+Suspend, Permit
+WIN_F4Kill()
+Return
+
+WIN_F4Kill() {
+
+	Global AHK_AudioEnabled
+	WinGet, LOC_KillWindowID, ID, A
+	WinGetClass, LOC_WindowClass, ahk_id %LOC_KillWindowID%
+	If (AHK_SystemWindowClass(LOC_WindowClass)) {
+		PRM_PowerManager(PRM_Submit := false, PRM_State := 3, , PRM_YesDefaultButton := false)
+		Return
+	}
+	WinGet, LOC_KillWindowPID, PID, ahk_id %LOC_KillWindowID%
+	LOC_WindowTitle := WIN_GetWindowTitle(LOC_KillWindowID)
+	WinKill, ahk_id %LOC_KillWindowID%
+	Process, Close, %LOC_KillWindowPID%
+	SendMessage, 0x02
+	If (LOC_WindowClass == "Rayman Legends") {
+		WinKill, Uplay ahk_class PlatformView
+	}
+	AUD_Beep()
+	TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_MiddleButtonCombinations:
+#MButton::
+^#MButton::
+#!MButton::
+^#!MButton::
+WIN_MiddleButtonCombinations()
+Return
+
+WIN_MiddleButtonCombinations() {
+
+	Global AHK_AudioEnabled
+	MouseGetPos, , , LOC_KillWindowID
+	If (LOC_KillWindowID) {
+		WinGetClass, LOC_WindowClass, ahk_id %LOC_KillWindowID%
+		If (AHK_SystemWindowClass(LOC_WindowClass)) {
+			PRM_PowerManager(PRM_Submit := false, PRM_State := 3, , PRM_YesDefaultButton := false)
+		} Else {
+			WinGet, LOC_KillWindowPID, PID, ahk_id %LOC_KillWindowID%
+			LOC_WindowTitle := WIN_GetWindowTitle(LOC_KillWindowID)
+			WinKill, ahk_id %LOC_KillWindowID%
+			Process, Close, %LOC_KillWindowPID%
+			SendMessage, 0x02,
+			AUD_Beep()
+			, TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
 		}
 	}
-	If (LOC_Title == "") {
-		LOC_Title := "Application"
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_TrayMenuClose:
+WIN_FocusLastWindow()
+!F4::
+WIN_Close()
+Return
+
+WIN_Close() {
+
+	Global AHK_AudioEnabled
+	IfInString, A_ThisHotkey, % "MButton"
+	{
+		MouseGetPos, , , LOC_CloseWindowID
+	} Else
+	IfInString, A_ThisHotkey, % "XButton"
+	{
+		MouseGetPos, , , LOC_CloseWindowID
+	} Else {
+		WinGet, LOC_CloseWindowID, ID, A
 	}
-	Return, LOC_Title
+
+	If (LOC_CloseWindowID) {
+		WinGetClass, LOC_WindowClass, ahk_id %LOC_CloseWindowID%
+		If (AHK_SystemWindowClass(LOC_WindowClass)) {
+			PRM_PowerManager(PRM_Submit := false, PRM_State := 1, PRM_ForcedActionEnabled := true, PRM_YesDefaultButton := false)
+			Return
+		}
+		LOC_WindowTitle := WIN_GetWindowTitle(LOC_KillWindowID)
+		If ((LOC_WindowTitle == "Visionneuse de photos Picasa" && LOC_WindowClass == "ytWindow")
+			|| LOC_WindowClass == "WMPTransition"
+			|| LOC_WindowClass == "ShockwaveFlashFullScreen") {
+			ControlSend, , {Ctrl Up}{Esc}, ahk_id %LOC_CloseWindowID%
+		} Else {
+			WinClose, ahk_id %LOC_CloseWindowID%
+		}
+		SendMessage, 0x02,
+		AUD_Beep()
+		, TRY_ShowTrayTip(LOC_WindowTitle . " closed")
+	}
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_TrayMenuCloseInside:
+WIN_FocusLastWindow()
+^F4 Up::
+WIN_CloseInside()
+Return
+
+WIN_CloseInside() {
+	WinGet, LOC_CloseWindowID, ID, A
+	If (LOC_CloseWindowID) {
+		WinGetClass, LOC_WindowClass, ahk_id %LOC_CloseWindowID%
+		If (AHK_SystemWindowClass(LOC_WindowClass)) {
+			Return
+		}
+		WinActivate, ahk_id %LOC_CloseWindowID%
+		WinWaitActive, ahk_id %LOC_CloseWindowID%, , 0
+		WinShow
+		ControlSend, ahk_parent, ^{F4}
+		AUD_Beep()
+	}
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -113,7 +743,10 @@ WIN_InitGroups() {
 	GroupAdd, WIN_NoDialogWindows, ahk_class VistaSwitcher_PreviewWnd ; Task switcher
 	GroupAdd, WIN_NoDialogWindows, Changement de tâche ahk_class TaskSwitcherWnd ; Task switcher
 	GroupAdd, WIN_NoDialogWindows, ahk_class Internet Explorer_Hidden ; IE
+	GroupAdd, WIN_NoDialogWindows, ahk_class SideBar_HTMLHostWindow ; Sidebar widgets
+	GroupAdd, WIN_NoDialogWindows, ahk_class WMPTransition ; WMP full screen
 	
+	GroupAdd, WIN_NoDialogWindows, ahk_class DFTaskbar:10c9aa42-8900-4ca4-8878-302581413079 ; DisplayFusion
 	GroupAdd, WIN_NoDialogWindows, ahk_class NeilShadow
 	GroupAdd, WIN_NoDialogWindows, ahk_class SysShadow
 	GroupAdd, WIN_NoDialogWindows, ahk_class MsoCommandBarShadow
@@ -156,15 +789,14 @@ WIN_InitGroups() {
 	GroupAdd, WIN_NoDialogWindows, ahk_class ToolbarWindow32
 	GroupAdd, WIN_NoDialogWindows, Boîte à outils Contrôles ahk_class MsoCommandBar ; Word
 	GroupAdd, WIN_NoDialogWindows, ahk_class WindowsForms10.Window.8.app.0.11ecf05 ; Startup Delayer
-	; GroupAdd, WIN_NoDialogWindows, ahk_class WindowsForms10.Window.0.app.0.33c0d9d ; DisplayFusion
 	GroupAdd, WIN_NoDialogWindows, TimeCamp ahk_class wxWindowNR ; TimeCamp
-	GroupAdd, WIN_NoDialogWindows, Take it Easy ahk_class #32770 ; MediaMonkey plugin
+	; GroupAdd, WIN_NoDialogWindows, Take it Easy ahk_class #32770 ; MediaMonkey plugin
 	GroupAdd, WIN_NoDialogWindows, Directory Opus ahk_class DOpus.ParentWindow ; Directory Opus
 	GroupAdd, WIN_NoDialogWindows, Registry Monitor ahk_class TMonitorForm
 	GroupAdd, WIN_NoDialogWindows, ahk_class PSFloatC ; PhotoShop
 	GroupAdd, WIN_NoDialogWindows, ahk_class PSViewC ; PhotoShop
-	GroupAdd, WIN_NoDialogWindows, Ouverture du document, veuillez patienter... ahk_class #32770 ; PDF-XChange
-	GroupAdd, WIN_NoDialogWindows, OpenVPN ahk_class OpenVPN-GUI ; OpenVPN
+	; GroupAdd, WIN_NoDialogWindows, Ouverture du documentveuillez patienter... ahk_class #32770 ; PDF-XChange
+	; GroupAdd, WIN_NoDialogWindows, OpenVPN ahk_class OpenVPN-GUI ; OpenVPN
 	GroupAdd, WIN_NoDialogWindows, ahk_class ExtPlayerCanvas ; Quintessential playlist
 	GroupAdd, WIN_NoDialogWindows, Nox ahk_class Qt5QWindowToolSaveBits
 
@@ -263,76 +895,71 @@ Return
 
 WIN_ShowDialogsPeriodicTimer() {
 
+	Global APP_DisplayFusionPath
 	Static STA_ActiveWindowID := 0
 	
 	DetectHiddenWindows, Off
 	WinGet, LOC_WindowsIDs, List, , , Program Manager
 	Loop, %LOC_WindowsIDs% {
-		StringTrimRight, LOC_ID, LOC_WindowsIDs%A_Index%, 0
-		If (STA_ActiveWindowID == LOC_ID) {
-			
-		}
-		
-		If (WinActive("ahk_id " . LOC_ID)) {
-			If (STA_ActiveWindowID == LOC_ID) {
+		StringTrimRight, LOC_WindowID, LOC_WindowsIDs%A_Index%, 0
+		If (WinActive("ahk_id " . LOC_WindowID)) {
+			If (STA_ActiveWindowID == LOC_WindowID) {
 				Continue
 			}
-			STA_ActiveWindowID := LOC_ID
+			STA_ActiveWindowID := LOC_WindowID
+		}
+
+		WinExist("ahk_id " . LOC_WindowID)
+		WinGetClass, LOC_WindowClass
+		WinGetTitle, LOC_WindowTitle
+
+		If (LOC_WindowClass == "SunAwtFrame"
+			|| LOC_WindowClass == "Photoshop"
+			|| (LOC_WindowClass == "#32770" || LOC_WindowClass == "SWT_Window0"	&& LOC_WindowTitle == "")
+			|| SubStr(LOC_WindowClass, 1, 14) == "WindowsForms10" && SubStr(LOC_WindowTitle, 1, 15) == "Startup Delayer") {
+			Continue
 		}
 		
-		WinExist("ahk_id " . LOC_ID)
-		WinGetClass, LOC_Class
-		WinGetTitle, LOC_Title
-		WinGetPos, , , LOC_Width, LOC_Height
-		If (LOC_Width && LOC_Height
-			&& !AHK_SystemWindowClass(LOC_Class)
-			&& LOC_Class != "WMP Skin Host") {
+		WinGetPos, LOC_WindowX, LOC_WindowY, LOC_WindowWidth, LOC_WindowHeight
+		If (LOC_WindowWidth && LOC_WindowHeight
+			&& !AHK_SystemWindowClass(LOC_WindowClass)
+			&& LOC_WindowClass != "WMP Skin Host") {
 			WinGet, LOC_ExStyle, ExStyle
 			LOC_VisibleInTaskBar := LOC_ExStyle & 0x40000
-			If (WinExist("ahk_id " . LOC_ID . " ahk_group WIN_NoDialogWindows")) {
+
+			If (APP_DisplayFusionPath
+					&& SubStr(LOC_WindowClass, 1, 2) == "DF" ; DisplayFusion window
+				|| WinExist("ahk_id " . LOC_WindowID . " ahk_group WIN_NoDialogWindows")) {
 				If (LOC_VisibleInTaskBar) {
 					WinSet, ExStyle, -0x40000
 					WinHide
 					WinShow
+					; TRY_ShowTrayTip(2)
 				}
 				Continue
 			}
-			
-			If (LOC_Class == "SunAwtFrame"
-				|| LOC_Class == "Photoshop"
-				|| (LOC_Class == "#32770" || LOC_Class == "SWT_Window0"	&& LOC_Title == "")
-				|| SubStr(LOC_Class, 1, 14) == "WindowsForms10" && SubStr(LOC_Window_Title, 1, 15) == "Startup Delayer") {
-				Continue
-			}
-				
-			If (SubStr(LOC_Class, 1, 11) == "MMInfoPopup") {
+			If (SubStr(LOC_WindowClass, 1, 11) == "MMInfoPopup") {
 				WinSet, ExStyle, +0x00000020 ; user transparent
 				Continue
 			}
 
-			If (SubStr(LOC_Class, 1, 14) == "TaskbarWindow:") {
-				If (LOC_VisibleInTaskBar) {
-					WinSet, ExStyle, -0x40000
-					WinHide
-					WinShow
-				}
-				Continue
-			}
-			
-			WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
 			If (LOC_VisibleInTaskBar) {
-				If (LOC_Width == 0
-					|| LOC_Height == 0) {
+				If (LOC_WindowWidth == 0
+					|| LOC_WindowHeight == 0) {
 					WinSet, ExStyle, -0x40000
 					WinHide
+					; TRY_ShowTrayTip(LOC_WindowTitle . " window hidden")
 				}
 			} Else {
-				If (LOC_Width > 0
-					&& LOC_Height > 0
-					&& WinActive("ahk_id " . LOC_ID)) {
-					WinSet, ExStyle, +0x40000 ; WS_EX_APPWINDOW : Forces a top-level window onto the taskbar when the window is visible
-					WinHide
-					WinShow
+				If (LOC_WindowWidth > 0
+					&& LOC_WindowHeight > 0
+					&& WinActive("ahk_id " . LOC_WindowID)) {
+					If (SubStr(LOC_WindowClass, 1, 21) != "WindowsForms10.Window") {
+						WinSet, ExStyle, +0x40000 ; WS_EX_APPWINDOW : Forces a top-level window onto the taskbar when the window is visible
+						WinHide
+						WinShow
+						;TRY_ShowTrayTip(6)
+					}
 				}
 			}
 		}
@@ -544,9 +1171,8 @@ WIN_OpenSaveDialogsPeriodicTimer() {
 !b::SendInput, {Ctrl Down}a{Ctrl Up}%A_Desktop%{Enter}
 !c::SendInput, {Ctrl Down}a{Ctrl Up}C:\{Enter}
 !d::SendInput, {Ctrl Down}a{Ctrl Up}D:\{Enter}
-; !f::SendInput, {Ctrl Down}a{Ctrl Up}%ZZZ_ProgramFiles32%{Enter}
+!g::SendInput, {Ctrl Down}a{Ctrl Up}G:\{Enter}
 !i::SendInput, {Ctrl Down}a{Ctrl Up}I:\{Enter}
-!j::SendInput, {Ctrl Down}a{Ctrl Up}J:\{Enter}
 !k::SendInput, {Ctrl Down}a{Ctrl Up}K:\{Enter}
 !m::SendInput, {Ctrl Down}a{Ctrl Up}M:\{Enter}
 !o::SendInput, {Ctrl Down}a{Ctrl Up}O:\{Enter}
@@ -713,7 +1339,6 @@ Return
 #Numpad0::
 #Numpad5::
 #NumpadIns::
-#NumpadEnter::
 WIN_Restore()
 Return
 
@@ -736,7 +1361,7 @@ WIN_Restore() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 WIN_RestoreAll:
-+#NumpadEnter::
++#m::
 WIN_RestoreAll()
 Return
 
@@ -1338,503 +1963,6 @@ Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-MButton::
-+MButton::
-!MButton::
-WIN_MiddleButton()
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_MiddleButton() {
-
-	Global SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight
-	WinGet, LOC_ActiveWindowID, ID
-	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_WindowID, LOC_ControlClass
-	If (LOC_WindowID) {
-		WinActivate, ahk_id %LOC_WindowID%
-		WinWaitActive, ahk_id %LOC_WindowID%
-	} Else {
-		LOC_WindowID := LOC_ActiveWindowID
-	}
-	WinActive("A")
-	WinGetClass, LOC_WindowClass
-	WinGetTitle, LOC_WindowTitle
-	CoordMode, Mouse, Screen
-	LOC_TitleBarClickZone := WIN_GetTitleBarClickZone()
-
-	; Close window after title bar click :
-	If (LOC_TitleBarClickZone == "t") {
-		If (LOC_WindowClass == "TConversationForm") { ; Skype
-			SendInput, {Ctrl Up}{Esc}
-		} Else If (LOC_WindowClass == "tSkMainForm") { ; Skype
-			SendInput, {Alt Down}s{Alt Up}f
-		} Else If (LOC_WindowClass == "AutoHotkey" && InStr(LOC_WindowTitle, A_ScriptFullPath . " - AutoHotkey")) { ; AutoHotKey debug window
-			WinMinimize
-		;~ } Else 	If (LOC_WindowClass == "CommunicatorMainWindowClass") { ; Lync main window
-			;~ WinHide
-		} Else {
-			WinClose
-			LOC_WindowTitle := WIN_GetWindowTitle(LOC_WindowID)
-			TRY_ShowTrayTip(LOC_WindowTitle . " closed")
-			, AUD_Beep()
-		}
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Minimize to tray after minimize click :
-	If (LOC_TitleBarClickZone == "m") {
-		WIN_MinimizeToTray(LOC_WindowID)
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Maximize window after maximize click :
-	If (LOC_TitleBarClickZone == "M") {
-		If (A_ThisHotkey == "+MButton") {
-			WIN_MaximizeOnAllScreens()
-		} Else If (A_ThisHotkey == "!MButton") {
-			WIN_MaximizeOnNextScreen()
-		} Else If (A_ThisHotKey == "MButton") {
-			Win_MaximizeVertically()
-		}
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Kill window after title bar click :
-	If (LOC_TitleBarClickZone == "x") {
-		If (AHK_SystemWindowClass(LOC_WindowClass)) {
-			PRM_PowerManager(PRM_Submit := false, PRM_State := 3, , PRM_YesDefaultButton := false)
-			Return
-		}
-		WinGet, LOC_KillWindowPID, PID
-		LOC_WindowTitle := WIN_GetWindowTitle(LOC_WindowID)
-		WinKill
-		Process, Close, %LOC_ActiveWindowPID%
-		SendMessage, 0x02
-		AUD_Beep()
-		, TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Kill window from everywhere { Shift | Alt } + { Middle Button } :
-	If (A_ThisHotkey == "!MButton"
-		|| A_ThisHotkey == "+MButton") {
-		WIN_Close()
-		, AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Defined actions :
-	;;;;;;;;;;;;;;;;;;;
-	
-	; Escape action :
-	If (LOC_WindowClass == "ytWindow" && SubStr(LOC_WindowTitle, -27) == "Visionneuse de photos Picasa" ; Picasa
-		|| LOC_WindowClass == "WMPTransition" ; WMP
-		|| LOC_WindowClass == "ShockwaveFlashFullScreen" ; Flash
-		|| LOC_WindowClass == "#32770" && LOC_WindowTitle == "Process Explorer Search" ; Process Explorer search
-		|| LOC_WindowClass == "#32770" && LOC_WindowTitle == "Rechercher - Directory Opus" ; Directory Opus search
-		|| LOC_WindowClass == "screenClass" && InStr(LOC_WindowTitle, "PowerPoint") ; PowerPoint
-		|| LOC_WindowClass == "TFNewPlayer") { ; MediaMonkey player
-		SendInput, {Esc}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Hide window action :
-	If (LOC_WindowClass == "CommunicatorMainWindowClass") { ; Lync main window
-		WinHide
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Control-W action :
-	If (LOC_WindowClass == "CabinetWClass" ; Shell
-		|| LOC_WindowClass == "PSDocC" ; Photoshop
-		|| LOC_WindowClass == "Photoshop" && LOC_WindowTitle != "Adobe Photoshop" ; Photoshop
-		|| LOC_WindowClass == "XLMAIN" && LOC_WindowTitle != "Excel (Utilisation non commerciale)" && LOC_WindowTitle != "Excel" && LOC_WindowTitle != "Microsoft Excel" && LOC_WindowTitle != "Microsoft Excel (Échec de l’activation du produit)" && LOC_WindowTitle != "Excel (Échec de l’activation du produit)" ; Excel
-		|| LOC_WindowClass == "Notepad++" ; Notepad++
-		|| LOC_WindowClass == "SWT_Window0" && !InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect")) { ; Sametime
-		SendInput, ^w
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Control-F4 action :
-	If (LOC_WindowClass == "IEFrame" ; IE
-		|| LOC_WindowClass == "Console_2_Main" ; Console¹
-		|| LOC_WindowClass == "PPTFrameClass" && LOC_WindowTitle != "PowerPoint" && LOC_WindowTitle != "PowerPoint (Échec de l’activation du produit)" ; PowerPoint
-		|| LOC_WindowClass == "SnagIt9Editor" && LOC_WindowTitle != "Editeur Snagit" ; Snag-It document
-		|| LOC_WindowClass == "SciTEWindow") { ; SCiTE editor
-		SendInput, ^{F4}
-		AUD_Beep()
-		; AHK_Debug("Ctrl-F4 sur " . LOC_WindowTitle . " ahk_class " . LOC_WindowClass)
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Alt-F4 action :
-	If (LOC_WindowClass == "SunAwtFrame" && ((LOC_KGSTitle := SubStr(LOC_WindowTitle, 1, 6)) == "KGS : " || LOC_KGSTitle == "CGoban") ; KGS
-		|| LOC_WindowClass == "PlayerCanvas" && (InStr(LOC_WindowTitle, "QMP") || LOC_WindowTitle == "Quintessential Media Player") ; Quintessential
-		|| LOC_WindowClass == "ExtPlayerCanvas" ; Quintessential
-		|| LOC_WindowClass == "PROCEXPL" ; Process Explorer
-		|| LOC_WindowClass == "ProcessHacker" ; Process Hacker
-		|| LOC_WindowClass == "TMainForm" ; Media Monkey
-		|| LOC_WindowClass == "TFMainWindow" ; Media Monkey
-		|| LOC_WindowClass == "TFImage" ; Media Monkey album image
-		|| LOC_WindowClass == "OpusApp" && LOC_WindowTitle != "Word" && LOC_WindowTitle != "Microsoft Word" && LOC_WindowTitle != "Microsoft Word (Échec de l’activation du produit)" && LOC_WindowTitle != "Word (Échec de l’activation du produit)" ; Word
-		|| LOC_WindowClass == "HH Parent" ; Windows CHTML file
-		|| LOC_WindowClass == "AutoHotkeyGUI" ; AHK self windows
-			&& (LOC_WindowTitle == "WindowSpy"
-				|| LOC_WindowTitle == "About"
-				|| LOC_WindowTitle == "GUI_Memo"
-				|| LOC_WindowTitle == "GUI_Magnifier"
-				|| LOC_WindowTitle == "Lock Keyboard"
-				|| LOC_WindowTitle == "Unlock Keyboard"
-				|| LOC_WindowTitle == "Text Capture"
-				|| LOC_WindowTitle == "Unicode Art Capture"
-				|| LOC_WindowTitle == "ASCII Art Capture"
-				|| LOC_WindowTitle == "Clipboard history")
-		|| LOC_WindowClass == "MMCMainFrame" ; Management console
-		|| LOC_WindowClass == "TAppForm" && InStr(LOC_WindowTitle, "Registrar Registry Manager") ; Registry Manager
-		|| LOC_WindowClass == "MozillaWindowClass" && (LOC_WindowTitle == "Enregistrement des mots de passe" || LOC_WindowTitle == "Carnet d'adresses" || SubStr(LOC_WindowTitle, 1, 12) == "Diaporama - " || SubStr(LOC_WindowTitle, 1, 12) == "Source de : " || SubStr(LOC_WindowTitle, 1, 11) == "Source of: ")
-		|| LOC_WindowClass == "OpusApp" && (LOC_WindowTitle == "Word" || LOC_WindowTitle == "Microsoft Word" || LOC_WindowTitle == "Microsoft Word (Échec de l’activation du produit)" || LOC_WindowTitle == "Word (Échec de l’activation du produit)") ; Word
-		|| LOC_WindowClass == "XLMAIN" && (LOC_WindowTitle == "Excel" || LOC_WindowTitle == "Excel (Utilisation non commerciale)" || LOC_WindowTitle == "Microsoft Excel" || LOC_WindowTitle == "Microsoft Excel (Échec de l’activation du produit)" || LOC_WindowTitle == "Excel (Échec de l’activation du produit)") ; Excel
-		|| LOC_WindowClass == "PPTFrameClass" && (LOC_WindowTitle == "PowerPoint" || LOC_WindowTitle == "PowerPoint (Échec de l’activation du produit)") ; PowerPoint
-		|| LOC_WindowClass == "SnagIt9Editor" && LOC_WindowTitle == "Editeur Snagit" ; Snag-It Editor with no more document
-		|| LOC_WindowClass == "SnagIt5UI" && LOC_WindowTitle == "Snagit" ; Snag-It
-		|| LOC_WindowClass == "CisMainWizard" ; Comodo
-		|| SubStr(LOC_WindowClass, 1, 27) == "WindowsForms10.Window.8.app"
-			&& (SubStr(LOC_WindowTitle, 1, 15) == "Startup Delayer" ; Startup Delayer
-				|| SubStr(LOC_WindowTitle, 1, 17) == "Duplicate Cleaner") ; Duplicate Cleaner
-		|| LOC_WindowClass == "Photoshop" && LOC_WindowTitle == "Adobe Photoshop" ; Photoshop
-		|| SubStr(LOC_WindowClass, 1, 24) == "HwndWrapper[screamer.exe" ; Screamer Radio
-		|| LOC_WindowClass == "MozillaWindowClass" && LOC_WindowTitle == "Bibliothèque" ; Firefox history
-		|| LOC_WindowClass == "CalcFrame"
-		|| LOC_WindowClass == "PuTTY" ; PuTTY
-		|| LOC_WindowClass == "AU3Reveal" ; Window Spy
-		|| LOC_WindowClass == "TAIDA64" ; Aida 64
-		|| LOC_WindowClass == "rctrl_renwnd32" ; Outlook message view
-		|| LOC_WindowClass == "IMWindowClass" ; Lync chat window
-		|| LOC_WindowClass == "SWT_Window0" && InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect") ; Sametime
-		|| LOC_WindowClass == "tSkMainForm" ; Skype
-		|| LOC_WindowClass == "TConversationForm") { ; Skype
-		SendInput, !{F4}
-		AUD_Beep()
-		AHK_Debug("Alt-F4 sur " . LOC_WindowTitle . " ahk_class " . LOC_WindowClass)
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-	
-	; Close window action :
-	If (LOC_WindowClass == "WMPlayerApp" ; WMP
-		|| LOC_WindowClass == "WMP Skin Host" ; WMP
-		|| SubStr(LOC_WindowClass, 1, 8) == "µTorrent" ; µTorrent
-		|| LOC_WindowTitle == "Freemake Video Converter" && SubStr(LOC_WindowClass, 1, 26) == "HwndWrapper[FreemakeVC.exe" ; Video Converter
-		|| LOC_WindowClass == "AutoHotkey" && SubStr(LOC_WindowTitle, 1, StrLen(A_ScriptFullPath)) == A_ScriptFullPath ; Debug
-		|| LOC_WindowClass == "NativeHWNDHost" && InStr(LOC_WindowTitle, "Ajouter ou supprimer des programmes")) { ; Ajout/Suppression de programmes
-		WinClose
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Kill window action :
-	If (LOC_WindowClass == "PlatformViewClassSession0" && LOC_WindowTitle == "Uplay" ; Rayman
-		|| LOC_WindowClass == "uplay_main" && LOC_WindowTitle == "Uplay" ; Rayman
-		|| LOC_WindowClass == "uplay_spotlight" && LOC_WindowTitle == "Spotlight" ; Rayman
-		|| LOC_WindowClass == "SunAwtFrame" && LOC_WindowTitle == "CGoban : Fenêtre Principale" ; KGS
-		|| InStr(LOC_WindowTitle, "DAMN NFO Viewer")) { ; NFO viewer
-		WinKill
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Specific defined actions :
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-	; Systray :
-	If (LOC_WindowClass == "Shell_TrayWnd") {
-		SendInput, ^+{Esc}
-		Return
-	}
-	
-	; Directory Opus :
-	If (LOC_WindowClass == "dopus.lister") {
-		If (LOC_WindowTitle == "Corbeille"
-			|| LOC_WindowTitle == "Ordinateur") {
-			SendInput, {Ctrl Up}{Esc}^{F4}
-		} Else If (InStr(LOC_ControlClass, "dopus.filedisplay")
-			|| InStr(LOC_ControlClass, "dopus.iconfiledisplay")) {
-			ControlGet, LOC_SecondFileDisplayID, Hwnd, , dopus.filedisplay2
-			If (LOC_SecondFileDisplayID) {
-				SendInput, {Ctrl Up}{Esc}^{F4}
-			} Else {
-				SendInput, {Ctrl Up}{Esc}!{F4}
-			}
-		} Else If (InStr(LOC_ControlClass, "RICHEDIT") ; Viewer txt
-			|| InStr(LOC_ControlClass, "SysListView") ; Viewer zip
-			|| InStr(LOC_ControlClass, "dopus.viewpic") ; Viewer images
-			|| InStr(LOC_ControlClass, "dopus.listerviewpane") ; Viewer images
-			|| InStr(LOC_ControlClass, "dopusviewerplugin.liv.viewer") ; Viewer gif
-			|| InStr(LOC_ControlClass, "_WwG") ; Viewer docx
-			|| InStr(LOC_ControlClass, "EVRVideoHandler") ; Viewer video
-			|| InStr(LOC_ControlClass, "Internet Explorer_Server") ; Viewer html & xml
-			|| InStr(LOC_ControlClass, "EXCEL7") ; Viewer video
-			|| InStr(LOC_ControlClass, "childclass") ; Viewer ppt
-			|| InStr(LOC_ControlClass, "PDFPreview")) { ; Viewer pdf
-			CoordMode, Mouse, Relative
-			MouseGetPos, LOC_MouseX, LOC_MouseY
-			ControlGetPos, LOC_ControlX, LOC_ControlY, LOC_ControlWidth, , dopus.listerviewpane1
-			If (LOC_ControlWidth) {
-				LOC_ClickX := LOC_ControlX + LOC_ControlWidth - 10
-				, LOC_ClickY := LOC_ControlY + 10
-				Click, %LOC_ClickX%, %LOC_ClickY%
-				MouseMove, LOC_MouseX, LOC_MouseY
-			} Else {
-				Click, % SubStr(A_ThisHotkey, 1, 1)
-			}
-		} Else {
-			Click, % SubStr(A_ThisHotkey, 1, 1)
-		}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Firefox & Chrome :
-	If (LOC_WindowClass == "MozillaWindowClass"
-			&& (InStr(LOC_WindowTitle, "Pale Moon")
-				|| InStr(LOC_WindowTitle, "Mozilla Firefox"))
-		|| LOC_WindowClass == "Chrome_WidgetWin_1") {
-		If (InStr(LOC_WindowTitle, "- Ecosia -")) {
-			SendInput, %A_Space%^w
-		} Else If (SubStr(LOC_ControlClass, 1, 5) == "DSUI:" ; PDF X-Change plug-in
-			|| InStr(LOC_WindowTitle, "WeTransfer")) {
-			WinActivate, ahk_class Shell_TrayWnd
-			WinActivate, ahk_id %LOC_WindowID%
-			SendInput, ^{F4}
-		} Else {
-			WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
-			If (LOC_Width == SCR_VirtualScreenWidth
-				&& LOC_Height == SCR_VirtualScreenHeight) { ; Full video screen
-				SendInput, {Esc}
-			} Else {
-				MouseClick, Left, LOC_X + 10, LOC_Y + 2 * LOC_Height // 3
-				Sleep, 10
-				SendInput, ^w
-				MouseMove, LOC_MouseX, LOC_MouseY
-			}
-		}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; PDF Exchange & UltraEdit :
-	Try {
-		If (LOC_WindowClass == "DSUI:PDFXCViewer" ; PDF X-Change
-			|| RegExMatch(LOC_WindowClass, "S)^Afx:[0-9]{16}:8:[0-9]{16}:0000000000000000:[A-F0-9]{16}$")) { ; UltraEdit
-			If (LOC_ControlClass == "MDIClient1") {
-				SendInput, {Ctrl Up}{Esc 2}!{F4}
-			} Else {
-				SendInput, {Ctrl Up}{Esc 2}^{F4}
-			}
-			AUD_Beep()
-			WinActivate, ahk_id %LOC_ActiveWindowID%
-			Return
-		}
-	} Catch LOC_Exception {
-		AHK_Catch(LOC_Exception, "WIN_MiddleButton")
-	}
-
-	; Many Faces of Go :
-	If (SubStr(LOC_WindowTitle, 1, 20) == "The Many Faces of Go" 
-		&& RegExMatch(LOC_WindowClass, "S)^Afx:00400000:8:00010003:00000000:[A-F0-9]{8}$")) {
-		If (SubStr(LOC_WindowTitle, 21, 4) == " - [") {
-			SendInput, ^{F4}
-		} Else {
-			WinClose
-		}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-	}
-	
-	; Thunderbird :
-	If (LOC_WindowClass == "MozillaWindowClass") {
-		If (InStr(LOC_WindowTitle, "Mozilla Thunderbird")) {
-			If (LOC_WindowTitle == "Agenda - Mozilla Thunderbird") { ; calendar
-				Return
-			}
-			If (LOC_WindowTitle == "Messages en attente - Dossiers locaux - Mozilla Thunderbird"
-				|| RegExMatch(LOC_WindowTitle, "^Courrier entrant - [a-zàäæéèêëîïôœüùûÿA-ZÀÄÆÉÈÊËÎÏÔŒÜÙÛŸ0-9_ \-&]{1,} - Mozilla Thunderbird$")
-				|| RegExMatch(LOC_WindowTitle, "^Envoyés - [a-zàäæéèêëîïôœüùûÿA-ZÀÄÆÉÈÊËÎÏÔŒÜÙÛŸ0-9_ \-&]{1,} - Mozilla Thunderbird$")
-				|| RegExMatch(LOC_WindowTitle, "^[a-zàäæéèêëîïôœüùûÿA-ZÀÄÆÉÈÊËÎÏÔŒÜÙÛŸ0-9_ :']{1,} - Dossiers locaux - Mozilla Thunderbird$")
-				|| RegExMatch(LOC_WindowTitle, "^Brouillons - [a-zàäæéèêëîïôœüùûÿA-ZÀÄÆÉÈÊËÎÏÔŒÜÙÛŸ0-9_ \-&]{1,} - Mozilla Thunderbird$")) { ; main board : current mail to delete
-				SendInput, {Esc}{Delete}
-				AHK_ShowToolTip("Mail deleted")
-				Return
-			}
-			If (RegExMatch(LOC_WindowTitle, "^.*- Courrier entrant - [a-zàäæéèêëîïôœüùûÿA-ZÀÄÆÉÈÊËÎÏÔŒÜÙÛŸ0-9_ \-]{1,} - Mozilla Thunderbird$")
-				|| RegExMatch(LOC_WindowTitle, "[^\-]{1,} - [a-zàäæéèêëîïôœüùûÿA-ZÀÄÆÉÈÊËÎÏÔŒÜÙÛŸ0-9_ ]{1,} - Dossiers locaux - Mozilla Thunderbird$")) { ; single window : mail view to close
-				SendInput, {Esc}^{F4}
-				Return
-			}
-			If (RegExMatch(LOC_WindowTitle, "^.+ - Mozilla Thunderbird$")) { ; single window : mail view to close
-				RegExReplace(LOC_WindowTitle, " - ", "", LOC_Count)
-				If (LOC_Count == 1) {
-					SendInput, {Esc}^{F4}
-					Return
-				}
-			}
-		} Else 	If (RegExMatch(LOC_WindowTitle, "^[0-9]{1,} rappels?$")) { ; Thunderbird meeting recall
-			WinClose
-			Return
-		} Else {
-		If (RegExMatch(LOC_WindowTitle, "^Rédaction")) { ; mail edition to close
-			SendInput, ^w
-			Return
-		}}
-	}
-	
-	; MPC :
-	If (LOC_WindowClass == "MediaPlayerClassicW") {
-		WinGetPos, , , LOC_Width, LOC_Height, A
-		If (LOC_Width == SCR_VirtualScreenWidth
-			&& LOC_Height == SCR_VirtualScreenHeight) {
-			SendInput, {Esc}
-		} Else {
-			SendInput, !x
-		}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-	
-	; UltraEdit :
-	If (WinActive("UltraEdit ahk_class #32770", "Enregistrer les modifications apportées à...")
-		|| WinActive("recharger le fichier ahk_class #32770")) {
- 		SendInput, !n
-		Return
-	}
-
-	; Nox :
-	If (LOC_WindowTitle == "Nox App Player" 
-		&& LOC_WindowClass == "Qt5QWindowIcon") {
-		SetTimer, APP_AndroidActivityTimer, Off
-		Loop, 5 { ; GUI_AndroidActivity*
-			LOC_GuiID := 51 + A_Index
-			Gui, %LOC_GuiID%:Destroy
-		}
-		SendInput, !{F4}
-		WinWait, Dialog ahk_class Qt5QWindowIcon, , 3
-		If (!ErrorLevel) {
-			WinActivate
-			SendInput, {Enter}
-		}
-		AHK_HideToolTip()
-		, AUD_Beep()
-		, AHK_ResetCursor()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; VLC :
-	If (WinActive("Lecteur multimédia VLC ahk_class QWidget")) {
-		WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
-		If (LOC_X == SCR_VirtualScreenX
-			&& LOC_Y == SCR_VirtualScreenY
-			&& LOC_Width == SCR_VirtualScreenWidth
-			&& LOC_Height == SCR_VirtualScreenHeight) {
-			SendInput, {Esc}
-		} Else {
-			SendInput, !{F4}
-		}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Registry Manager :
-	If (LOC_WindowClass == "TEditDockForm"
-		&& LOC_WindowTitle == "Registry and Tool Windows") {
-		WinGet, LOC_WindowPID, PID
-		WinKill
-		Process, Close, %LOC_WindowPID%
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-	
-	; Video Converter :
-	If (SubStr(LOC_WindowClass, 1, 28) == "HwndWrapper[FreemakeVC.exe;;") {
-		If (LOC_WindowTitle != "Freemake Video Converter"
-			&& SubStr(LOC_WindowTitle, -9) != "% terminés") {
-			WinKill
-			AUD_Beep()
-			Return
-		}
-	}
-	
-	; WinMerge :
-	If (LOC_WindowClass == "WinMergeWindowClassW") {
-		ControlGet, LOC_Edit1ID, Hwnd, , Edit1
-		If (LOC_Edit1ID) {
-			SendInput, ^{F4}
-		} Else {
-			WinClose
-		}
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; Window Spy :
-	If (LOC_WindowClass == "AutoHotkeyGUI"
-		&& LOC_WindowTitle == "WindowSpy — by BeLO.") {
-		SetTimer, ADM_WindowSpyRefreshTimer, Off
-		Gui, 31:Hide ; GUI_WindowSpyHoveredColor
-		Gui, 30:Hide ; Window Spy
-		AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-
-	; AHK Calendar :
-	If (LOC_WindowClass == "AutoHotkeyGUI"
-		&& LOC_WindowTitle == "GUI_Calendar") {
-		SYS_TaskbarCalendarPeriodicTimer(PRM_Hide := true)
-		, AUD_Beep()
-		WinActivate, ahk_id %LOC_ActiveWindowID%
-		Return
-	}
-	
-	; Ruler :
-	If (LOC_WindowClass == "AutoHotkeyGUI"
-		&& LOC_WindowTitle == "GUI_HorizontalRuler") {
-		Gui, 8:Destroy
-		Return
-	}
-	If (LOC_WindowClass == "AutoHotkeyGUI"
-		&& LOC_WindowTitle == "GUI_VerticalRuler") {
-		Gui, 9:Destroy
-		Return
-	}
-
-	; No defined action :
-	Click, % SubStr(A_ThisHotkey, 1, 1)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 WIN_MinimizeToTrayShellHook(wParam, lParam, PRM_MessageNumber) {
 	Critical
 	If (PRM_MessageNumber == 1028) {
@@ -2059,107 +2187,8 @@ WIN_CheckAlwaysOnTopWindowIDs() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Brightness { Win + AltGr + Wheel } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_LighterBrightness:
-<^>!#WheelUp::
-WIN_LighterBrightness()
-Return
-
-WIN_LighterBrightness() {
-	WIN_AdjustBrightness(PRM_Delta := +12.75)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_DarkerBrightness:
-<^>!#WheelDown::
-WIN_DarkerBrightness()
-Return
-
-WIN_DarkerBrightness() {
-	WIN_AdjustBrightness(PRM_Delta := -12.75)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_SetBrightness(PRM_Brightness = 128) {
-
-	Static STA_RtlMoveMemoryFunction := AHK_GetFunction("kernel32", "RtlMoveMemory"), STA_SetDeviceGammaRampFunction := AHK_GetFunction("gdi32", "SetDeviceGammaRamp"), STA_GetDCFunction := AHK_GetFunction("user32", "GetDC"), STA_ReleaseDCFunction := AHK_GetFunction("user32", "ReleaseDC")
-
-	Loop, % VarSetCapacity(LOC_GR, 1536) / 6
-	{
-		NumPut((LOC_Value := (PRM_Brightness + 128) * (A_Index - 1)) > 65535 ? 65535 : LOC_Value, LOC_GR, 2 * (A_Index - 1), "UShort")
-	}
-	DllCall(STA_RtlMoveMemoryFunction, "UInt", &LOC_GR + 512,  "UInt", &LOC_GR, "UInt", 512)
-	, DllCall(STA_RtlMoveMemoryFunction, "UInt", &LOC_GR + 1024, "UInt", &LOC_GR, "UInt", 512)
-	, DllCall(STA_SetDeviceGammaRampFunction, "UInt", DllCall(STA_GetDCFunction, "UInt", 0), "UInt", &LOC_GR)
-	, DllCall(STA_ReleaseDCFunction, "UInt", 0, "UInt", 0)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_SetBrightness2(PRM_Brightness = 128) {
-
-	Static STA_RtlMoveMemoryFunction := AHK_GetFunction("kernel32", "RtlMoveMemory"), STA_SetDeviceGammaRampFunction := AHK_GetFunction("gdi32", "SetDeviceGammaRamp"), STA_GetDCFunction := AHK_GetFunction("user32", "GetDC"), STA_ReleaseDCFunction := AHK_GetFunction("user32", "ReleaseDC")
-
-	Loop, % VarSetCapacity(LOC_BGR, 1536) / 6
-	{
-		NumPut((LOC_Value := (PRM_Brightness + 128) * (A_Index - 1)) > 65535 ? 65535 : LOC_Value, LOC_BGR, 2 * (A_Index - 1), "UShort")
-	}
-	DllCall(STA_RtlMoveMemoryFunction, "UInt", &LOC_BGR,  "UInt", &LOC_BGR, "UInt", 512) ; blue
-	, DllCall(STA_RtlMoveMemoryFunction, "UInt", &LOC_BGR + 512,  "UInt", &LOC_BGR, "UInt", 512) ; green
-	, DllCall(STA_RtlMoveMemoryFunction, "UInt", &LOC_BGR + 1024, "UInt", &LOC_BGR, "UInt", 512) ; red
-	, DllCall(STA_SetDeviceGammaRampFunction, "UInt", DllCall(STA_GetDCFunction, "UInt", 0), "UInt", &LOC_BGR)
-	, DllCall(STA_ReleaseDCFunction, "UInt", 0, "UInt", 0)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_AdjustBrightness(PRM_Delta = 0) {
-	Global WIN_Brightness
-	AHK_Log("> WIN_AdjustBrightness(" . PRM_Delta . ")")
-	WIN_Brightness := Round(Min(Max(0, WIN_Brightness + PRM_Delta), 255))
-	, WIN_SetBrightness(WIN_Brightness)
-	If (PRM_Delta != 0) {
-		AHK_ShowToolTip("Brightness : " . Round(WIN_Brightness / 255 * 100) . "%")
-	}
-	If (PRM_Delta != 0) {
-		AHK_SaveIniFile()
-	}
-	AHK_Log("< WIN_AdjustBrightness(" . PRM_Delta . ")")
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Transparency { Ctrl + Win + Wheel } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_ToggleAutomaticTransparency:
-WIN_ToggleAutomaticTransparency()
-Menu, Options, Show
-Return
-^+#y::
-WIN_ToggleAutomaticTransparency()
-, TRY_ShowTrayTip("Automatic transparency: " . (WIN_TransparencyEnabled ? "On" : "Off"))
-Return
-
-WIN_ToggleAutomaticTransparency() {
-	Global
-	WIN_TransparencyEnabled := !WIN_TransparencyEnabled
-	If (WIN_TransparencyEnabled) {
-		WIN_InitTransparency()
-	} Else {
-		WIN_TransparencyAllOff()
-	}
-	TRY_UpdateMenus()
-	, AHK_SaveIniFile()
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 WIN_ClassTransparentable(PRM_Class) {
 	Return, (PRM_Class != "MozillaWindowClass"
@@ -2174,7 +2203,7 @@ WIN_ClassTransparentable(PRM_Class) {
 
 WIN_InitTransparency() {
 
-	Global WIN_Transparency, WIN_MenusTransparency, WIN_TransparencyEnabled
+	Global APP_DisplayFusionPath
 	AHK_Log("> WIN_InitTransparency()")
 	If (WIN_TransparencyEnabled) {
 		DetectHiddenWindows, Off
@@ -2212,32 +2241,31 @@ WIN_InitTransparency() {
 		}
 	}
 
-	Process, Exist, DisplayFusion.exe
-	If (ErrorLevel) {
-		DetectHiddenWindows, Off
-		WinGet, LOC_WindowsIDs, List, , , Program Manager
-		DetectHiddenWindows, On
-		Loop, %LOC_WindowsIDs% {
-			StringTrimRight, LOC_ID, LOC_WindowsIDs%A_Index%, 0
-			WinGetClass, LOC_Class, ahk_id %LOC_ID%
-			If LOC_Class Contains TaskbarWindow:
-			{
-				WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height, ahk_id %LOC_ID%
-				WinSet, TransColor, %LOC_Color%, ahk_id %LOC_ID%
-				Gui, 19:-AlwaysOnTop +Disabled +Owner -Caption +ToolWindow -Resize +LastFound ; GUI_DisplayFusionColoredTaskbar
-				Gui, 19:Show, x%LOC_X% y%LOC_Y% w%LOC_Width% h%LOC_Height% NoActivate, GUI_DisplayFusionColoredTaskbar
-				WinSet, ExStyle, +0x00000020
-				If (A_Is64bitOS) {
-					WinSet, Transparent, 100
+	If (APP_DisplayFusionPath) {
+		Process, Exist, DisplayFusion.exe
+		If (ErrorLevel) {
+			WinGet, LOC_WindowsIDs, List, , , Program Manager
+			DetectHiddenWindows, On
+			Loop, %LOC_WindowsIDs% {
+				StringTrimRight, LOC_ID, LOC_WindowsIDs%A_Index%, 0
+				WinGetClass, LOC_Class, ahk_id %LOC_ID%
+				If (SubStr(LOC_Class, 1, 10) == "DFTaskbar:") {
+					WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height, ahk_id %LOC_ID%
+					WinSet, TransColor, %LOC_Color%, ahk_id %LOC_ID%
+					Gui, 19:-AlwaysOnTop +Disabled +Owner -Caption +ToolWindow -Resize +LastFound ; GUI_DisplayFusionColoredTaskbar
+					Gui, 19:Show, x%LOC_X% y%LOC_Y% w%LOC_Width% h%LOC_Height% NoActivate, GUI_DisplayFusionColoredTaskbar
+					; WinSet, ExStyle, +0x00000020 ; TODO : à réactiver si DF apparaît encore ds la barre des tâches
+					If (A_Is64bitOS) {
+						WinSet, Transparent, 100
+					}
+					SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionID := LOC_ID)
+					Break
 				}
-				Break
 			}
 		}
-		SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionExists := true)
 	} Else {
-		SYS_TaskbarColorPeriodicTimer(PRM_DisplayFusionExists := false)
+		SYS_TaskbarColorPeriodicTimer()
 	}
-
 	AHK_Log("< WIN_InitTransparency()")
 }
 
@@ -2247,75 +2275,34 @@ WIN_TransparencyPeriodicTimer:
 WIN_TransparencyPeriodicTimer()
 Return
 
-WIN_TransparencyPeriodicTimer() {
+WIN_TransparencyPeriodicTimer(PRM_DisplayFusionID := 0) {
 
 	LOC_InitialDegree := 10, LOC_FinalTransparency := 200
-	Global WIN_Transparency, WIN_MenusTransparency, WIN_TransparencyEnabled
-	Static STA_LastActiveWindowID := 0, STA_SysTrayDegree := LOC_InitialDegree, STA_DisplayFusionID := -1, STA_GetParentFunction := AHK_GetFunction("user32", "GetParent")
+	Global APP_DisplayFusionPath
+	Static STA_LastActiveWindowID := 0, STA_SysTrayDegree := LOC_InitialDegree, STA_DisplayFusionID := 0, STA_GetParentFunction := AHK_GetFunction("user32", "GetParent")
 	WinGet, LOC_NewActiveWindowID, ID, A
 	WinGetClass, LOC_NewActiveClass, ahk_id %LOC_NewActiveWindowID%
-		
-	; Windows :
-	If (LOC_NewActiveWindowID != STA_LastActiveWindowID
-		&& LOC_NewActiveClass != "MozillaDialogClass") {
-		If (WIN_TransparencyEnabled) {
-			WinGetClass, LOC_LastActiveClass, ahk_id %STA_LastActiveWindowID%
-			LOC_ParentID := DllCall(STA_GetParentFunction, "UInt", LOC_NewActiveWindowID) + 0
 
-			If (!WinExist("ahk_group WIN_StartMenuGroup ahk_id " . STA_LastActiveWindowID)) {
-				If (LOC_ParentID != STA_LastActiveWindowID
-					&& WIN_ClassTransparentable(LOC_LastActiveClass)) {
-					LOC_CheckedTransparency := WIN_CheckTransparencyWindowID(STA_LastActiveWindowID)
-					If (LOC_CheckedTransparency != -1
-						&& LOC_CheckedTransparency < WIN_Transparency) {
-						WinSet, Transparent, %LOC_CheckedTransparency%, ahk_id %STA_LastActiveWindowID%
-					} Else {
-						WinSet, Transparent, %WIN_Transparency%, ahk_id %STA_LastActiveWindowID%
-					}
-				}
-			}
-			If (!WinExist("ahk_group WIN_StartMenuGroup ahk_id " . LOC_NewActiveWindowID)) {
-				If (WIN_ClassTransparentable(LOC_NewActiveClass)) {
-					LOC_CheckedTransparency := WIN_CheckTransparencyWindowID(LOC_NewActiveWindowID)
-					If (LOC_CheckedTransparency != -1) {
-						WinSet, Transparent, %LOC_CheckedTransparency%, ahk_id %LOC_NewActiveWindowID%
-						If (LOC_CheckedTransparency == 255) {
-							WinSet, Transparent, Off, ahk_id %LOC_NewActiveWindowID%
-						}
-					} Else {
-						WinGet, LOC_Transparency, Transparent, ahk_id %LOC_NewActiveWindowID%
-						If (LOC_Transparency != 255) {
-							WinSet, Transparent, 255, ahk_id %LOC_NewActiveWindowID%
-							WinSet, Transparent, Off, ahk_id %LOC_NewActiveWindowID%
-						}
-					}
-				}
-			}
-		}
-	}
+	; Display Fusion :
+	; If (PRM_DisplayFusionID
+	
+	; System taskbar :
+	STA_SysTrayDegree := (LOC_HoveredClass == "Shell_TrayWnd"
+						|| LOC_HoveredClass == "BaseBar"
+						|| SubStr(LOC_HoveredClass, 1, 14) == "TaskbarWindow:"
+							? min(STA_SysTrayDegree + 3, LOC_InitialDegree)
+							: max(STA_SysTrayDegree - 1, 0))
+	, LOC_Transparency := Round(LOC_FinalTransparency + STA_SysTrayDegree * (255 - LOC_FinalTransparency) / LOC_InitialDegree)
+	WinSet, Transparent, %LOC_Transparency%, ahk_class Shell_TrayWnd
 
-		; Menus :
-		If (LOC_HoveredClass == "#32768") {
-			WinSet, Transparent, 255, ahk_id %LOC_WindowID%
-		}
-
-		; System taskbar :
-		STA_SysTrayDegree := (LOC_HoveredClass == "Shell_TrayWnd"
-							|| LOC_HoveredClass == "BaseBar"
-							|| SubStr(LOC_HoveredClass, 1, 14) == "TaskbarWindow:"
-								? min(STA_SysTrayDegree + 3, LOC_InitialDegree)
-								: max(STA_SysTrayDegree - 1, 0))
-		, LOC_Transparency := Round(LOC_FinalTransparency + STA_SysTrayDegree * (255 - LOC_FinalTransparency) / LOC_InitialDegree)
-		WinSet, Transparent, %LOC_Transparency%, ahk_class Shell_TrayWnd
-
-		; Display Fusion taskbar :
-		If (STA_DisplayFusionID > 0
-			&& !WinExist("ahk_id " . STA_DisplayFusionID)) {
-			STA_DisplayFusionID := 0
-		}
+	; DisplayFusion taskbar :
+	If (APP_DisplayFusionPath) {
+		;~ If (STA_DisplayFusionID > 0
+		;~ && !WinExist("ahk_id " . STA_DisplayFusionID)) {
+			;~ STA_DisplayFusionID := 0
+		;~ }
 		If (STA_DisplayFusionID == 0
-			&& STA_SysTrayDegree == LOC_InitialDegree
-			|| STA_DisplayFusionID == -1) {
+			&& STA_SysTrayDegree == LOC_InitialDegree) {
 			Process, Exist, DisplayFusion.exe
 			If (ErrorLevel) {
 				DetectHiddenWindows, Off
@@ -2336,6 +2323,7 @@ WIN_TransparencyPeriodicTimer() {
 			WinSet, Transparent, %LOC_Transparency%
 			WinSet, Top
 		}
+	}
 	STA_LastActiveWindowID := LOC_NewActiveWindowID
 }
 
@@ -3117,102 +3105,6 @@ WIN_PadResizing() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; X-Window switching focus (focus follows mouse) :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-/**
- * Provided a 'X Window' like focus switching by mouse cursor movement. After
- * activation of this feature (by using the responsible entry in the Tray icon
- * menu) the focus will follow the mouse cursor with a delayed focus change
- * (after movement end) of 500 milliseconds (half a second). This feature is
- * disabled per default to avoid any confusion due to the new user-interface-flow.
- */
-
-WIN_ToggleFocusFollowsMouse:
-WIN_ToggleFocusFollowsMouse()
-Menu, Options, Show
-Return
-^+#f::
-WIN_ToggleFocusFollowsMouse()
-, TRY_ShowTrayTip("X-Mouse focus: " . (WIN_FocusFollowsMouseEnabled ? "On" : "Off"), 2)
-Return
-
-WIN_ToggleFocusFollowsMouse() {
-	Global
-	WIN_FocusFollowsMouseEnabled := !WIN_FocusFollowsMouseEnabled
-	, WIN_SetFocusFollowsMouse()
-	, AHK_SaveIniFile()
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_SetFocusFollowsMouse() {
-	Global WIN_FocusFollowsMouseEnabled, ZZZ_XWindowFocusPeriodicTimer
-	If (WIN_FocusFollowsMouseEnabled) {
-		SetTimer, WIN_XWindowFocusPeriodicTimer, %ZZZ_XWindowFocusPeriodicTimer%
-	} Else {
-		SetTimer, WIN_XWindowFocusPeriodicTimer, Off
-	}
-	TRY_UpdateMenus()
-}
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_XWindowFocusPeriodicTimer:
-WIN_XWindowFocus()
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_XWindowFocus() {
-	Global ZZZ_XWindowFocusPeriodicTimer
-	Static STA_FocusRequest := false, STA_MouseX := -1, STA_MouseY := -1, STA_MouseMovedTickCount := 0
-	CoordMode, Mouse, Screen
-	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_HoveredWindowID
-	If (!LOC_HoveredWindowID) {
-		Return
-	}
-
-	If (LOC_MouseX != STA_MouseX
-		|| LOC_MouseY != STA_MouseY) {
-		STA_FocusRequest := !WinActive("ahk_id " . LOC_HoveredWindowID)
-		, STA_MouseX := LOC_MouseX
-		, STA_MouseY := LOC_MouseY
-		, STA_MouseMovedTickCount := A_TickCount
-	} Else {
-		If (STA_FocusRequest
-			&& A_TickCount - STA_MouseMovedTickCount > ZZZ_XWindowFocusPeriodicTimer) {
-			WinGetClass, LOC_WindowClass, ahk_id %LOC_HoveredWindowID%
-			If (AHK_SystemWindowClass(LOC_WindowClass)) {
-				Return
-			}
-
-
-			; checks wheter the selected window is a popup menu
-			; (WS_POPUP) && !(WS_DLGFRAME | WS_SYSMENU | WS_THICKFRAME)
-			WinGet, LOC_WindowStyle, Style, ahk_id %LOC_HoveredWindowID%
-			If ((LOC_WindowStyle & 0x80000000)
-				&& !(LOC_WindowStyle & 0x4C0000)) {
-				Return
-			}
-
-			IfWinNotActive, ahk_id %LOC_HoveredWindowID%
-			{
-				WinActivate, ahk_id %LOC_HoveredWindowID%
-				WinWaitActive, ahk_id %LOC_HoveredWindowID%, , 0
-				WinShow, ahk_id %LOC_HoveredWindowID%
-			}
-
-			STA_FocusRequest := false
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Cancel visual effects { Ctrl + Win + Esc } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -3252,247 +3144,6 @@ WIN_FocusLastWindow() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Close window { { Ctrl | Win | Alt } + F4 } or { Ctrl + Esc } :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-#Esc::
-WIN_EscKill()
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_EscKill() {
-
-	Global 	AHK_AudioEnabled
-	WinActive("A")
-	WinGet, LOC_ActiveWindowID, ID
-	If (LOC_ActiveWindowID) {
-		WinGetClass, LOC_WindowClass
-		If (AHK_SystemWindowClass(LOC_WindowClass)) {
-			SendInput, {LWin Down}{Esc}{LWin Up}
-		} Else {
-			LOC_WindowTitle := WIN_GetWindowTitle(LOC_ActiveWindowID)
-			If (LOC_WindowClass == "MozillaWindowClass"
-				|| LOC_WindowClass == "IEFrame"
-				|| LOC_WindowClass == "Photoshop"
-				|| LOC_WindowClass == "dopus.lister") {
-				SendInput, ^{F4}
-			} Else {
-				WinClose
-				AUD_Beep()
-				TRY_ShowTrayTip(LOC_WindowTitle . " closed")
-			}
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_TrayMenuKill:
-WIN_FocusLastWindow()
-#F4::
-^#F4::
-!#F4::
-^!#F4::
-Suspend, Permit
-WIN_F4Kill()
-Return
-
-WIN_F4Kill() {
-
-	Global AHK_AudioEnabled
-	WinGet, LOC_KillWindowID, ID, A
-	WinGetClass, LOC_WindowClass, ahk_id %LOC_KillWindowID%
-	If (AHK_SystemWindowClass(LOC_WindowClass)) {
-		PRM_PowerManager(PRM_Submit := false, PRM_State := 3, , PRM_YesDefaultButton := false)
-		Return
-	}
-	WinGet, LOC_KillWindowPID, PID, ahk_id %LOC_KillWindowID%
-	LOC_WindowTitle := WIN_GetWindowTitle(LOC_KillWindowID)
-	WinKill, ahk_id %LOC_KillWindowID%
-	Process, Close, %LOC_KillWindowPID%
-	SendMessage, 0x02
-	If (LOC_WindowClass == "Rayman Legends") {
-		WinKill, Uplay ahk_class PlatformView
-	}
-	AUD_Beep()
-	TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_MiddleButtonCombinations:
-#MButton::
-^#MButton::
-#!MButton::
-^#!MButton::
-WIN_MiddleButtonCombinations()
-Return
-
-WIN_MiddleButtonCombinations() {
-
-	Global AHK_AudioEnabled
-	MouseGetPos, , , LOC_KillWindowID
-	If (LOC_KillWindowID) {
-		WinGetClass, LOC_WindowClass, ahk_id %LOC_KillWindowID%
-		If (AHK_SystemWindowClass(LOC_WindowClass)) {
-			PRM_PowerManager(PRM_Submit := false, PRM_State := 3, , PRM_YesDefaultButton := false)
-		} Else {
-			WinGet, LOC_KillWindowPID, PID, ahk_id %LOC_KillWindowID%
-			LOC_WindowTitle := WIN_GetWindowTitle(LOC_KillWindowID)
-			WinKill, ahk_id %LOC_KillWindowID%
-			Process, Close, %LOC_KillWindowPID%
-			SendMessage, 0x02,
-			AUD_Beep()
-			, TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
-		}
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_TrayMenuClose:
-WIN_FocusLastWindow()
-!F4::
-WIN_Close()
-Return
-
-WIN_Close() {
-
-	Global AHK_AudioEnabled
-	IfInString, A_ThisHotkey, % "MButton"
-	{
-		MouseGetPos, , , LOC_CloseWindowID
-	} Else
-	IfInString, A_ThisHotkey, % "XButton"
-	{
-		MouseGetPos, , , LOC_CloseWindowID
-	} Else {
-		WinGet, LOC_CloseWindowID, ID, A
-	}
-
-	If (LOC_CloseWindowID) {
-		WinGetClass, LOC_WindowClass, ahk_id %LOC_CloseWindowID%
-		If (AHK_SystemWindowClass(LOC_WindowClass)) {
-			PRM_PowerManager(PRM_Submit := false, PRM_State := 1, PRM_ForcedActionEnabled := true, PRM_YesDefaultButton := false)
-			Return
-		}
-		LOC_WindowTitle := WIN_GetWindowTitle(LOC_KillWindowID)
-		If ((LOC_WindowTitle == "Visionneuse de photos Picasa" && LOC_WindowClass == "ytWindow")
-			|| LOC_WindowClass == "WMPTransition"
-			|| LOC_WindowClass == "ShockwaveFlashFullScreen") {
-			ControlSend, , {Ctrl Up}{Esc}, ahk_id %LOC_CloseWindowID%
-		} Else {
-			WinClose, ahk_id %LOC_CloseWindowID%
-		}
-		SendMessage, 0x02,
-		AUD_Beep()
-		, TRY_ShowTrayTip(LOC_WindowTitle . " closed")
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-WIN_TrayMenuCloseInside:
-WIN_FocusLastWindow()
-^F4 Up::
-WIN_CloseInside()
-Return
-
-WIN_CloseInside() {
-	WinGet, LOC_CloseWindowID, ID, A
-	If (LOC_CloseWindowID) {
-		WinGetClass, LOC_WindowClass, ahk_id %LOC_CloseWindowID%
-		If (AHK_SystemWindowClass(LOC_WindowClass)) {
-			Return
-		}
-		WinActivate, ahk_id %LOC_CloseWindowID%
-		WinWaitActive, ahk_id %LOC_CloseWindowID%, , 0
-		WinShow
-		ControlSend, ahk_parent, ^{F4}
-		AUD_Beep()
-	}
-}
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Rulers :
-;;;;;;;;;;
-
-WIN_HorizontalRuler:
-#NumpadDot::
-WIN_Ruler()
-Return
-
-WIN_VerticalRuler:
-^#NumpadDot::
-#+NumpadDot::
-!#NumpadDot::
-<^>!#NumpadDot::
-WIN_Ruler(false)
-Return
-
-WIN_Ruler(PRM_Horizontal = true) {
-	
-	Global SCR_PixelsPerMillimeter, SCR_VisibleScreenWidth, SCR_VisibleScreenHeight
-	LOC_GuiThickness := (PRM_Horizontal ? 50 : 60)
-	, LOC_Margin := 10
-	, LOC_Gui := (PRM_Horizontal ? 8 : 9)
-	, LOC_RulerScreenLength := (PRM_Horizontal ? SCR_VisibleScreenWidth : SCR_VisibleScreenHeight) - 4 * LOC_Margin
-	, LOC_RulerMillimetersLength := LOC_RulerScreenLength // SCR_PixelsPerMillimeter
-	Gui, %LOC_Gui%:Destroy
-	Gui, %LOC_Gui%:-Caption -Resize +Owner +AlwaysOnTop +Border +LastFound
-	
-	Gui, %LOC_Gui%:Font, s1
-	Loop, %LOC_RulerMillimetersLength% {
-		LOC_Index := A_Index - 1
-		LOC_Delta := (LOC_Index / 10 == LOC_Index // 10
-						? 0
-						: (LOC_Index / 5 == LOC_Index // 5
-							? 5
-							: 10))
-					
-		If (PRM_Horizontal) {
-			Gui, %LOC_Gui%:Add, Text, % "X" . Round(LOC_Margin + A_Index * SCR_PixelsPerMillimeter) . " Y0 W1 H" . Round(LOC_GuiThickness - 2.5 * LOC_Margin - LOC_Delta) . " 0x7"
-		} Else {
-			Gui, %LOC_Gui%:Add, Text, % "X" . Round(3.5 * LOC_Margin + LOC_Delta) . " Y" . Round(LOC_Margin + A_Index * SCR_PixelsPerMillimeter) . " W" . Round(LOC_GuiThickness - 3.5 * LOC_Margin - LOC_Delta) . "H1 0x7"
-		}
-	}
-	
-	Gui, %LOC_Gui%:Font, s8 Bold, Courier New
-	Loop, % LOC_RulerMillimetersLength // 10 + 1
-	{
-		If (PRM_Horizontal) {
-			Gui, %LOC_Gui%:Add, Text, % "X" . Round(LOC_Margin + 10 * (A_Index - 1) * SCR_PixelsPerMillimeter - (A_Index > 10 ? 3 : 0)) . " Y" . LOC_GuiThickness - 2 * LOC_Margin . " W60 H30", % (A_Index - 1) . (A_Index == 1 ? "cm": "")
-		} Else {
-			Gui, %LOC_Gui%:Add, Text, % "X" . LOC_Margin . " Y" Round(LOC_Margin + 10 * (A_Index - 1) * SCR_PixelsPerMillimeter - 3) . " W20 H30 Right", % (A_Index - 1) . (A_Index == 1 ? "cm": "")
-		}
-	}
-	
-	WinSet, Transparent, 190
-	LOC_GuiX := (PRM_Horizontal ? "Center" : LOC_Margin)
-	, LOC_GuiY := (PRM_Horizontal ? SCR_VisibleScreenHeight - LOC_GuiThickness : LOC_Margin)
-	, LOC_GuiWidth := (PRM_Horizontal ? SCR_VisibleScreenWidth - 2 * LOC_Margin : LOC_GuiThickness)
-	, LOC_GuiHeight := (PRM_Horizontal ? LOC_GuiThickness : SCR_VisibleScreenHeight - 2 * LOC_Margin)
-	Gui, %LOC_Gui%:Show, % "X" . LOC_GuiX . " Y" . LOC_GuiY . " W" . LOC_GuiWidth . " H" . LOC_GuiHeight, % (PRM_Horizontal ? "GUI_HorizontalRuler" : "GUI_VerticalRuler")
-}
-
-8GuiEscape:
-8GuiClose:
-Gui, 8:Destroy
-Return
-
-9GuiEscape:
-9GuiClose:
-Gui, 9:Destroy
-Return
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 WIN_BoringPopUpsPeriodicTimer:
 WIN_BoringPopUpsPeriodicTimer()
 Return
@@ -3500,27 +3151,33 @@ Return
 WIN_BoringPopUpsPeriodicTimer() {
 
 	Global ZZZ_BoringPopUpsPeriodicTimer
-	
+
 	; Edition :
 	;;;;;;;;;;;
+	
+	; Word :
 	Static STA_WordCount := 0
 	If (WIN_IfWinActive(STA_WordCount, PRM_ParentTitle := "Word ahk_class OpusApp", PRM_WindowTitle := "Word ahk_class #32770", PRM_WindowText := "Comme ce fichier a été créé dans une version plus récente de Word", PRM_SecondsWaitingForParent := 4, PRM_SecondsWaitingAfterSuccess := 15)) {
 		WinClose
 		Return
 	}
 
-	Static STA_OfficeActivationCount := 0
-	If (WIN_IfWinActive(STA_OfficeActivationCount, PRM_ParentTitles := "Word ahk_class OpusApp|ahk_class XLMAIN|PowerPoint ahk_class PPTFrameClass", PRM_WindowTitle := "Assistant Activation Microsoft Office ahk_class NUIDialog", , PRM_SecondsWaitingForParent := 2, PRM_SecondsWaitingAfterSuccess := 10)) {
-		WinClose
-		Return
-	}
-	
+	; Excel
 	Static STA_ExcelCount := 0
 	If (WIN_IfWinActive(STA_ExcelCount, PRM_ParentTitle := "ahk_class XLMAIN", PRM_WindowTitle := "Excel ahk_class #32770", PRM_WindowText := "The file has been converted to a format you can work with", PRM_SecondsWaitingForParent := 2, PRM_SecondsWaitingAfterSuccess := 15)) {
 		WinClose
 		Return
 	}
 
+	; Office activation :
+	Static STA_OfficeActivationCount := 0
+	If (WIN_IfWinActive(STA_OfficeActivationCount, PRM_ParentTitles := "Word ahk_class OpusApp|ahk_class XLMAIN|PowerPoint ahk_class PPTFrameClass", PRM_WindowTitle := "Assistant Activation Microsoft Office ahk_class NUIDialog", , PRM_SecondsWaitingForParent := 2, PRM_SecondsWaitingAfterSuccess := 10)) {
+		TRY_ShowTrayTip("Microsoft Office Activation wizard closed")
+		WinClose
+		Return
+	}
+	
+	; UltraEdit :
 	Static STA_UltraEditCount := 0
 	If (WIN_IfWinActive(STA_UltraEditCount, PRM_ParentTitle := "UltraEdit", PRM_WindowTitle := "UltraEdit ahk_class #32770", PRM_WindowText := "Enregistrer les modifications", PRM_SecondsWaitingForParent := 3)) {
 		WinGet, LOC_UltraEditID, ID
@@ -3542,8 +3199,10 @@ WIN_BoringPopUpsPeriodicTimer() {
 		STA_UltraEditCount := 0
 	}
 	
+	; SciTE for Autohotkey :
 	Static STA_SciTECount := 0
 	If (WIN_IfWinActive(STA_SciTECount, , PRM_WindowTitle := "SciTE4AutoHotkey ahk_class #32770", PRM_WindowText := "Welcome to SciTE4AutoHotkey", , PRM_SecondsWaitingAfterSuccess := 10)) {
+		TRY_ShowTrayTip("SciTE welcome message closed")
 		WinClose
 		Return
 	}
@@ -3551,6 +3210,8 @@ WIN_BoringPopUpsPeriodicTimer() {
 
 	; Games :
 	;;;;;;;;;
+	
+	; UPlay :
 	Static STA_UPlayID := 0, STA_UPlayCount := 0
 	If (WIN_IfWinActive(STA_UPlayCount, PRM_ParentTitle := "Uplay ahk_class PlatformView")) {
 		WinGet, LOC_UPlayID, ID
@@ -3564,17 +3225,12 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 	
-	IfWinActive, Mise à jour disponible! ahk_class #32770, Une ou plusieurs mise(s) a jour ont été trouvées et téléchargées ; Rayman update
-	{
-		SendInput, {Alt Down}n{Alt Up}
-		Return
-	}
-	
-	IfWinActive, Ubisoft Autopatch ahk_class #32770
-	{
-		WinClose
-		Return
-	}
+	; Rayman :
+	;IfWinActive, Mise à jour disponible! ahk_class #32770, Une ou plusieurs mise(s) a jour ont été trouvées et téléchargées ; Rayman update
+	;{
+	;	SendInput, {Alt Down}n{Alt Up}
+	;	Return
+	;}
 	
 	IfWinActive, FlatOut Ultimate Carnage ahk_class #32770
 	{
@@ -3588,24 +3244,20 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 	
-	;~ IfWinActive, La connexion est occupée ahk_class SunAwtDialog
-	;~ {
-		;~ ControlSend, ahk_parent, {Right}{Space}
-		;~ Return
-	;~ }
-	
-	IfWinActive, VisionGo ahk_class #32770
+	IfWinActive, VisionGo ahk_class #32770 ; VisionGo
 	{
 		WinClose
 		Return
 	}
 	
+	; Many Faces of Go :
 	Static STA_ManyFacesOfGoCount := 0
 	If (WIN_IfWinActive(STA_ManyFacesOfGoCount, PRM_ParentTitle := "The Many Faces of Go", PRM_WindowTitle := "The Many Faces of Go", PRM_WindowText := "Save changes to", PRM_SecondsWaitingForParent := 2)) {
 		SendMessage, 0x111, 7 ; No <=> SendInput, !N
 		Return
 	}
 	
+	; SGF Files :
 	Static STA_SGFCount := 0
 	If (WIN_IfWinActive(STA_SGFCount, PRM_ParentTitles := "Pale Moon ahk_class MozillaWindowClass|Firefox ahk_class MozillaWindowClass", PRM_WindowTitle := ".sgf ahk_class MozillaDialogClass", , PRM_SecondsWaitingForParent := 10, PRM_SecondsWaitingAfterSuccess := 3)) {
 		WinGetTitle, LOC_FileName
@@ -3615,8 +3267,9 @@ WIN_BoringPopUpsPeriodicTimer() {
 			SendInput, {Enter}
 			StringReplace, LOC_FileName, LOC_FileName, Ouverture de%A_Space%
 			LOC_FileName := SubStr(LOC_FileName, 1, StrLen(LOC_FileName) - 7) ; because of the appended suffix in the name : game-01.sgf, instead of game.sgf)
-			WinWaitActive, The Many Faces of Go - [%LOC_FileName%, , 5
+			WinWait, The Many Faces of Go - [%LOC_FileName%, , 5
 			If (!ErrorLevel) {
+				WinActivate
 				PostMessage, 0x111, 32806 ; File editable
 				PostMessage, 0x111, 32777 ; Go to game end
 				PostMessage, 0x111, 32807 ; View Score
@@ -3628,6 +3281,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 		}
 	}
 	
+	; Java Web Start :
 	Static STA_JavaWebStartCount := 0
 	If (WIN_IfWinActive(STA_JavaWebStartCount, PRM_ParentTitle := "Web Start", PRM_WindowTitle := "Web Start", PRM_WindowText := "échec de recv", PRM_SecondsWaitingForParent := 2, PRM_SecondsWaitingAfterSuccess := 3)) {
 		WinClose
@@ -3635,6 +3289,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 	
+	; KGS :
 	Static STA_KGSCount := 0
 	If (WIN_IfWinExist(STA_KGSCount, , PRM_WindowTitle := "KGS : Attention ahk_class SunAwtFrame", , PRM_SecondsWaitingForParent := 500, PRM_SecondsWaitingAfterSuccess := 500)) {
 		WinGet, LOC_KgsID, ID
@@ -3659,7 +3314,6 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 
-
 	; Image :
 	;;;;;;;;;
 	Static STA_PhotoshopCount := 0
@@ -3675,6 +3329,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	;;;;;;;;;
 	Static STA_MediaMonkeyDeadCount := 0
 	If (WIN_IfWinActive(STA_MediaMonkeyDeadCount, , PRM_WindowTitle := "MediaMonkey ahk_class #32770", PRM_WindowText := "Access violation at address")) {
+		TRY_ShowTrayTip("MediaMonkey access violation notification closed")
 		WinClose
 		Return
 	}
@@ -3692,11 +3347,13 @@ WIN_BoringPopUpsPeriodicTimer() {
 	}
 	Static STA_MediaMonkeySplashCount := 0
 	If (WIN_IfWinExist(STA_MediaMonkeySplashCount, , PRM_WindowTitle := "ahk_class MMSplash", , , PRM_SecondsWaitingAfterSuccess := 30)) {
-		WinHide
+		TRY_ShowTrayTip("MediaMonkey splash screen closed")
+		WinClose
 	}
 	Static STA_MediaMonkeyCueReadingErrorCount := 0
 	If (WIN_IfWinExist(STA_MediaMonkeyCueReadingErrorCount, PRM_ParentTitle := "MediaMonkey ahk_class TFMainWindow", PRM_WindowTitle := "Erreur ahk_class TMessageFormPlus", PRM_WindowText := "Ok", PRM_SecondsWaitingForParent := 10, PRM_SecondsWaitingAfterSuccess := 10)) {
 		ControlSend, ahk_parent, {Enter}, Erreur ahk_class TMessageFormPlus
+		TRY_ShowTrayTip("MediaMonkey error notification closed")
 	}
 	Static STA_DecoderSuspension := 50, STA_DecoderPID := 0
 	If (STA_DecoderPID > 0) {
@@ -3753,23 +3410,25 @@ WIN_BoringPopUpsPeriodicTimer() {
 
 	Static STA_TableEditCount := 0
 	If (WIN_IfWinActive(STA_TableEditCount, , PRM_WindowTitle := "TablEdit ahk_class #32770", PRM_WindowText := "TablEdit Version de démonstration", , PRM_SecondsWaitingAfterSuccess := 5)) {
+		TRY_ShowTrayTip("TablEdit demo message closed")
 		SendInput, {Enter}
 		Return
 	}
 	
-	Static STA_EarMasterConfigurationCount := 0
-	If (WIN_IfWinActive(STA_EarMasterConfigurationCount, , PRM_WindowTitle := "Configuration d'EarMaster ahk_class tConfigWizard", , , PRM_SecondsWaitingAfterSuccess := 10)) {
-		ControlSend, , {Enter}
-		Return
-	}
-	Static STA_EarMasterSplashCount := 0
-	If (WIN_IfWinActive(STA_EarMasterSplashCount, , PRM_WindowTitle := "ahk_class TSplashForm")) {
-		WinGet, LOC_ProcessName, ProcessName
-		If (LOC_ProcessName == "EarMaster Pro 6.dat") {
-			WinHide
-		}
-		Return
-	}
+	;~ Static STA_EarMasterConfigurationCount := 0
+	;~ If (WIN_IfWinActive(STA_EarMasterConfigurationCount, , PRM_WindowTitle := "Configuration d'EarMaster ahk_class tConfigWizard", , , PRM_SecondsWaitingAfterSuccess := 10)) {
+		;~ ControlSend, , {Enter}
+		;~ TRY_ShowTrayTip("EarMaster configuration wizard closed")
+		;~ Return
+	;~ }
+	;~ Static STA_EarMasterSplashCount := 0
+	;~ If (WIN_IfWinActive(STA_EarMasterSplashCount, , PRM_WindowTitle := "ahk_class TSplashForm")) {
+		;~ WinGet, LOC_ProcessName, ProcessName
+		;~ If (LOC_ProcessName == "EarMaster Pro 6.dat") {
+			;~ WinHide
+		;~ }
+		;~ Return
+	;~ }
 	Static STA_GraceNoteCount := 0
 	If (WIN_IfWinExist(STA_GraceNoteCount, , PRM_WindowTitle := "ahk_class PoweredByGracenote")) { ; Quintessential popup
 		WinKill
@@ -3883,7 +3542,8 @@ WIN_BoringPopUpsPeriodicTimer() {
 	{
 		WinGetPos, , , LOC_Width, LOC_Height
 		If (LOC_Width * LOC_Height < 500 * 500) {
-			WinClose
+		TRY_ShowTrayTip("Comodo message closed")
+		WinClose
 		}
 		Return
 	}
@@ -3929,20 +3589,17 @@ WIN_BoringPopUpsPeriodicTimer() {
 	; System :
 	;;;;;;;;;;
 	
-	Static STA_UltraCopierCount := 0, STA_UltraCopierAffinity := 1
-	If (WIN_IfWinExist(STA_UltraCopierCount, , PRM_WindowTitle := "Ultracopier ahk_class Qt5QWindowIcon", , PRM_SecondsWaitingAfterSuccess := 5, PRM_SecondsWaitingAfterSuccess := 5)) {
-		WinGet, LOC_PID, PID
-		Process, Priority, %LOC_PID%, Low
-		STA_UltraCopierAffinity := 3 - STA_UltraCopierAffinity
-		AHK_SetProcessAffinity(PRM_PID := LOC_PID, PRM_CPU := STA_UltraCopierAffinity)
+	Static STA_UltraCopierCount := 0
+	If (WIN_IfWinExist(STA_UltraCopierCount, , PRM_WindowTitle := "Warning ahk_class Qt5QWindowIcon", , PRM_SecondsWaitingAfterSuccess := 5, PRM_SecondsWaitingAfterSuccess := 5)) {
+		WinClose
 	}
-
-	IfWinActive, Mises à jour automatiques ahk_class #32770, , , Comment voulez-vous installer les mises à jour ?
-	{
-		WinHide
-		WinKill
-		Return
-	}
+	
+	;~ IfWinActive, Mises à jour automatiques ahk_class #32770, , , Comment voulez-vous installer les mises à jour ?
+	;~ {
+		;~ WinHide
+		;~ WinKill
+		;~ Return
+	;~ }
 	
 	;~ DetectHiddenWindows, Off
 	;~ If (A_Is64bitOS
@@ -3953,24 +3610,25 @@ WIN_BoringPopUpsPeriodicTimer() {
 	;~ }
 	;~ DetectHiddenWindows, On
 	
-	While (WinActive("RegSvr32 ahk_class #32770")) {
-		WinClose
-	}
+	;~ While (WinActive("RegSvr32 ahk_class #32770")) {
+		;~ WinClose
+	;~ }
 	
-	Static STA_DUMoCount := 0
-	If (WIN_IfWinActive(STA_DUMoCount, PRM_ParentTitle := "DUMo ahk_class TMainDlg", PRM_WindowTitle := "DUMo ahk_class TShareDlg", PRM_WindowText := "Enter Licence", PRM_SecondsWaitingForParent := 10, PRM_SecondsWaitingAfterSuccess := 10)) {
-		WinKill
-		Return
-	}
+	;~ Static STA_DUMoCount := 0
+	;~ If (WIN_IfWinActive(STA_DUMoCount, PRM_ParentTitle := "DUMo ahk_class TMainDlg", PRM_WindowTitle := "DUMo ahk_class TShareDlg", PRM_WindowText := "Enter Licence", PRM_SecondsWaitingForParent := 10, PRM_SecondsWaitingAfterSuccess := 10)) {
+		;~ WinKill
+		;~ Return
+	;~ }
 	
-	IfWinActive, Licence du logiciel ahk_class NativeHWNDHost
-	{
-		WinKill
-		Return
-	}
+	;~ IfWinActive, Licence du logiciel ahk_class NativeHWNDHost
+	;~ {
+		;~ WinKill
+		;~ Return
+	;~ }
 	
 	IfWinExist, - Erreur d'application ahk_class #32770 ; Any application down
 	{
+		TRY_ShowTrayTip("Application error notification closed")
 		WinKill
 	}
 
@@ -3980,15 +3638,15 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 	
-	IfWinExist, Envoi des mises à jour facultatives - dysfonctionnement ahk_class #32770 
-	{
-		WinKill
-	}
+	;~ IfWinExist, Envoi des mises à jour facultatives - dysfonctionnement ahk_class #32770 
+	;~ {
+		;~ WinKill
+	;~ }
 	
-	IfWinExist, Assistant Matériel détecté ahk_class #32770, SAMSUNG Android Composite ADB Interface
-	{
-		ControlSend, ahk_parent, {Enter}
-	}
+	;~ IfWinExist, Assistant Matériel détecté ahk_class #32770, SAMSUNG Android Composite ADB Interface
+	;~ {
+		;~ ControlSend, ahk_parent, {Enter}
+	;~ }
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4035,6 +3693,98 @@ WIN_IfWin(ByRef PRM_Count, PRM_ParentTitles, PRM_WindowTitle, PRM_WindowText, PR
 		PRM_Count--
 		Return, false
 	}
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Excluded system windows :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+AHK_SystemWindowClass(PRM_WindowClass = "") {
+	If (PRM_WindowClass == "") {
+		WinGetClass, PRM_WindowClass, A
+	}
+	Return, (PRM_WindowClass == "Progman"
+			|| PRM_WindowClass == "WorkerW"
+			|| PRM_WindowClass == "Shell_TrayWnd"
+			|| PRM_WindowClass == "VistaSwitcher_SwitcherWnd"
+			|| PRM_WindowClass == "ThunderRT6Main")
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_GetTitleBarClickZone() {
+;	  't' : title
+;	  'm' : minimize
+;	  'M' : maximize
+;	  'x' : close
+;	false : other
+
+	CoordMode, Mouse, Screen
+	MouseGetPos, LOC_MouseX, LOC_MouseY, LOC_ActiveWindowID
+	If (!LOC_ActiveWindowID) {
+		Return, false
+	}
+
+	WinGetClass, LOC_WindowClass, ahk_id %LOC_ActiveWindowID%
+	SendMessage, 0x84, 0, (LOC_MouseX & 0xFFFF) | (LOC_MouseY & 0xFFFF) << 16, , ahk_id %LOC_ActiveWindowID%
+	LOC_ErrorLevel := ErrorLevel
+	If (LOC_ActiveWindowID && !AHK_SystemWindowClass(LOC_WindowClass)) {
+		If (LOC_ErrorLevel == 2) { ; Title bar
+			Return, "t"
+		}
+		If (LOC_ErrorLevel == 3) { ; System menu
+			Return, "s"
+		}
+		If (LOC_ErrorLevel == 8) { ; Minimize button
+			Return, "m"
+		}
+		If (LOC_ErrorLevel == 9) { ; Maximize button
+			Return, "M"
+		}
+		If (LOC_ErrorLevel == 20) { ; Close button
+			Return, "x"
+		}
+		If (LOC_ErrorLevel == 21) { ; Help button
+			Return, "h"
+		}
+	}
+	Return false
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+WIN_GetWindowTitle(PRM_WindowID) {
+
+	AutoTrim, On
+	If (!PRM_WindowID) {
+		WinGet, PRM_WindowID, ID, A
+	}
+	WinGetTitle, LOC_Title, ahk_id %PRM_WindowID%
+	LOC_Title = %LOC_Title%
+	LOC_LastDash := InStr(LOC_Title, "-", false, 0)
+	If (LOC_LastDash) {
+		LOC_NewTitle := SubStr(LOC_Title, LOC_LastDash + 1)
+		LOC_NewTitle = %LOC_NewTitle%
+		If (LOC_NewTitle) {
+			LOC_Title := LOC_NewTitle
+		}
+	}
+	If (LOC_Title == "") {
+		WinGet, LOC_Title, ProcessName, ahk_id %PRM_WindowID%
+		LOC_Dot := InStr(LOC_Title, ".", false, 0)
+		If (LOC_Dot) {
+			LOC_Title := SubStr(LOC_Title, 1, LOC_Dot - 1)
+		}
+	}
+	If (LOC_Title == "") {
+		LOC_Title := "Application"
+	}
+	Return, LOC_Title
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
