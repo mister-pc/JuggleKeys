@@ -167,6 +167,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "TMainForm" ; Media Monkey
 		|| LOC_WindowClass == "TFMainWindow" ; Media Monkey
 		|| LOC_WindowClass == "TFImage" ; Media Monkey album image
+		|| LOC_WindowClass == "wxWindowNR" ; FileZilla
 		|| LOC_WindowClass == "TkTopLevel" ; GitK
 		|| LOC_WindowClass == "HH Parent" ; Windows CHTML file
 		|| LOC_WindowClass == "AutoHotkeyGUI" ; AHK self windows

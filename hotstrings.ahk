@@ -452,8 +452,16 @@ Return
 :*:pvt::{Left 2}eu{Right}en{Right} ; peuvent
 :*:pvent::{Left 4}eu{Right 4} ; peuvent
 :*:pvant::{Left 4}ou{Right 4} ; pouvant
+:*:vlr::{Left 2}ou{Right}oi{Right} ; vouloir
+:*:vloir::{Left 4}ou{Right 4} ; vouloir
+:*:vlai::{Left 3}ou{Right 3} ; voulai
+:*:vlons::{Left 4}ou{Right 4} ; voulons
+:*:vlez::{Left 3}ou{Right 3} ; voulez
+:*:vlions::{Left 5}ou{Right 5} ; voulions
+:*:vliez::{Left 4}ou{Right 4} ; vouliez
 :*:vlt::{Left 2}eu{Right}en{Right} ; veulent
 :*:vlent::{Left 4}eu{Right 4} ; veulent
+:*:vlant::{Left 4}ou{Right 4} ; voulant
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
