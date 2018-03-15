@@ -150,7 +150,8 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "PPTFrameClass" && LOC_WindowTitle != "PowerPoint" && LOC_WindowTitle != "PowerPoint (Échec de l’activation du produit)" ; PowerPoint
 		|| LOC_WindowClass == "SnagIt9Editor" && LOC_WindowTitle != "Editeur Snagit" ; Snag-It document
 		|| LOC_WindowClass == "SciTEWindow" ; SCiTE editor
-		|| LOC_WindowClass == "SunAwtFrame" && InStr(LOC_WindowTitle, "SQL Developer")) { ; SQL Developer
+		|| LOC_WindowClass == "SunAwtFrame" && InStr(LOC_WindowTitle, "SQL Developer") ; SQL Developer
+		|| LOC_WindowClass == "Maxthon3Cls_MainFrm") { ; Maxthon
 		SendInput, ^{F4}
 		AUD_Beep()
 		; AHK_Debug("Ctrl-F4 sur " . LOC_WindowTitle . " ahk_class " . LOC_WindowClass)
