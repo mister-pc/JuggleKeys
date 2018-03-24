@@ -248,6 +248,7 @@ SetFormat, Integer, D
 CoordMode, Mouse, Screen
 DetectHiddenWindows, On
 OnExit, AHK_Exit
+TXT_OnClipboardChange(PRM_Enable := -1)
 SetTimer, AHK_Init, -1
 Return
 
@@ -336,6 +337,7 @@ ADM_ApplyMouseHooks()
 , SYS_SetClassicStartMenu()
 , SCR_InitWallpapers()
 , AHK_BackupScripts()
+, TXT_OnClipboardChange(1)
 SetTimer, TRY_CheckTrayIconStatePeriodicTimer, %ZZZ_CheckTrayIconStatePeriodicTimer%
 Return
 

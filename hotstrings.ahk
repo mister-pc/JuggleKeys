@@ -11,15 +11,15 @@ HOT_InitGroups() {
 	; GroupAdd, HOT_HotstringsWindowsGroup, UEStudio ; UltraEdit
 	GroupAdd, HOT_HotstringsWindowsGroup, UltraEdit ; UltraEdit
 	GroupAdd, HOT_HotstringsWindowsGroup, Notepad++ ahk_class Notepad++ ; Notepad++
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class MozillaWindowClass ; Mozilla
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class OpusApp ; Office
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class XLMAIN ; Excel
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
-	GroupAdd, HOT_HotstringsWindowsGroup, KGS ahk_class SunAwtFrame ; KGS
 	GroupAdd, HOT_HotstringsWindowsGroup, évènement ahk_class MozillaDialogClass ; Thunderbird
 	GroupAdd, HOT_HotstringsWindowsGroup, EditEmailSubject - Editer le sujet du message ahk_class MozillaDialogClass ; Thunderbird
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class MozillaWindowClass ; Mozilla
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Chrome_WidgetWin_1 ; Chrome
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IEFrame ; IE
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Maxthon3Cls_MainFrm ; Maxthon
 	GroupAdd, HOT_HotstringsWindowsGroup, heure de début ahk_class SWT_Window0 ; Sametime
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IMWindowClass ; Lync
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class HwndWrapper[TabbedConversations.exe;; ; Lync
@@ -28,17 +28,19 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, Edit Text ahk_class #32770 ; SnagIt
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class DSUI:PDFXCViewer ; PDF-XChange
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Sticky_Notes_Note_Window ; Windows 7 Sticky Notes
+	GroupAdd, HOT_HotstringsWindowsGroup, KGS ahk_class SunAwtFrame ; KGS
 	GroupAdd, HOT_HotstringsWindowsGroup, Nox App Player ahk_class Qt5QWindowIcon ; Nox
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class WordPadClass ; WordPad
 	GroupAdd, HOT_HotstringsWindowsGroup, Skype ahk_class tSkMainForm ; Skype
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class TConversationForm ; Skype
 	GroupAdd, HOT_HotstringsWindowsGroup, Create task ahk_class #32770 ; Timecamp create task
 	GroupAdd, HOT_HotstringsWindowsGroup, Task Editor ahk_class #32770 ; Timecamp task editor
+	
 	GroupAdd, HOT_IgnoringWindows, ahk_class Progman
 	GroupAdd, HOT_IgnoringWindows, ahk_class Shell_TrayWnd
 	GroupAdd, HOT_IgnoringWindows, ahk_class VistaSwitcher_SwitcherWnd
 	GroupAdd, HOT_IgnoringWindows, ahk_class AutoHotkeyGUI
-	, AHK_CapsLockTickCount := 0
+	AHK_CapsLockTickCount := 0
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -870,6 +872,7 @@ Return
 :*:jsqo::{Left}{BackSpace}'{Right} ; jusqu'o (à partir de jusqueo)
 :*:jsqu::{Left}{BackSpace}'{Right} ; jusqu'u (à partir de jusqueu)
 :*:jsqy::{Left}{BackSpace}'{Right} ; jusqu'y (à partir de jusquey)
+::cz::{BackSpace}{Left}he{Right} ; chez
 ::vr::{BackSpace}{Left}e{Right}s ; vers
 ::tr::{BackSpace}{Left}ou{Right} ; tour
 ::atr::{BackSpace}{Left 2}u{Right}ou{Right} ; autour

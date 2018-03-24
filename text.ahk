@@ -1109,6 +1109,10 @@ TXT_OnClipboardChange(PRM_Operation := 0) {
 	
 	; Enables / disables :
 	;;;;;;;;;;;;;;;;;;;;;;
+	If (PRM_Operation == -1) {
+		STA_OnClipBoardChangeEnabled := false
+		Return
+	}
 	If (PRM_Operation == 1) {
 		STA_OnClipBoardChangeEnabled := true
 		Return
@@ -1729,9 +1733,9 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;~ KBD_ControlShiftArrow(PRM_Direction = true) {
-	;~ TXT_OnClipboardChange(PRM_Enabled := -1)
+	;~ TXT_OnClipboardChange(PRM_Activate := -1)
 	;~ , LOC_Selection := TXT_GetSelectedText()
-	;~ , TXT_OnClipboardChange(PRM_Enabled := 1)
+	;~ , TXT_OnClipboardChange(PRM_Activate := 1)
 	;~ If (LOC_Selection) {
 		;~ SendInput, % "^+" . (PRM_Direction ? "Right" : "Left")
 	;~ } Else {
@@ -1765,9 +1769,9 @@ KBD_WordControl(PRM_Direction, PRM_Operation = 0, PRM_AppendedText = "") {
 ; MsgBox, % "^{Alt Up}" . (GetKeyState("Shift") ? "" : "+") . "{" . (PRM_Direction ? "Right" : "Left") . "}"
 ;	SendInput, % "^{Alt Up}" . (GetKeyState("Shift") ? "" : "+") . "{" . (PRM_Direction ? "Right" : "Left") . "}"
 	SendInput, % "^+{" . (PRM_Direction ? "Right" : "Left") . "}"
-	TXT_OnClipboardChange(PRM_Enabled := -1)
+	TXT_OnClipboardChange(PRM_Activate := -1)
 	, LOC_Selection := TXT_GetSelectedText()
-	, TXT_OnClipboardChange(PRM_Enabled := 1)
+	, TXT_OnClipboardChange(PRM_Activate := 1)
 ;Return
 	If (LOC_Selection == "") {
 ;MsgBox, Out !

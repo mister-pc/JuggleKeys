@@ -182,6 +182,7 @@ TRY_InitMenus() {
 	Menu, Positions, Add, pdt`tpendant, TRY_TrayMenuHotstring
 	Menu, Positions, Add, jq`tjusque, TRY_TrayMenuHotstring
 	Menu, Positions, Add, vr`tvers, TRY_TrayMenuHotstring
+	Menu, Positions, Add, cz`tchez, TRY_TrayMenuHotstring
 	Menu, Positions, Add, atr`tautour, TRY_TrayMenuHotstring
 	Menu, Positions, Add, apr`taprès, TRY_TrayMenuHotstring
 	Menu, Positions, Add
