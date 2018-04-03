@@ -171,6 +171,10 @@ SYS_WheelRight(PRM_Cancel = false) {
 ; Keyboard moving mouse :
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#Numpad5::
+MouseClick
+Return
+
 #NumPad1::
 ^#NumPad1::
 <^>!NumPad1::

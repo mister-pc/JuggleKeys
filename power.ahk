@@ -740,8 +740,10 @@ PWR_DisplayConfirmationNo() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, ahk_group PWR_RebootPopUps
+
+Esc::
 PWR_RebootPopUpsEscape()
-Esc::PWR_RebootPopUpsEscape()
+Return
 
 PWR_RebootPopUpsEscape() {
 	PRM_PowerManager(, PRM_State := -1)
@@ -836,6 +838,7 @@ PWR_BSOD() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, GUI_BSOD ahk_class AutoHotkeyGUI
+Esc::
 !Tab::
 !+Tab::
 ^!Delete::

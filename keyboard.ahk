@@ -452,7 +452,7 @@ KBD_Zoom(PRM_ZoomIn = true) {
 		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "UltraEdit|UEStudio|Notepad++", PRM_ZoomInAction := "{Esc}!{Up}", PRM_ZoomOutAction := "{Esc}!{Down}")
 		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "MediaMonkey ahk_class TFMainWindow", PRM_ZoomInAction := "{Esc}+{Enter}")
 		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "- Mp3 Editor Pro ahk_class TMainForm", PRM_ZoomInAction := "{Esc}{Alt Down}v{Alt Up}z", PRM_ZoomOutAction := "{Esc}{Alt Down}v{Alt Up}o")
-		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "ahk_class DSUI:PDFXCViewer|Pale Moon ahk_class MozillaWindowClass|Mozilla Firefox ahk_class MozillaWindowClass|Windows Internet Explorer ahk_class IEFrame|Google Chrome ahk_class Chrome_WidgetWin_1", PRM_ZoomInAction := "{Esc}^{NumPadAdd}", PRM_ZoomOutAction := "{Esc}^{NumPadSub}")
+		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "ahk_class DSUI:PDFXCViewer|PDF-XChange Editor|Pale Moon ahk_class MozillaWindowClass|Mozilla Firefox ahk_class MozillaWindowClass|Windows Internet Explorer ahk_class IEFrame|Google Chrome ahk_class Chrome_WidgetWin_1", PRM_ZoomInAction := "{Esc}^{NumPadAdd}", PRM_ZoomOutAction := "{Esc}^{NumPadSub}")
 		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "- Visionneuse de photos Picasa ahk_class ytWindow", PRM_ZoomInAction := "{WheelUp}", PRM_ZoomOutAction := "{WheelDown}")
 		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "Mozilla Thunderbird ahk_class MozillaWindowClass", PRM_ZoomInAction := "{Up}", PRM_ZoomOutAction := "{Down}")
 		|| KBD_CheckZoom(PRM_ZoomIn, PRM_ActiveWindows := "Rédaction ahk_class MozillaWindowClass", PRM_ZoomInAction := "^{NumPadAdd}", PRM_ZoomOutAction := "^{NumPadSub}")

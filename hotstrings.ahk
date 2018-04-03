@@ -74,6 +74,10 @@ Return
 :*:cepdt::{Left 2}en{Right}an{Right} ; cependant
 :*:dail::{Left 3}'{Right 3}leurs ; d'ailleurs
 :*:parail::{Left 3} {Right 3}leurs ; par ailleurs
+:*:parav::
+SendInput, {Left 2} {Right 2}ance ; par avance
+Return
+:*:parave::{Left}{BackSpace 4}{Lef 2}{BackSpace}[{Right 3} ; parave (à partir de par avancee)
 :C*:ps:: ; puis
 SendInput, {Left}ui{Right}
 Return

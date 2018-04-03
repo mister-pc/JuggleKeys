@@ -1698,33 +1698,26 @@ Return
 SCR_Escape() {
 
 	Global ZZZ_HexaColorPicked, ZZZ_RGBColorPicked
-	If (!WinActive("GUI_BSOD ahk_class AutoHotkeyGUI")) {
-		IfWinActive, Color Chooser ahk_class #32770
-		{
-			WinClose
-			AUD_Beep()
-		}
 
-		If (ZZZ_HexaColorPicked == -1) {
-			ZZZ_HexaColorPicked := 1
-			, ZZZ_RGBColorPicked := 0
-			Return
-		}
-
-		If (ZZZ_RGBColorPicked == -1) {
-			ZZZ_HexaColorPicked := 0
-			, ZZZ_RGBColorPicked := 1
-			Return
-		}
-
-		IfWinExist, GUI_Magnifier ahk_class AutoHotkeyGUI
-		{
-			SCR_DestroyMagnifier()
-			Return
-		}
-
-		SendInput, {Esc}
+	If (ZZZ_HexaColorPicked == -1) {
+		ZZZ_HexaColorPicked := 1
+		, ZZZ_RGBColorPicked := 0
+		Return
 	}
+
+	If (ZZZ_RGBColorPicked == -1) {
+		ZZZ_HexaColorPicked := 0
+		, ZZZ_RGBColorPicked := 1
+		Return
+	}
+
+	IfWinExist, GUI_Magnifier ahk_class AutoHotkeyGUI
+	{
+		SCR_DestroyMagnifier()
+		Return
+	}
+
+	SendInput, {Esc}
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1747,6 +1740,13 @@ SCR_ColorChooser("RGB")
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#IfWinActive, Color Chooser ahk_class #32770
+Esc::
+WinClose
+AUD_Beep()
+Return
+#IfWinActive
 
 SCR_ColorChooser(PRM_ColorChooserMode = "Hexa") {
 
