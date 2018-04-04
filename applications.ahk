@@ -1254,6 +1254,7 @@ APP_MediaMonkey() {
 					If (LOC_Width == 500
 						&& LOC_Height == 200) {
 						WinHide
+						TRY_ShowTrayTip("MediaMonkey splash screen hidden")
 						Break
 					}
 				}

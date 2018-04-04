@@ -54,7 +54,7 @@ WIN_MiddleButton() {
 		} Else {
 			WinClose
 			LOC_WindowTitle := WIN_GetWindowTitle(LOC_WindowID)
-			TRY_ShowTrayTip(LOC_WindowTitle . " closed")
+			, TRY_ShowTrayTip(LOC_WindowTitle . " closed")
 			, AUD_Beep()
 		}
 		WinActivate, ahk_id %LOC_ActiveWindowID%
@@ -127,6 +127,7 @@ WIN_MiddleButton() {
 	; Hide window action :
 	If (LOC_WindowClass == "CommunicatorMainWindowClass") { ; Lync main window
 		WinHide
+		TRY_ShowTrayTip("Lync main window hidden")
 		AUD_Beep()
 		WinActivate, ahk_id %LOC_ActiveWindowID%
 		Return
@@ -381,6 +382,7 @@ WIN_MiddleButton() {
 				SendInput, {Ctrl Up}{Esc 2}!{F4}
 			} Else {
 				SendInput, {Ctrl Up}{Esc 2}^{F4}
+				TRY_ShowTrayTip(LOC_WindowTitle . " closed")
 			}
 			AUD_Beep()
 			WinActivate, ahk_id %LOC_ActiveWindowID%
@@ -395,6 +397,7 @@ WIN_MiddleButton() {
 		|| WinActive("recharger le fichier ahk_class #32770")) {
  		SendInput, !n
 		AUD_Beep()
+		, TRY_ShowTrayTip(LOC_WindowTitle . " closed")
 		WinActivate, ahk_id %LOC_ActiveWindowID%
 		Return
 	}
@@ -408,6 +411,7 @@ WIN_MiddleButton() {
 			WinClose
 		}
 		AUD_Beep()
+		, TRY_ShowTrayTip("WinMerge window closed")
 		WinActivate, ahk_id %LOC_ActiveWindowID%
 		Return
 	}
@@ -420,6 +424,7 @@ WIN_MiddleButton() {
 			SendInput, ^{F4}
 		}
 		AUD_Beep()
+		, TRY_ShowTrayTip("Araxis Merge window closed")
 		WinActivate, ahk_id %LOC_ActiveWindowID%
 		Return
 	}
@@ -431,6 +436,7 @@ WIN_MiddleButton() {
 			SendInput, ^{F4}
 		} Else {
 			WinClose
+			TRY_ShowTrayTip("MFG window closed")
 		}
 		AUD_Beep()
 		WinActivate, ahk_id %LOC_ActiveWindowID%
@@ -582,7 +588,7 @@ WIN_EscKill() {
 			} Else {
 				WinClose
 				AUD_Beep()
-				TRY_ShowTrayTip(LOC_WindowTitle . " closed")
+				, TRY_ShowTrayTip(LOC_WindowTitle . " closed")
 			}
 		}
 	}
@@ -618,7 +624,7 @@ WIN_F4Kill() {
 		WinKill, Uplay ahk_class PlatformView
 	}
 	AUD_Beep()
-	TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
+	, TRY_ShowTrayTip(LOC_WindowTitle . " killed", 2)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -950,7 +956,7 @@ WIN_ShowDialogsPeriodicTimer() {
 					|| LOC_WindowHeight == 0) {
 					WinSet, ExStyle, -0x40000
 					WinHide
-					; TRY_ShowTrayTip(LOC_WindowTitle . " window hidden")
+					TRY_ShowTrayTip(LOC_WindowTitle . " window hidden")
 				}
 			} Else {
 				If (LOC_WindowWidth > 0
@@ -3160,6 +3166,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_WordCount := 0
 	If (WIN_IfWinActive(STA_WordCount, PRM_ParentTitle := "Word ahk_class OpusApp", PRM_WindowTitle := "Word ahk_class #32770", PRM_WindowText := "Comme ce fichier a été créé dans une version plus récente de Word", PRM_SecondsWaitingForParent := 4, PRM_SecondsWaitingAfterSuccess := 15)) {
 		WinClose
+		TRY_ShowTrayTip("Word document version notification closed")
 		Return
 	}
 
@@ -3167,6 +3174,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_ExcelCount := 0
 	If (WIN_IfWinActive(STA_ExcelCount, PRM_ParentTitle := "ahk_class XLMAIN", PRM_WindowTitle := "Excel ahk_class #32770", PRM_WindowText := "The file has been converted to a format you can work with", PRM_SecondsWaitingForParent := 2, PRM_SecondsWaitingAfterSuccess := 15)) {
 		WinClose
+		TRY_ShowTrayTip("Excel conversion end message closed")
 		Return
 	}
 
@@ -3248,6 +3256,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	IfWinActive, VisionGo ahk_class #32770 ; VisionGo
 	{
 		WinClose
+		TRY_ShowTrayTip("Vision Go window closed")
 		Return
 	}
 	
@@ -3286,6 +3295,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_JavaWebStartCount := 0
 	If (WIN_IfWinActive(STA_JavaWebStartCount, PRM_ParentTitle := "Web Start", PRM_WindowTitle := "Web Start", PRM_WindowText := "échec de recv", PRM_SecondsWaitingForParent := 2, PRM_SecondsWaitingAfterSuccess := 3)) {
 		WinClose
+		TRY_ShowTrayTip("Java Web Start reception error notification closed")
 		APP_KGS(PRM_Relaunch := true)
 		Return
 	}
@@ -3494,6 +3504,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_ActiveXCount := 0
 	If (WIN_IfWinActive(STA_ActiveXCount, PRM_ParentTitle := "Internet Explorer ahk_class IEFrame", PRM_WindowTitle := "Windows Internet Explorer", PRM_WindowText := "Au moins un contrôle ActiveX n’a pas pu être affiché", PRM_SecondsWaitingForParent := 5, PRM_SecondsWaitingAfterSuccess := 1)) {
 		WinClose
+		TRY_ShowTrayTip("ActiveX error message closed")
 		Return
 	}
 
@@ -3593,6 +3604,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_UltraCopierCount := 0
 	If (WIN_IfWinExist(STA_UltraCopierCount, , PRM_WindowTitle := "Warning ahk_class Qt5QWindowIcon", , PRM_SecondsWaitingAfterSuccess := 5, PRM_SecondsWaitingAfterSuccess := 5)) {
 		WinClose
+		TRY_ShowTrayTip("UltraCopier warning hidden")
 	}
 	
 	;~ IfWinActive, Mises à jour automatiques ahk_class #32770, , , Comment voulez-vous installer les mises à jour ?

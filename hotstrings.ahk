@@ -747,6 +747,7 @@ SendInput, {BackSpace}{Left}{BackSpace 2}lu{Right}ôt
 Return
 :*:ptot::{BackSpace} ; plutôt (à partir de plutôtt)
 ::+-::{BackSpace 3}± ; ±
+::pl::{BackSpace}us ; plus
 :*:++ ::{Left}{BackSpace 2}plus{Right} ; plus 
 :*:++.::{Left}{BackSpace 2}plus{Right} ; plus.
 :*:++,::{Left}{BackSpace 2}plus{Right} ; plus,
@@ -1212,13 +1213,8 @@ Return
 SendInput, {Left 2}om{Right 2}
 Return
 :*:nbrx::{Left}eu{Right} ; nombreux (à partir de nombrx)
-:*:num:: ; numér
-SendInput, ér
-Return
-:*:numér:: ; numér (à partir de numérér)
-SendInput, {BackSpace 2}
-Return
-:*:numb::{Left}{BackSpace 2}{Right} ; numb (à partir de numérb)
+::num::{BackSpace}éro ; numéro
+::nums::{BackSpace}{Left}éro{Right} ; numéros
 :*:travx::{Left}au{Right} ; travaux
 :*:trvx::{Left 2}a{Right}au{Right} ; travaux
 :?*:trvl::{Left 2}a{Right}ai{Right} ; travail
