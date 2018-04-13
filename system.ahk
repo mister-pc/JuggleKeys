@@ -513,10 +513,9 @@ SYS_WindowsUpdate() {
 
 #IfWinActive, Windows Update ahk_class #32770, &Redémarrer maintenant
 Esc::
-ControlFocus, ComboBox1
-SendInput, {End}
-ControlFocus, Button2
-SendInput, {Space}
+ControlSend, ComboBox1, {End}
+Sleep, 10
+ControlSend, Button2, {Space}
 Return
 #IfWinActive
 

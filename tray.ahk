@@ -495,7 +495,7 @@ TRY_InitMenus() {
 	TRY_AddMenuItem("Login", "           Win +              Enter`tPassword", "LOG_TrayMenuPassword", "shell32.dll", 105)
 	TRY_AddMenuItem("Login", "           Win + Shift + Enter`tWindows Login", "LOG_TrayMenuWindowsLogin", "shell32.dll", 16)
 	TRY_AddMenuItem("Login", "Ctrl + Win + Shift + Enter`tWindows Domain Login", "LOG_TrayMenuDNSLogin", "shell32.dll", 19)
-	TRY_AddMenuItem("Login", "           Win +              B`tBank Account", "LOG_TrayMenuBankAccount", "mmcndmgr.dll", 109)
+	TRY_AddMenuItem("Login", "Ctrl + Win +              B`tBank Account", "LOG_TrayMenuBankAccount", "mmcndmgr.dll", 109)
 	TRY_AddMenuItem("Login", " Alt + Win +              B`tBank Pro Account", "LOG_TrayMenuBankProAccount", "mmcndmgr.dll", 109)
 	TRY_AddMenuItem("Login", "           Win + Shift + B`tCB", "LOG_TrayMenuCB", "certmgr.dll")
 	TRY_AddMenuItem("Login", "Ctrl + Win +              @`tMail addresses", "LOG_TrayMenuMailAddresses", "shell32.dll", 157)
@@ -801,6 +801,11 @@ TRY_InitMenus() {
 	}
 	If (APP_PhotoshopPath) {
 		TRY_AddMenuItem("Applications", "Ctrl + Win + Alt + BackSpace`t&Photoshop", "APP_Photoshop", APP_PhotoshopPath)
+	}
+	If (APP_BashPath) {
+		TRY_AddMenuItem("Applications", "           Win +           B`t&Bash", "APP_Bash", APP_BashPath)
+	} Else {
+		HotKey, #b, Off
 	}
 	TRY_AddMenuItem("Applications", "           Win +           C`t&Calculator", "APP_Calculator", "system32\calc.exe")
 	If (APP_DirectoryOpusPath) {

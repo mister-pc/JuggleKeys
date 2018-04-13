@@ -23,7 +23,7 @@ ADM_InitMemo() {
 		 
 		_Hotstrings_ : { Capslock    }     { A(nt) | (a)B(le) | E(nce) | (a)G(e) | (c)H(ie) | J : <gie> | (e)L(le) | (is)M(e) | N(aison) | (ti)O(n) | (i)Q(ue) | (eu)R | (e)S(se) | (emen)T | Y : <aille> | Z : <euse> }
 		_Login_      : { Win + Enter }     [ Ctrl  \: <No Enter> | Shift : <Windows Login> |  Ctrl + Shift \: <Windows domain Login> ]
-		_Bank_       : { Win + B     }     [ Alt   \: Pro\ | Shift ] \: CB\ ]
+		_Bank_       : { Win + B     }     { Ctrl  \: Personal   | Alt   \: Pro\           | Shift ] \: CB\ }
 		_Case_       : { Win + F8    }     [ Shift : \To uppercase\    | Ctrl : \Sentence first letter\ | Ctrl + Shift : \Words first letter\ ] [ Alt ] \: Invert\
 		 
 		_Clipboard_   : { Ctrl } { C | X | V }     [ Alt ] \: To alternate buffer\     [ Shift ] \: Plain text mode\     [ { Shift } { Insert <or> Delete } ] \: Append mode\

@@ -137,6 +137,7 @@ WIN_MiddleButton() {
 	If (LOC_WindowClass == "CabinetWClass" ; Shell
 		|| LOC_WindowClass == "PSDocC" ; Photoshop
 		|| LOC_WindowClass == "Photoshop" && LOC_WindowTitle != "Adobe Photoshop" ; Photoshop
+		|| LOC_WindowClass == "OpusApp" && LOC_WindowTitle != "Word" && LOC_WindowTitle != "Microsoft Word" && LOC_WindowTitle != "Microsoft Word (Échec de l’activation du produit)" && LOC_WindowTitle != "Word (Échec de l’activation du produit)" ; Word
 		|| LOC_WindowClass == "XLMAIN" && LOC_WindowTitle != "Excel (Utilisation non commerciale)" && LOC_WindowTitle != "Excel" && LOC_WindowTitle != "Microsoft Excel" && LOC_WindowTitle != "Microsoft Excel (Échec de l’activation du produit)" && LOC_WindowTitle != "Excel (Échec de l’activation du produit)" ; Excel
 		|| LOC_WindowClass == "Notepad++") { ; Notepad++
 		SendInput, ^w

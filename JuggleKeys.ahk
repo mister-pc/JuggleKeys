@@ -604,6 +604,7 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 	Static STA_ApplicationDefaultPathA := { "Apache": "G:\xamp\apache\bin\httpd.exe" ; APP_ApachePath
 		, "AutoScriptWriter": "AutoHotkey\AutoScriptWriter\AutoScriptWriter.exe" ; APP_AutoScriptWriterPath
 		, "Android": "Nox\bin\Nox.exe" ; APP_AndroidPath
+		, "Bash": "G:\git\git-bash.exe" ; APP_BashPath
 		, "CDBurner": "CDBurnerXP\cdbxpp.exe" ; APP_CDBurnerPath
 		, "ClassicStartMenu": "Classic Shell\ClassicStartMenu.exe" ; APP_ClassicStartMenuPath
 		, "CygWin": "CygWin\Cygwin.bat" ; APP_CygWinPath
@@ -612,7 +613,6 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 		, "DisplayFusion": "DisplayFusion\DisplayFusion.exe" ; APP_DisplayFusionPath
 		, "Eclipse": "Eclipse\eclipse.exe" ; APP_EclipsePath
 		, "Firefox": "Pale Moon\palemoon.exe" ; APP_FirefoxPath
-		, "Git": "Git\git-bash.exe" ; APP_GitPath
 		, "InternetExplorer": "Internet Explorer\iexplore.exe" ; APP_InternetExplorerPath
 		, "JavaWebStart": "Java\jre\bin\javaws.exe" ; APP_JavaWebStartPath
 		, "MP3Editor": "Mp3 Editor Pro\Mp3EditorPro.exe"

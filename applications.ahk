@@ -84,16 +84,16 @@ APP_Run(PRM_ApplicationName, PRM_Process, PRM_Parameters = "", PRM_WorkingDirect
 			If (PRM_WorkingDirectory == "") {
 				PRM_WorkingDirectory := LOC_ProcessDirectory
 			}
-			PRM_Maximized := (PRM_Maximized ? "Max " : "") . "UseErrorLevel"
+			PRM_WindowParameters := (PRM_Maximized ? "Max " : "") . "UseErrorLevel"
 			If (PRM_RunAs) {
 				APP_RunAs()
 			}
 			If (PRM_Parameters == "") {
-				Run, "%PRM_Process%", %PRM_WorkingDirectory%, %PRM_Maximized% UseErrorLevel, LOC_WindowPID
-				AHK_Debug("Run, """ . PRM_Process . """, " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
+				Run, "%PRM_Process%", %PRM_WorkingDirectory%, %PRM_WindowParameters%, LOC_WindowPID
+				AHK_Debug("Run, """ . PRM_Process . """, " . PRM_WorkingDirectory . ", " . PRM_WindowParameters . ", " . LOC_WindowPID)
 			} Else {
-				Run, "%PRM_Process%" %PRM_Parameters%, %PRM_WorkingDirectory%, %PRM_Maximized% UseErrorLevel, LOC_WindowPID
-				AHK_Debug("Run, """ . PRM_Process . """ " . PRM_Parameters . ", " . PRM_WorkingDirectory . ", " . PRM_Maximized . " UseErrorLevel, " . LOC_WindowPID)
+				Run, "%PRM_Process%" %PRM_Parameters%, %PRM_WorkingDirectory%, %PRM_WindowParameters%, LOC_WindowPID
+				AHK_Debug("Run, """ . PRM_Process . """ " . PRM_Parameters . ", " . PRM_WorkingDirectory . ", " . PRM_WindowParameters . ", " . LOC_WindowPID)
 			}
 			RunAs
 			TRY_ShowTrayTip(PRM_ApplicationName . (ErrorLevel ? " not" : "") . " launched")
@@ -396,12 +396,33 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; CD-Burner [ Win + B } :
+; CD-Burner { Win + B } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-APP_Burner:
-APP_Run("CD Burner", APP_CDBurnerPath, , , false)
+; APP_Burner:
+; APP_Run("CD Burner", APP_CDBurnerPath, , , false)
+; Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Bash console { Win + B } :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+APP_Bash:
+#b::
+APP_Run("Bash", APP_BashPath, "--cd=/g/projects/kamea", , , , false)
+MsgBox, Launched ?
 Return
+
+#IfWinActive, ahk_class mintty
+RButton::
+^v::
+^+v::
+SendInput, +{Insert}
+Return
+#IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -533,24 +554,6 @@ APP_Explorer() {
 		APP_Run("Explorer", A_WinDir . "\explorer.exe", , , false, false)
 	}
 }
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Git { Win + G } :
-;;;;;;;;;;;;;;;;;;;
-
-APP_Git:
-#g::
-APP_Run("Git", APP_GitPath, , , , , false)
-Return
-
-#IfWinActive, ahk_class mintty
-RButton::
-SendInput, +{Insert}
-Return
-#IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
