@@ -3646,6 +3646,12 @@ WIN_BoringPopUpsPeriodicTimer() {
 		WinKill
 	}
 
+	Static STA_DeleteFontCount := 0
+	If (WIN_IfWinActive(STA_DeleteFontCount, PRM_ParentTitle := "Supprimer une police ahk_class #32770", PRM_WindowTitle := "Supprimer une police ahk_class #32770", PRM_WindowText := "&Oui", PRM_SecondsWaitingForParent := 1, PRM_SecondsWaitingAfterSuccess := 1)) {
+		SendInput, {Left}{Space}
+		Return
+	}
+	
 	Static STA_ProcessHackerCount := 0
 	If (WIN_IfWinActive(STA_ProcessHackerCount, PRM_ParentTitle := "Process Hacker [FUSION\BeLO]+ ahk_class ProcessHacker", PRM_WindowTitle := "Process Hacker ahk_class #32770", PRM_WindowText := "Terminate", PRM_SecondsWaitingForParent := 3, PRM_SecondsWaitingAfterSuccess := 0)) {
 		SendInput, {Left}{Enter}
