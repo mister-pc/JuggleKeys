@@ -861,7 +861,10 @@ Return
 :*:jqê::{Left}{BackSpace}'{Right} ; jusqu'ê (à partir de jusqueê)
 :*:jqi::{Left}{BackSpace}'{Right} ; jusqu'i (à partir de jusquei)
 :*:jqo::{Left}{BackSpace}'{Right} ; jusqu'o (à partir de jusqueo)
-:*:jqu::{Left}{BackSpace}'{Right} ; jusqu'u (à partir de jusqueu)
+:*:jqu:: ; jusqu'u (à partir de jusqueu)
+SendInput, {Left}{BackSpace}'{Right}
+Return
+:*:jquery::{Left 4}{BackSpace 5}Q{Right 4} ; jQuery (à partir de jusqu'uery)
 :*:jqy::{Left}{BackSpace}'{Right} ; jusqu'y (à partir de jusquey)
 :*:jsq::
 SendInput, {Left 2}u{Right 2}ue ; jusque
@@ -1226,6 +1229,7 @@ Return
 :*:bt:: ; bout
 SendInput, {Left}ou{Right}
 Return
+:*:btq::{Left}i{Right}ue ; boutique (depuis boutq)
 :*:rmq::{Left 2}e{Right}ar{Right}u ; remarqu
 :?*:grp:: ; groupe
 SendInput, {Left}ou{Right}e
