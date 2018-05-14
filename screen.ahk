@@ -142,15 +142,20 @@ Return
 
 WIN_Ruler(PRM_Horizontal = true) {
 	
-	Global SCR_PixelsPerMillimeter, SCR_VisibleScreenWidth, SCR_VisibleScreenHeight
+	Global SCR_PixelsPerMillimeter, SCR_VisibleScreenX, SCR_VisibleScreenY, SCR_VisibleScreenWidth, SCR_VisibleScreenHeight
 	LOC_GuiThickness := (PRM_Horizontal ? 50 : 60)
 	, LOC_Margin := 10
 	, LOC_Gui := (PRM_Horizontal ? 8 : 9)
+	, LOC_GuiTitle := (PRM_Horizontal ? "GUI_HorizontalRuler" : "GUI_VerticalRuler")
 	, LOC_RulerScreenLength := (PRM_Horizontal ? SCR_VisibleScreenWidth : SCR_VisibleScreenHeight) - 4 * LOC_Margin
 	, LOC_RulerMillimetersLength := LOC_RulerScreenLength // SCR_PixelsPerMillimeter
-	Gui, %LOC_Gui%:Destroy
-	Gui, %LOC_Gui%:-Caption -Resize +Owner +AlwaysOnTop +Border +LastFound
 	
+	If (WinExist(LOC_GuiTitle . " ahk_class AutoHotkeyGUI")) {
+		Gui, %LOC_Gui%:Destroy
+		Return
+	}
+	
+	Gui, %LOC_Gui%:-Caption -Resize +Owner +AlwaysOnTop +Border +LastFound
 	Gui, %LOC_Gui%:Font, s1
 	Loop, %LOC_RulerMillimetersLength% {
 		LOC_Index := A_Index - 1
@@ -178,11 +183,11 @@ WIN_Ruler(PRM_Horizontal = true) {
 	}
 	
 	WinSet, Transparent, 190
-	LOC_GuiX := (PRM_Horizontal ? "Center" : LOC_Margin)
+	LOC_GuiX := SCR_VisibleScreenX + LOC_Margin
 	, LOC_GuiY := (PRM_Horizontal ? SCR_VisibleScreenHeight - LOC_GuiThickness : LOC_Margin)
 	, LOC_GuiWidth := (PRM_Horizontal ? SCR_VisibleScreenWidth - 2 * LOC_Margin : LOC_GuiThickness)
 	, LOC_GuiHeight := (PRM_Horizontal ? LOC_GuiThickness : SCR_VisibleScreenHeight - 2 * LOC_Margin)
-	Gui, %LOC_Gui%:Show, % "X" . LOC_GuiX . " Y" . LOC_GuiY . " W" . LOC_GuiWidth . " H" . LOC_GuiHeight, % (PRM_Horizontal ? "GUI_HorizontalRuler" : "GUI_VerticalRuler")
+	Gui, %LOC_Gui%:Show, % "X" . LOC_GuiX . " Y" . LOC_GuiY . " W" . LOC_GuiWidth . " H" . LOC_GuiHeight, % LOC_GuiTitle
 }
 
 8GuiEscape:

@@ -578,7 +578,7 @@ TRY_InitMenus() {
 	; Audio :
 	;;;;;;;;;
 
-	If (APPMp3EditorPath) {
+	If (APP_Mp3EditorPath) {
 		TRY_AddMenuItem("Audio", "Ctrl + Win +             BackSpace`t&MP3Editor", "APP_MP3Editor", APP_Mp3EditorPath)
 	}
 	If (APP_MediaMonkeyPath) {

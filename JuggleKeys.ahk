@@ -15,7 +15,7 @@
 
 ; Propriété d'une tâche planifiée se ferme immédiatement
 
-; Refaire disparaitre la règle avec la mm combinaison de touches (attention à la fermeture avec mbutton)
+; Déplacer la règle graduée avec un clic gche glissé/déposé
 
 ; Revoir les agrandissements sur l'autre écran, surtt lrsq la fenêtre est dj agrandie ou pas
 
@@ -1053,6 +1053,10 @@ AHK_InitLibraries() {
 ; Windows clock :
 ;;;;;;;;;;;;;;;;;
 
+AHK_WindowsTimeSynchronization:
+AHK_WindowsTimeSynchronization(true)
+Return
+
 AHK_WindowsTimeSynchronization(PRM_Action = false) {
 
 	If (PRM_Action) {
@@ -1066,15 +1070,9 @@ AHK_WindowsTimeSynchronization(PRM_Action = false) {
 			RunAs
 		}
 	} Else {
-		SetTimer, AHK_WindowsTimeSynchronization, -1
+		SetTimer, AHK_WindowsTimeSynchronization, -120000 ; 2 minutes after launching JuggleKeys, especially because the network connection isn't set up when the system just started
 	}
 }
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-AHK_WindowsTimeSynchronization:
-AHK_WindowsTimeSynchronization(true)
-Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

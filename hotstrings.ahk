@@ -1159,6 +1159,8 @@ Return
 :*:mv:: ; mauvais
 SendInput, {Left}au{Right}ais
 Return
+:?*:vulg:: ; vulg (pour éviter vulong)
+Return
 :?*:lg:: ; long
 SendInput, {Left}on{Right}
 Return
