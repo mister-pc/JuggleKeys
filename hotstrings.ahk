@@ -1281,6 +1281,8 @@ SendInput, {BackSpace}
 Return
 :*:pbmt::{Left}{BackSpace}{Left}{BackSpace}é{Right}a{Right}ique ; problématique (à partir de problèmet)
 :*:pbt::{Left}{BackSpace}{Left}{BackSpace}é{Right}a{Right}ique ; problématique (à partir de problèmet)
+:*:pbma::{Left}{BackSpace}{Left}{BackSpace}é{Right 2} ; probléma (à partir de problèmea)
+:*:pba::{Left}{BackSpace}{Left}{BackSpace}é{Right 2} ; probléma (à partir de problèmea)
 :*:fd::{Left}on{Right} ; fond
 :C*:rv::{Left}endez-{Right}ous ; rendez-vous
 :C*:Rv::{Left}endez-{Right}ous ; Rendez-vous
@@ -1448,7 +1450,8 @@ Return
 :C*:Dl:: ; Dès lors
 SendInput, {Left}ès {right}ors
 Return
-:*:dll::{Left}{BackSpace 3}{Left}{BackSpace 3}{Right 2} ; dll (à partir de dès lorsl)
+:C*:Dll::{BackSpace 8}LL ; DLL (à partir de Dès lorsl)
+:C*:dll::{BackSpace 9}DLL ; DLL (à partir de dès lorsl)
 ::ec::{BackSpace}{Left}n{Right}ore ; encore
 ::ef::{BackSpace}{Left}n{Right}in ; enfin
 :*:atf::{Left 2}u{Right}re{Right}ois ; autrefois

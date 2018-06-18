@@ -200,6 +200,68 @@ Return
 Gui, 9:Destroy
 Return
 
+#IfWinActive, GUI_HorizontalRuler ahk_class AutoHotkeyGUI
+Left::
+Right::
+Up::
+Down::
++Left::
++Right::
++Up::
++Down::
+^Left::
+^Right::
+^Up::
+^Down::
+SCR_MoveRuler(A_ThisHotkey)
+Return
+
+#IfWinActive, GUI_VerticalRuler ahk_class AutoHotkeyGUI
+Left::
+Right::
+Up::
+Down::
++Left::
++Right::
++Up::
++Down::
+^Left::
+^Right::
+^Up::
+^Down::
+SCR_MoveRuler(A_ThisHotkey)
+Return
+
+SCR_MoveRuler(PRM_HotKey) {
+	
+	If (WinActive("GUI_HorizontalRuler ahk_class AutoHotkeyGUI")
+		|| WinActive("GUI_VerticalRuler ahk_class AutoHotkeyGUI")) {
+		WinGet, LOC_GuiID, ID, A
+	} Else {
+		Return
+	}
+	
+	CoordMode, Mouse, Screen
+	WinGetPos, LOC_X, LOC_Y, , , ahk_id %LOC_GuiID%
+	LOC_FirstChar := SubStr(PRM_HotKey, 1, 1)
+	LOC_Delta := (LOC_FirstChar == "+" 
+		? 10 
+		: (LOC_FirstChar != "^" ? 5 : 1))
+	LOC_DeltaX := (InStr(PRM_HotKey, "Left") 
+		? -LOC_Delta 
+		: (InStr(PRM_HotKey, "Right") 
+			? LOC_Delta 
+			: 0))
+	, LOC_DeltaY := (InStr(PRM_HotKey, "Up") 
+		? -LOC_Delta 
+		: (InStr(PRM_HotKey, "Down")
+			? LOC_Delta
+			: 0))
+	WinMove, ahk_id %LOC_GuiID%, , % LOC_X + LOC_DeltaX, % LOC_Y + LOC_DeltaY
+}
+	
+#IfWinActive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1747,7 +1809,7 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, Color Chooser ahk_class #32770
-Esc::
+Esc:: ; Color Chooser ahk_class #32770
 WinClose
 AUD_Beep()
 Return

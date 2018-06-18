@@ -101,7 +101,7 @@ PWR_SetMonitorOffTimer(PRM_Status = 0, PRM_MilliSecondsToScreenOff = 0) {
 	;              2 = Screensaver
 	;              3 = Lock
 
-	Global SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, LOG_DomainLogin, LOG_DomainEncryptedPassword, ZZZ_SetMonitorOffTimer
+	Global SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, LOG_DomainEncryptedPassword, ZZZ_SetMonitorOffTimer
 	Static STA_MilliSecondsToScreenOff := 0, STA_InitialMilliSecondsToScreenOff := 0, STA_Status := 0, STA_InitialMouseX, STA_InitialMouseY, STA_InitialTimer
 
 	SetTimer, PWR_SetMonitorOffTimer, Off
@@ -475,7 +475,7 @@ PRM_PowerManager(PRM_Submit = true, PRM_State = 0, PRM_ForcedActionEnabled = fal
 ;              Shutdown : 3
 ;              Restart  : 4
 
-	Global SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, LOG_DomainLogin, LOG_DomainEncryptedPassword
+	Global SCR_VirtualScreenX, SCR_VirtualScreenY, SCR_VirtualScreenWidth, SCR_VirtualScreenHeight, LOG_DomainEncryptedPassword
 
 	Static STA_SavedState := -1
 	, STA_SavedForced := false
@@ -741,7 +741,7 @@ PWR_DisplayConfirmationNo() {
 
 #IfWinActive, ahk_group PWR_RebootPopUps
 
-Esc::
+Esc:: ; ahk_group PWR_RebootPopUps
 PWR_RebootPopUpsEscape()
 Return
 
@@ -749,12 +749,12 @@ PWR_RebootPopUpsEscape() {
 	PRM_PowerManager(, PRM_State := -1)
 }
 
-Left::
-Right::
+Left:: ; ahk_group PWR_RebootPopUps
+Right:: ; ahk_group PWR_RebootPopUps
 SendInput, {Tab}
 Return
 
-Enter::
+Enter:: ;ahk_group PWR_RebootPopUps
 PWR_DisplayConfirmationEnter()
 Return
 
@@ -838,12 +838,12 @@ PWR_BSOD() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, GUI_BSOD ahk_class AutoHotkeyGUI
-Esc::
-!Tab::
-!+Tab::
-^!Delete::
-LWin Up::
-RWin Up::
+Esc:: ; GUI_BSOD ahk_class AutoHotkeyGUI
+!Tab:: ; GUI_BSOD ahk_class AutoHotkeyGUI
+!+Tab:: ; GUI_BSOD ahk_class AutoHotkeyGUI
+^!Delete:: ; GUI_BSOD ahk_class AutoHotkeyGUI
+LWin Up:: ; GUI_BSOD ahk_class AutoHotkeyGUI
+RWin Up:: ; GUI_BSOD ahk_class AutoHotkeyGUI
 Return
 #IfWinActive
 

@@ -1,0 +1,14 @@
+*.ahk    text eol=crlf
+*.cfg    text eol=crlf
+*.ini    text eol=crlf
+*.txt		 text eol=crlf
+*.xml    text eol=crlf
+*.chm   -text
+*.clip  -text
+*.dll   -text
+*.exe   -text
+*.icl   -text
+*.ico   -text
+*.jpg		-text
+*.png   -text
+*.wav   -text

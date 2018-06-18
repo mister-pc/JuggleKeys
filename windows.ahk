@@ -244,7 +244,8 @@ WIN_MiddleButton() {
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
 	; Systray :
-	If (LOC_WindowClass == "Shell_TrayWnd") {
+	If (LOC_WindowClass == "Shell_TrayWnd"
+		|| SubStr(LOC_WindowClass, 1, 10) == "DFTaskbar:") {
 		SendInput, ^+{Esc}
 		Return
 	}

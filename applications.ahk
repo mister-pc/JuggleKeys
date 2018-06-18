@@ -35,7 +35,6 @@ APP_Run(PRM_ApplicationName, PRM_Process, PRM_Parameters = "", PRM_WorkingDirect
 ; 7. PRM_AlreadyLaunchedWarning : if true display a warning if application is already started
 ; 8. PRM_RunAs                  : run as login/password given by shortcuts Win + Shift + Enter
 
-	Global LOG_DomainLogin, LOG_DomainEncryptedPassword
 	If (PRM_WindowIdentification
 		&& PRM_WindowIdentification != true) {
 		IfWinExist, %PRM_WindowIdentification%
@@ -515,11 +514,11 @@ APP_DOpus() {
 #IfWinActive
 
 #IfWinActive, Accès au dossier refusé ahk_class #32770
-Esc::SendInput, {Right}{Space}
+Esc::SendInput, {Right}{Space} ; Accès au dossier refusé ahk_class #32770
 #IfWinActive
 
 #IfWinActive, Suppression de fichier - Directory Opus ahk_class #32770
-Esc::
+Esc:: ; Suppression de fichier - Directory Opus ahk_class #32770
 IfWinExist, Accès au dossier refusé ahk_class #32770
 {
 	WinActivate
@@ -865,6 +864,14 @@ APP_FolderJpg(PRM_MoveToUnknownFolderToo = false) {
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#IfWinActive, Confirmer l’enregistrement ahk_class #32770, &Non
+Esc:: ; Confirmer l’enregistrement ahk_class #32770, &Non
+SendInput, n
+Return
+#IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -904,7 +911,7 @@ APP_ShiftIE() {
 
 APP_IE(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedWarning = true) {
 
-	Global APP_InternetExplorerPath, LOG_DomainLogin, LOG_DomainEncryptedPassword
+	Global APP_InternetExplorerPath, LOG_DomainEncryptedPassword
 	LOC_Selection := Trim(PRM_Selection, " `t`r`n`v`f")
 	IfWinExist, Internet Explorer ahk_class IEFrame
 	{
@@ -1063,7 +1070,7 @@ Return
 
 APP_KGS(PRM_Relaunch = false) {
 
-	Global APP_JavaWebStartPath, APP_VisionGoPath, LOG_DomainLogin, LOG_DomainEncryptedPassword
+	Global APP_JavaWebStartPath, APP_VisionGoPath, LOG_DomainEncryptedPassword
 	LOC_AlreadyLaunched := WinExist("KGS : Salles ahk_class SunAwtFrame")
 	If (LOC_AlreadyLaunched) {
 		WinActivate
@@ -1097,7 +1104,7 @@ APP_KGS(PRM_Relaunch = false) {
 		
 		If (WinExist("KGS : Connexion ahk_class SunAwtFrame")) {
 			WinActivate
-			SendInput, ^a%LOG_DomainLogin%{Tab}
+			SendInput, ^a%A_Username%{Tab}
 			Sleep, 50
 			SendInput, ^a
 			SendInput, {Raw}%LOG_DomainEncryptedPassword%
@@ -1133,8 +1140,8 @@ APP_KillVisionGo() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, KGS : Information ahk_class SunAwtFrame
-Enter::
-Esc::
+Enter:: ; KGS : Information ahk_class SunAwtFrame
+Esc:: ; KGS : Information ahk_class SunAwtFrame
 SendInput, {Space}
 Return
 #IfWinActive
@@ -1142,10 +1149,10 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, KGS : Nouvelle partie ahk_class SunAwtFrame
-Enter::
+Enter:: ; KGS : Nouvelle partie ahk_class SunAwtFrame
 APP_KGSNewGame(true)
 Return
-Esc::
+Esc:: ; KGS : Nouvelle partie ahk_class SunAwtFrame
 APP_KGSNewGame(false)
 Return
 #IfWinActive
@@ -2227,7 +2234,7 @@ APP_NewMailComposerTimer(PRM_Body = "") {
 
 APP_MailManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedWarning = true) {
 
-	Global APP_MailApplicationPath, LOG_DomainLogin, LOG_DomainEncryptedPassword
+	Global APP_MailApplicationPath, LOG_DomainEncryptedPassword
 	; APP_MailApplicationPath == Mozilla Thunderbird\thunderbird.exe
 	; APP_MailApplicationPath == Microsoft Office\OFFICE11\OUTLOOK.EXE
 	If (APP_MailApplicationPath == "") {
@@ -3191,22 +3198,17 @@ APP_CheckXButton(PRM_Direction, PRM_ActiveWindows, PRM_4thButtonAction = "", PRM
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 APP_RunAs(PRM_DomainLogin = "", PRM_DomainEncryptedPassword = "") {
-	Global LOG_DomainLogin, LOG_DomainEncryptedPassword
+	Global LOG_DomainEncryptedPassword
 	
-	; TODO : à supprimer !
-	AHK_Debug("RunAs, ", LOG_DomainLogin . ",", LOG_DomainEncryptedPassword)
-	RunAs, %LOG_DomainLogin%, %LOG_DomainEncryptedPassword%
-	Return, true
-	
-	If (A_IsAdmin) {
-		LOC_DomainLogin := (PRM_DomainLogin ? PRM_DomainLogin : LOG_DomainLogin)
+	;If (A_IsAdmin) {
+		LOC_DomainLogin := (PRM_DomainLogin ? PRM_DomainLogin : A_Username)
 		LOC_DomainPassword := LOG_GetFieldValue(PRM_DomainEncryptedPassword && PRM_DomainLogin
-			? "PRM_DomainEncryptedPassword"
-			: "LOG_DomainEncryptedPassword")
+				? "PRM_DomainEncryptedPassword"
+				: "LOG_DomainEncryptedPassword")
 		If (LOC_DomainPassword) {
-			RunAs, %LOG_DomainLogin%, %LOC_DomainPassword%
+			RunAs, %LOC_DomainLogin%, %LOC_DomainPassword%
 		}
-	}
+	;}
 }
 
 APP_ShowQuickHelpTooltip() {
@@ -3231,6 +3233,9 @@ APP_ShowQuickHelpTooltip() {
 				|| LOC_Class == "TModuleForm" && LOC_Title == "Chronotron Plugin"
 				|| LOC_Class == "#32770" && LOC_Title == "A-B Repeat") {
 		LOC_Tooltip := "Alt + Left`t: Previous track`nAlt + Right`t: Next track`n`nControl + Left`t: Slow down`nControl + Right`t: Speed up`n`nControl + Up`t: ½ tone higher`nControl + Down`t: ½ tone lower`n`nInsert`t`t: Repeat A-B"
+	} Else If (LOC_Class == "AutoHotKeyGUI" 
+		&& (LOC_Title == "GUI_HorizontalRuler" || LOC_Title == "Gui_VerticalRuler")) {
+		LOC_Tooltip := "Arrows`t: Move ruler`n+ Control`t: Small steps`n+ Shift`t:Long steps`n`nEscape`t: Close ruler"
 	} Else If (LOC_Class == "MMCMainFrame" && LOC_Title == "Services") {
 		LOC_Tooltip := "Insert`t: Start service`nDelete`t: Stop service"
 	} Else If (WinActive("ahk_group APP_WMPWindowsGroup")) {

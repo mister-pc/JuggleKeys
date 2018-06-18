@@ -61,20 +61,11 @@ KBD_DelayForSpecialKeys(PRM_Hotkey) {
 		} Else If (PRM_Hotkey == "Insert") {
 			SendInput, {%PRM_Hotkey%}
 			TRY_ShowTrayTip("Insert toggled")
-		} Else {
-			GetKeyState, LOC_KeyState, %PRM_Hotkey%, T
-			If (PRM_Hotkey == "ScrollLock") {
-				If (LOC_KeyState == "U") {
-					SetScrollLockState, On
-					TRY_ShowTrayTip("ScrollLock activated")
-				} Else {
-					SetScrollLockState, Off
-					TRY_ShowTrayTip("ScrollLock desactivated")
-				}
-			}
 		}
 	} Else {
-		APP_ShowQuickHelpTooltip()
+		If (PRM_Hotkey == "F1") {
+			APP_ShowQuickHelpTooltip()
+		}
 	}
 	KeyWait, %PRM_Hotkey%
 }
@@ -319,47 +310,47 @@ KBD_LockClose() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, Lock Keyboard ahk_class AutoHotkeyGUI
-Esc::
+Esc:: ; Lock Keyboard ahk_class AutoHotkeyGUI
 Gui, 28:Destroy ; GUI_LockKeyboardBackground
 Gui, 27:Destroy ; { Unl | L } ock Keyboard
 Return
-Up::
-Down::
-PgUp::
-PgDn::
+Up:: ; Lock Keyboard ahk_class AutoHotkeyGUI
+Down:: ; Lock Keyboard ahk_class AutoHotkeyGUI
+PgUp:: ; Lock Keyboard ahk_class AutoHotkeyGUI
+PgDn:: ; Lock Keyboard ahk_class AutoHotkeyGUI
 Return
 #IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #IfWinActive, Unlock Keyboard ahk_class AutoHotkeyGUI
-LWin::
-*LWin::
-RWin::
-*RWin::
-Esc::
-*Esc::
-Tab::
-*Tab::
-Space::
-*Space::
-Enter::
-*Enter::
-NumpadEnter::
-*NumpadEnter::
-Left::
-*Left::
-Right::
-*Right::
-Up::
-*Up::
-Down::
-^Down::
-*Down::
-PgUp::
-*PgUp::
-PgDn::
-*PgDn::
+LWin:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*LWin:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+RWin:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*RWin:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Esc:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Esc:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Tab:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Tab:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Space:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Space:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Enter:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Enter:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+NumpadEnter:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*NumpadEnter:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Left:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Left:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Right:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Right:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Up:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Up:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+Down:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+^Down:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*Down:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+PgUp:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*PgUp:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+PgDn:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
+*PgDn:: ; Unlock Keyboard ahk_class AutoHotkeyGUI
 Return
 #IfWinActive
 

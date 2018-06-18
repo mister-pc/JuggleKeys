@@ -9,7 +9,7 @@
 ; Bugs :
 ;;;;;;;;
 
-; Supprimer LOG_DomainLogin pr le remplacer par A_Username automatiquement
+; Supprimer LOG_DomainEncryptedPassword là où il ne sert pas (déclaré en Global inutilement)
 
 ; Modif .ini non prise en cpte
 
@@ -78,6 +78,8 @@
 ;;;;;;;;;;;;;;
 
 ; Les titres des fenêtres matchent aves des regex (chercher RegEx ds l'aide) 
+
+; APP_ShowQuickHelpTooltip ne marche pas pr les rulers
 
 ; Faire un pense-bête (avec alarme ?)
 
@@ -827,8 +829,6 @@ AHK_SaveIniFile() {
 		EnvGet, LOG_DomainName, USERDOMAIN
 	}
 	IniWrite, %LOG_DomainName%, %AHK_IniFile%, Text, DomainName
-	IniRead, LOG_DomainLogin, %AHK_IniFile%, Text, DomainLogin, %A_UserName%
-	IniWrite, %LOG_DomainLogin%, %AHK_IniFile%, Text, DomainLogin
 	IniRead, LOG_DomainEncryptedPassword, %AHK_IniFile%, Text, DomainEncryptedPassword, %A_Space%
 	IniWrite, %LOG_DomainEncryptedPassword%, %AHK_IniFile%, Text, DomainEncryptedPassword
 	IniRead, LOG_MainEncryptedPassword, %AHK_IniFile%, Text, MainEncryptedPassword, %A_Space%

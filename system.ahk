@@ -136,7 +136,7 @@ Return
 
 SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 
-	Global AHK_SSD, LOG_DomainLogin, LOG_DomainEncryptedPassword, TRY_TrayTipEnabled, ZZZ_KillRegServerTimer
+	Global AHK_SSD, LOG_DomainEncryptedPassword, TRY_TrayTipEnabled, ZZZ_KillRegServerTimer
 	Static STA_RegServer1 := 0, STA_RegServer2 := 0
 	
 	; Kill unclosed regserver commands :
@@ -492,7 +492,6 @@ SYS_WindowsUpdate()
 Return
 
 SYS_WindowsUpdate() {
-	Global LOG_DomainLogin, LOG_DomainEncryptedPassword
 	TRY_ShowTrayTip("Launching Windows Update...")
 	APP_RunAs()
 	/*
@@ -512,7 +511,7 @@ SYS_WindowsUpdate() {
 }
 
 #IfWinActive, Windows Update ahk_class #32770, &Redémarrer maintenant
-Esc::
+Esc:: ; Windows Update ahk_class #32770, &Redémarrer maintenant
 ControlSend, ComboBox1, {End}
 Sleep, 10
 ControlSend, Button2, {Space}

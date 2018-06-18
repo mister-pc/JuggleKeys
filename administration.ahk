@@ -2366,7 +2366,7 @@ OnMessage(0x200, "")
 , OnMessage(0x202, "")
 , AHK_ResetCursor()
 Return
-Esc::
+Esc:: ; About ahk_class AutoHotkeyGUI
 Gui, 1:Destroy
 OnMessage(0x200, "")
 , OnMessage(0x202, "")

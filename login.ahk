@@ -45,7 +45,7 @@ LOG_FieldValueManager(PRM_Action, PRM_VariableName, PRM_DecryptedValue = false, 
 	
 	
 
-	Global LOG_MailEncryptedAddresses, LOG_BankEncryptedAccount, LOG_BankEncryptedProAccount, LOG_CBEncryptedNumber, LOG_DomainEncryptedPassword, LOG_MainEncryptedPassword, LOG_DomainLogin, LOG_DomainName
+	Global LOG_MailEncryptedAddresses, LOG_BankEncryptedAccount, LOG_BankEncryptedProAccount, LOG_CBEncryptedNumber, LOG_DomainEncryptedPassword, LOG_MainEncryptedPassword, LOG_DomainName
 	Static STA_Password := ""
 	, STA_EncryptedFields := "LOG_MailEncryptedAddresses,LOG_BankEncryptedAccount,LOG_BankEncryptedProAccount,LOG_CBEncryptedNumber,LOG_DomainEncryptedPassword,LOG_MainEncryptedPassword"
 	
@@ -536,22 +536,18 @@ Return
 
 LOG_WindowsLogin() {
 
-	Global LOG_DomainLogin, LOG_DomainEncryptedPassword, AHK_IniFile
-	IniRead, LOG_DomainLogin, %AHK_IniFile%, Text, DomainLogin, %A_Space%
+	Global LOG_DomainEncryptedPassword, AHK_IniFile
 	IniRead, LOG_DomainEncryptedPassword, %AHK_IniFile%, Text, DomainEncryptedPassword, %A_Space%
-	LOG_FieldsManager(PRM_Title := "Informations d'identification à Windows", PRM_Text := "&Login Windows,&Mot de passe", PRM_TextWidth := 90, PRM_VariableNames := "LOG_DomainLogin,LOG_DomainEncryptedPassword", PRM_VariableWidth := 120)
-	If (LOG_DomainLogin) {
+	LOG_FieldsManager(PRM_Title := "Informations d'identification à Windows", PRM_Text := "&Mot de passe Windows", PRM_TextWidth := 90, PRM_VariableNames := "LOG_DomainEncryptedPassword", PRM_VariableWidth := 120)
+	SendInput, ^a
+	TXT_SendRaw(A_Username)
+	SendInput, {Tab}
+	If (LOG_DomainEncryptedPassword) {
+		Sleep, 200
 		SendInput, ^a
-		TXT_SendRaw(LOG_Decrypt(LOG_DomainLogin))
-		SendInput, {Tab}
-		If (LOG_DomainEncryptedPassword) {
-			Sleep, 200
-			SendInput, ^a
-			TXT_SendRaw(LOG_Decrypt(LOG_DomainEncryptedPassword))
-			SendInput, {Enter}
-		}
+		TXT_SendRaw(LOG_Decrypt(LOG_DomainEncryptedPassword))
+		SendInput, {Enter}
 	}
-	IniWrite, %LOG_DomainLogin%, %AHK_IniFile%, Text, DomainLogin
 	IniWrite, %LOG_DomainEncryptedPassword%, %AHK_IniFile%, Text, DomainEncryptedPassword
 }
 
@@ -581,18 +577,16 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 LOG_DNSLogin() {
-	Global LOG_DomainName, LOG_DomainLogin, LOG_DomainEncryptedPassword, AHK_IniFile
+	Global LOG_DomainName, LOG_DomainEncryptedPassword, AHK_IniFile
     If (GetKeyState("RWin", "P")) {
 		KeyWait, RWin
 	}
 	IniRead, LOG_DomainName, %AHK_IniFile%, Text, DomainName, %A_Space%
-	IniRead, LOG_DomainLogin, %AHK_IniFile%, Text, DomainLogin, %A_Space%
 	IniRead, LOG_DomainEncryptedPassword, %AHK_IniFile%, Text, DomainEncryptedPassword, %A_Space%
-	LOG_FieldsManager(PRM_Title := "Informations d'identification au domaine", PRM_Text := "&Domaine,&Login,&Mot de passe", PRM_TextWidth := 90, PRM_VariableNames := "LOG_DomainName,LOG_DomainLogin,LOG_DomainEncryptedPassword", PRM_VariableWidth := 120)
-	If (LOG_DomainName
-		&& LOG_DomainLogin) {
+	LOG_FieldsManager(PRM_Title := "Informations d'identification au domaine", PRM_Text := "&Domaine,&Mot de passe de session", PRM_TextWidth := 90, PRM_VariableNames := "LOG_DomainName,LOG_DomainEncryptedPassword", PRM_VariableWidth := 120)
+	If (LOG_DomainName) {
 		SendInput, ^a
-		TXT_SendRaw(LOG_Decrypt(LOG_DomainName) . "\" . LOG_Decrypt(LOG_DomainLogin))
+		TXT_SendRaw(LOG_DomainName . "\" . A_Username)
 		SendInput, {Tab}
 		If (LOG_DomainEncryptedPassword) {
 			Sleep, 200
@@ -602,7 +596,6 @@ LOG_DNSLogin() {
 		}
 	}
 	IniWrite, %LOG_DomainName%, %AHK_IniFile%, Text, DomainName
-	IniWrite, %LOG_DomainLogin%, %AHK_IniFile%, Text, DomainLogin
 	IniWrite, %LOG_DomainEncryptedPassword%, %AHK_IniFile%, Text, DomainEncryptedPassword
 }
 
