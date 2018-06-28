@@ -14,7 +14,8 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class OpusApp ; Office
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class XLMAIN ; Excel
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
-	GroupAdd, HOT_HotstringsWindowsGroup, évènement ahk_class MozillaDialogClass ; Thunderbird
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class PPTFrameClass ; PowerPoint
 	GroupAdd, HOT_HotstringsWindowsGroup, EditEmailSubject - Editer le sujet du message ahk_class MozillaDialogClass ; Thunderbird
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class MozillaWindowClass ; Mozilla
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Chrome_WidgetWin_1 ; Chrome
@@ -524,7 +525,8 @@ Return
 :*:pcqi::{Left}{BackSpace}'{Right} ; parce qu'i (à partir de parce quei)
 :*:pcqo::{Left}{BackSpace}'{Right} ; parce qu'o (à partir de parce queo)
 :*:pcqu::{Left}{BackSpace}'{Right} ; parce qu'u (à partir de parce queu)
-:*:pcqy::{Left}{BackSpace}'{Right} ; parce qu'y (à partir de parce quey):*:ssq:: ; sans que (à partir de sansq)
+:*:pcqy::{Left}{BackSpace}'{Right} ; parce qu'y (à partir de parce quey)
+:*:ssq:: ; sans que (à partir de sansq)
 SendInput, {Left} {Right}ue
 Return
 :*:ssq'::{Left}{BackSpace}{Right} ; sans qu' (à partir de sans que')
@@ -942,6 +944,7 @@ SendInput, {Left}an{Right}
 Return
 :*:ssd::{BackSpace 5}SSD ; SSD (à partir de sansd)
 :*:ssh::{Left 2}{BackSpace 2}{Right 2} ; ssh (à partir de sansh)
+:*:ssl::{Left 2}{BackSpace 2}{Right 2} ; SSL (à partir de sansl)
 :*:sso::{Left 2}{BackSpace 2}{Right 2} ; sso (à partir de sanso)
 ::s_::{BackSpace 2}ur ; sur
 ::_s::{BackSpace}{Left}{BackSpace}{Right}ous ; sous
@@ -1311,7 +1314,12 @@ Return
 SendInput, {Left}on{Right}tion
 Return
 :*:fct::{Left}nemen{Right} ; fonctionnement
-:C*:ctrl::{Left 3}{BackSpace 5}on{Right 2}ô{Right}e ; contrôle (à partir de c'étaitrl)
+:C*:ctrl:: ; contrôle (à partir de c'étaitrl)
+SendInput, {Left 3}{BackSpace 5}on{Right 2}ô{Right}e
+Return
+:C*:ctrle::{BackSpace} ; contrôle (à partir de contrôlee)
+:C*:ctrlé::{Left}{BackSpace}{Right} ; contrôle (à partir de contrôleé)
+:C*:ctrla::{Left}{BackSpace}{Right} ; contrôle (à partir de contrôlea)
 :C*:Ctrl::{Left 3}{BackSpace 5}{Right 3} ; Ctrl (à partir de C'étaitrl)
 :C:cr::{BackSpace}{Left}ompte-{Right}endu ; compte-rendu
 :C:Cr::{BackSpace}{Left}ompte-{Right}endu ; Compte-rendu
