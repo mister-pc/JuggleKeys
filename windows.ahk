@@ -167,6 +167,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "ExtPlayerCanvas" ; Quintessential
 		|| LOC_WindowClass == "PROCEXPL" ; Process Explorer
 		|| LOC_WindowClass == "ProcessHacker" ; Process Hacker
+		|| LOC_WindowClass == "#32770" && LOC_WindowTitle == "Find Handles or DLLs"
 		|| LOC_WindowClass == "TMainForm" ; Media Monkey
 		|| LOC_WindowClass == "TFMainWindow" ; Media Monkey
 		|| LOC_WindowClass == "TFImage" ; Media Monkey album image
@@ -881,6 +882,7 @@ WIN_InitGroups() {
 	GroupAdd, WIN_SuspendingWindowsGroup, Doomsday ahk_class QWidget ; Doom
 	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class ZDoomMainWindow ; Doom
 	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class DragonAge2 ; Dragon Age 2
+	GroupAdd, WIN_SuspendingWindowsGroup, Assassin's Creed Revelations ahk_class ScimitarEngineWindowClass
 	
 	GroupAdd, WIN_StartMenuGroup, ahk_class BaseBar ; Start menus
 	GroupAdd, WIN_StartMenuGroup, ahk_class ClassicShell.CMenuContainer ; Start menu
@@ -3368,7 +3370,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 		ControlSend, ahk_parent, {Enter}, Erreur ahk_class TMessageFormPlus
 		TRY_ShowTrayTip("MediaMonkey error notification closed")
 	}
-	Static STA_DecoderSuspension := 50, STA_DecoderPID := 0
+/*	Static STA_DecoderSuspension := 50, STA_DecoderPID := 0
 	If (STA_DecoderPID > 0) {
 		Process, Exist, %STA_DecoderPID%
 	} Else {
@@ -3384,7 +3386,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 			STA_DecoderSuspension := 50
 		}
 	}
-	Static STA_MediaMonkeyAutoPlayListCriteriasCount := 0
+*/	Static STA_MediaMonkeyAutoPlayListCriteriasCount := 0
 	If (WIN_IfWinExist(STA_MediaMonkeyAutoPlayListCriteriasCount, PRM_ParentTitle := "MediaMonkey ahk_class TFMainWindow", PRM_WindowTitle := "Crit√®re de recherche ahk_class TFQueryCondition", , PRM_SecondsWaitingForParent := 10, PRM_SecondsWaitingAfterSuccess := 10)) {
 		WinGetPos, LOC_X, LOC_Y, LOC_Width, LOC_Height
 		If (LOC_Height < 300) {
@@ -3653,12 +3655,18 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 	
-	Static STA_ProcessHackerCount := 0
-	If (WIN_IfWinActive(STA_ProcessHackerCount, PRM_ParentTitle := "Process Hacker [FUSION\BeLO]+ ahk_class ProcessHacker", PRM_WindowTitle := "Process Hacker ahk_class #32770", PRM_WindowText := "Terminate", PRM_SecondsWaitingForParent := 3, PRM_SecondsWaitingAfterSuccess := 0)) {
+	Static STA_ProcessHackerTerminateCount := 0
+	If (WIN_IfWinActive(STA_ProcessHackerTerminateCount, PRM_ParentTitle := "Process Hacker ahk_class ProcessHacker", PRM_WindowTitle := "Process Hacker ahk_class #32770", PRM_WindowText := "Terminate", PRM_SecondsWaitingForParent := 3, PRM_SecondsWaitingAfterSuccess := 0)) {
 		SendInput, {Left}{Enter}
 		Return
 	}
 	
+	Static STA_ProcessHackerCount := 0
+	If (WIN_IfWinActive(STA_ProcessHackerTerminateCount, PRM_ParentTitle := "Process Hacker ahk_class ProcessHacker", PRM_WindowTitle := "Process Hacker ahk_class #32770", PRM_WindowText := "Close", PRM_SecondsWaitingForParent := 3, PRM_SecondsWaitingAfterSuccess := 0)) {
+		SendInput, {Left}{Enter}
+		Return
+	}
+
 	;~ IfWinExist, Envoi des mises ‡ jour facultatives - dysfonctionnement ahk_class #32770 
 	;~ {
 		;~ WinKill

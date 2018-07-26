@@ -439,6 +439,30 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Comodo :
+;;;;;;;;;;
+
+#IfWinActive, COMODO Alerte de redémarrage ahk_class CisMainWizard
+Esc::
+APP_ComodoRestartAlert()
+Return
+
+APP_ComodoRestartAlert() {
+	CoordMode, Mouse, Screen
+	MouseGetPos, LOC_MouseX, LOC_MouseY
+	WinActivate, COMODO Alerte de redémarrage ahk_class CisMainWizard
+	CoordMode, Mouse, Window
+	MouseClick, , 232, 232
+	SendInput, {Down 2}{Tab 2}{Space}
+	CoordMode, Mouse, Screen
+	MouseMove, LOC_MouseX, LOC_MouseY
+}
+#IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Disk manager { Ctrl + Win + D } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

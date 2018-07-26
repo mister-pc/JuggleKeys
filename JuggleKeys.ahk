@@ -11,6 +11,8 @@
 
 ; Supprimer LOG_DomainEncryptedPassword là où il ne sert pas (déclaré en Global inutilement)
 
+; logon background
+
 ; Modif .ini non prise en cpte
 
 ; Propriété d'une tâche planifiée se ferme immédiatement

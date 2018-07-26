@@ -194,7 +194,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	RegWrite, REG_SZ,     HKEY_CURRENT_USER,  Control Panel\Desktop,                                                 FontSmoothingType, 2 ; smooth edges of screen fonts
 	RegWrite, REG_SZ,     HKEY_CURRENT_USER,  Control Panel\Desktop,                                                 DragFullWindows, 1 ; display full window while dragging
 	RegWrite, REG_BINARY, HKEY_CURRENT_USER,  Control Panel\Desktop,                                                 UserPreferencesMask, % "1e2c0780" ; adjust visual effects for appearance
-	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Control Panel\Desktop,                                                 PaintDesktopVersion, 1
+	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Control Panel\Desktop,                                                 PaintDesktopVersion, 0 ; don't display Windows version
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Control Panel\Desktop,                                                 SmoothScroll, 1
 	RegWrite, REG_SZ,     HKEY_CURRENT_USER,  Control Panel\Desktop\WindowMetrics,                                   MinAnimate, 1 ; animate windows when minimizing and maximizing
 	RegWrite, REG_SZ,     HKEY_CURRENT_USER,  Control Panel\Desktop\Keyboard,                                        KeyboardDataQueueSize, 1 ; animate windows when minimizing and maximizing
@@ -361,20 +361,25 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	; Set logon background from media\logon*.jpg :
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background, OEMBackground, 1 ; change logon background
 	LOC_BackgroundA := Array()
+	, LOC_FullBackgroundA := Array()
 	, LOC_LogonCount := 0
 	Loop, Files, %A_ScriptDir%\media\logon*.jpg
 	{
-		LOC_BackgroundA[A_Index] := A_LoopFileLongPath
+		LOC_BackgroundA[A_Index] := A_LoopFileName
+		, LOC_FullBackgroundA[A_Index] := A_LoopFileLongPath
 		, LOC_LogonCount++
 	}
 	If (LOC_LogonCount) {
 		Random, LOC_LogonIndex, 1, LOC_LogonCount
 		LOC_File := LOC_BackgroundA[LOC_LogonIndex]
-		FileCreateDir, %A_WinDir%\System32\oobe\info\backgrounds
+		, LOC_FullFile := LOC_FullBackgroundA[LOC_LogonIndex]
 		APP_RunAs()
+		FileCreateDir, %A_WinDir%\System32\oobe\info\backgrounds
 		Try {
-			Run, xcopy /r /h /y "%LOC_File%" "%A_WinDir%\System32\oobe\info\backgrounds\backgroundDefault.jpg", , Hide
-			; AHK_Debug("FileCopy, ", LOC_BackgroundA[LOC_LogonIndex] . ", " . A_WinDir . "\System32\oobe\info\backgrounds\backgroundDefault.jpg, 1")
+			;MsgBox, xcopy /r /h /y /i "%LOC_FullFile%" "%A_WinDir%\System32\oobe\info\backgrounds"
+			RunWait, xcopy /r /h /y /i "%LOC_FullFile%" "%A_WinDir%\System32\oobe\info\backgrounds", , Hide ; TODO : ne marche pas
+			;MsgBox, ren "%A_WinDir%\System32\oobe\info\backgrounds\%LOC_File%" "backgroundDefault.jpg"
+			Run, ren "%A_WinDir%\System32\oobe\info\backgrounds\%LOC_File%" "backgroundDefault.jpg", , Hide ; TODO : ne marche pas
 		} Catch LOC_Exception {
 			AHK_Catch(LOC_Exception, "SYS_WriteRegistryOptions", PRM_KillRegServer)
 		}
