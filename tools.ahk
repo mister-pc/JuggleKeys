@@ -48,38 +48,36 @@ AHK_ShowToolTip(PRM_ToolTipText = "", PRM_ToolTipSeconds = 0.75, PRM_Transparenc
 	Static STA_ToolTipBuffered = false
 	If (AHK_ToolTipsEnabled) {
 		If (PRM_ToolTipText) {
+			LOC_CurrentGUI := (STA_ToolTipBuffered ? 45 : 44)
+			, LOC_NextGUI := (STA_ToolTipBuffered ? 44 : 45)
+			, LOC_NextGUITitle := (STA_ToolTipBuffered ? "GUI_ToolTip" : "GUI_BufferedToolTip")
+			Gui, %LOC_NextGUI%:Destroy ; GUI_ToolTip | GUI_BufferedToolTip
+			Gui, %LOC_NextGUI%:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound
+			Gui, %LOC_NextGUI%:Color, FFFFDF, 000000
+			Gui, %LOC_NextGUI%:Margin, 5, 5
+			If (PRM_Bold) {
+				Gui, %LOC_NextGUI%:Font, Bold
+			}
+			Gui, %LOC_NextGUI%:Add, Text, , %PRM_ToolTipText%
+			Gui, %LOC_NextGUI%:Show, % "x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth) . " y" . (SCR_VirtualScreenY + SCR_VirtualScreenHeight) . " AutoSize NA NoActivate", %LOC_NextGUITitle%
 			Try {
-				LOC_CurrentGUI := (STA_ToolTipBuffered ? 45 : 44)
-				, LOC_NextGUI := (STA_ToolTipBuffered ? 44 : 45)
-				, LOC_NextGUITitle := (STA_ToolTipBuffered ? "GUI_ToolTip" : "GUI_BufferedToolTip")
-				Gui, %LOC_NextGUI%:Destroy ; GUI_ToolTip | GUI_BufferedToolTip
-				Gui, %LOC_NextGUI%:+AlwaysOnTop -Caption +Border -Resize +ToolWindow +Disabled +LastFound
-				Gui, %LOC_NextGUI%:Color, FFFFDF, 000000
-				Gui, %LOC_NextGUI%:Margin, 5, 5
-				If (PRM_Bold) {
-					Gui, %LOC_NextGUI%:Font, Bold
-				}
-				Gui, %LOC_NextGUI%:Add, Text, , %PRM_ToolTipText%
-				Gui, %LOC_NextGUI%:Show, % "x" . (SCR_VirtualScreenX + SCR_VirtualScreenWidth) . " y" . (SCR_VirtualScreenY + SCR_VirtualScreenHeight) . " AutoSize NA NoActivate", %LOC_NextGUITitle%
 				WinSet, Transparent, %PRM_Transparency%
 				WinSet, ExStyle, +0x00000020
-				WinGetPos, , , LOC_Width, LOC_Height
-				CoordMode, Mouse, Screen
-				MouseGetPos, LOC_MouseX, LOC_MouseY
-				LOC_ToolTipX := min(max(PRM_ToolTipX != 99999 ? PRM_ToolTipX : LOC_MouseX + 24, SCR_VirtualScreenX), SCR_VirtualScreenX + SCR_VirtualScreenWidth - LOC_Width)
-				, LOC_ToolTipY := min(max(PRM_ToolTipY != 99999 ? PRM_ToolTipY : LOC_MouseY + 34, SCR_VirtualScreenY), SCR_VirtualScreenY + SCR_VirtualScreenHeight - LOC_Height)
-				If (LOC_ToolTipX != ""
-					&& LOC_ToolTipY != "") { ; sometimes values are not affected : why ???
-					Gui, %LOC_NextGUI%:Show, % "x" . LOC_ToolTipX . " y" . LOC_ToolTipY . (PRM_ToolTipWidth > 0 ? " w" . PRM_ToolTipWidth : "") . (PRM_ToolTipHeight > 0 ? " h" . PRM_ToolTipHeight : "") . " NA NoActivate", %LOC_NextGUITitle%
-					Gui, %LOC_CurrentGUI%:Destroy
-					If (PRM_ToolTipSeconds) {
-						SetTimer, AHK_HideToolTipTimer, % - PRM_ToolTipSeconds * 1000
-					}
-				}
-				STA_ToolTipBuffered := !STA_ToolTipBuffered
-			} Catch, LOC_Exception {
-				AHK_Catch(LOC_Exception, "AHK_ShowToolTip")
 			}
+			WinGetPos, , , LOC_Width, LOC_Height
+			CoordMode, Mouse, Screen
+			MouseGetPos, LOC_MouseX, LOC_MouseY
+			LOC_ToolTipX := min(max(PRM_ToolTipX != 99999 ? PRM_ToolTipX : LOC_MouseX + 24, SCR_VirtualScreenX), SCR_VirtualScreenX + SCR_VirtualScreenWidth - LOC_Width)
+			, LOC_ToolTipY := min(max(PRM_ToolTipY != 99999 ? PRM_ToolTipY : LOC_MouseY + 34, SCR_VirtualScreenY), SCR_VirtualScreenY + SCR_VirtualScreenHeight - LOC_Height)
+			If (LOC_ToolTipX != ""
+				&& LOC_ToolTipY != "") { ; sometimes values are not affected : why ???
+				Gui, %LOC_NextGUI%:Show, % "x" . LOC_ToolTipX . " y" . LOC_ToolTipY . (PRM_ToolTipWidth > 0 ? " w" . PRM_ToolTipWidth : "") . (PRM_ToolTipHeight > 0 ? " h" . PRM_ToolTipHeight : "") . " NA NoActivate", %LOC_NextGUITitle%
+				Gui, %LOC_CurrentGUI%:Destroy
+				If (PRM_ToolTipSeconds) {
+					SetTimer, AHK_HideToolTipTimer, % - PRM_ToolTipSeconds * 1000
+				}
+			}
+			STA_ToolTipBuffered := !STA_ToolTipBuffered
 		} Else {
 			AHK_HideToolTip()
 		}
@@ -282,7 +280,7 @@ AHK_HideWindowToolTip() {
 
 AHK_Trace(PRM_SecondLevelLog = false, PRM_String1 = "", PRM_String2 = "", PRM_String3 = "", PRM_String4 = "", PRM_String5 = "", PRM_String6 = "", PRM_String7 = "", PRM_String8 = "", PRM_String9 = "") {
 	
-	Global AHK_ScriptName, AHK_LogsEnabled, AHK_DebugEnabled, ZZZ_HideDebugTimer
+	Global AHK_LogsEnabled, AHK_DebugEnabled, ZZZ_HideDebugTimer
 	Static STA_QueryPerformanceCounter := AHK_GetFunction("kernel32", "QueryPerformanceCounter"), STA_Frequency := 0, STA_CounterInit := false
 	
 	If (!STA_CounterInit) {
@@ -332,7 +330,7 @@ AHK_Trace(PRM_SecondLevelLog = false, PRM_String1 = "", PRM_String2 = "", PRM_St
 			LOC_FormatedLog .= LOC_Time . A_LoopField . "`r`n"
 		}
 		Try {
-			FileAppend, % LOC_FormatedLog, % A_ScriptDir . "\conf\" . AHK_ScriptName . ".log"
+			FileAppend, % LOC_FormatedLog, % A_ScriptDir . "\conf\" . A_Username . ".log"
 		}
 	}
 	

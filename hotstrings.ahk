@@ -21,20 +21,21 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Chrome_WidgetWin_1 ; Chrome
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IEFrame ; IE
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Maxthon3Cls_MainFrm ; Maxthon
-	GroupAdd, HOT_HotstringsWindowsGroup, heure de début ahk_class SWT_Window0 ; Sametime
+	; GroupAdd, HOT_HotstringsWindowsGroup, heure de début ahk_class SWT_Window0 ; Sametime
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class IMWindowClass ; Lync
-	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class HwndWrapper[TabbedConversations.exe;; ; Lync
-	GroupAdd, HOT_HotstringsWindowsGroup, New Defect ahk_class TNewBugForm ; Quality Center
-	GroupAdd, HOT_HotstringsWindowsGroup, Required Defect Fields ahk_class TRequiredFieldsDlg ; Quality Center
+	; GroupAdd, HOT_HotstringsWindowsGroup, ahk_class HwndWrapper[TabbedConversations.exe;; ; Lync
+	; GroupAdd, HOT_HotstringsWindowsGroup, New Defect ahk_class TNewBugForm ; Quality Center
+	; GroupAdd, HOT_HotstringsWindowsGroup, Required Defect Fields ahk_class TRequiredFieldsDlg ; Quality Center
 	GroupAdd, HOT_HotstringsWindowsGroup, Edit Text ahk_class #32770 ; SnagIt
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class DSUI:PDFXCViewer ; PDF-XChange
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Sticky_Notes_Note_Window ; Windows 7 Sticky Notes
 	GroupAdd, HOT_HotstringsWindowsGroup, KGS ahk_class SunAwtFrame ; KGS
-	GroupAdd, HOT_HotstringsWindowsGroup, Nox App Player ahk_class Qt5QWindowIcon ; Nox
+	GroupAdd, HOT_HotstringsWindowsGroup, NoxPlayer ahk_class Qt5QWindowIcon ; Nox
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class WordPadClass ; WordPad
 	GroupAdd, HOT_HotstringsWindowsGroup, Skype ahk_class tSkMainForm ; Skype
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class TConversationForm ; Skype
 	GroupAdd, HOT_HotstringsWindowsGroup, Create task ahk_class #32770 ; Timecamp create task
+	GroupAdd, HOT_HotstringsWindowsGroup, Start a Task ahk_class #32770 ; Timecamp start a task
 	GroupAdd, HOT_HotstringsWindowsGroup, Task Editor ahk_class #32770 ; Timecamp task editor
 	
 	GroupAdd, HOT_IgnoringWindows, ahk_class Progman
@@ -737,6 +738,7 @@ Return
 :*:mm:: ; même
 SendInput, {Left}ê{Right}e
 Return
+:*:mme::{BackSpace}{Left 2}{BackSpace}{Right 2} ; mme (à partir de mêmee)
 :C*:+to::
 SendInput, {BackSpace}{Left}{BackSpace}plu{Right}ôt ; plutôt
 Return
@@ -951,8 +953,12 @@ Return
 :*:dess:: ; dessous
 SendInput, ous
 Return
-:*:desse::{Left}{BackSpace 3}{Right} ; desse (à partir de dessouse)
-:*:dessi::{Left}{BackSpace 3}{Right} ; dessi (à partir de dessousi)
+:*:desse:: ; desse (à partir de dessouse)
+SendInput, {Left}{BackSpace 3}{Right}
+Return
+:*:dessi:: ; dessi (à partir de dessousi)
+SendInput, {Left}{BackSpace 3}{Right}
+Return
 :*:dessu::{Left}{BackSpace 3}{Right} ; dessu (à partir de dessousu)
 :*:desso::{BackSpace 3} ; desso (à partir de dessouso)
 ::pr::{BackSpace}{Left}ou{Right} ; pour
@@ -1555,6 +1561,7 @@ Return
 :*:mk:: ; Miuka
 SendInput, {BackSpace 2}Miuka
 Return
+:C:MW::{BackSpace}{Left}iloslawa {Right}YBORSKA ; Miloslawa WYBORSKA
 :C*:wp:: ; WordPress
 SendInput, {BackSpace 2}WordPress
 Return

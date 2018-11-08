@@ -578,6 +578,20 @@ APP_Explorer() {
 	}
 }
 
+#IfWinActive, ahk_class CabinetWClass
+^!f::
+APP_ExplorerFolderRename()
+Return
+
+APP_ExplorerFolderRename() {
+	SendInput, {F2}
+	Sleep, 50
+	SendInput, {Home}+{End}
+	SendInput, {Raw}Folder.jpg
+	SendInput, {Enter}
+}
+#IfWinActive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -893,6 +907,31 @@ APP_FolderJpg(PRM_MoveToUnknownFolderToo = false) {
 Esc:: ; Confirmer l’enregistrement ahk_class #32770, &Non
 SendInput, n
 Return
+#IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Image Resizer :
+;;;;;;;;;;;;;;;;;
+
+#IfWinActive, Image Resizer pour Windows
+
+Enter::
+APP_ImageResizerReturn()
+Return
+
+APP_ImageResizerReturn() {
+	CoordMode, Mouse, Screen
+	MouseGetPos, LOC_MouseX, LOC_MouseY
+	CoordMode, Mouse, Window
+	MouseClick, Left, 275, 325
+	Sleep, 50
+	CoordMode, Mouse, Screen
+	MouseMove, LOC_MouseX, LOC_MouseY
+}
+
 #IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2888,6 +2927,19 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Timecamp :
+;;;;;;;;;;;;
+
+#IfWinActive, Create task ahk_class #32770
+Enter::
+ControlClick, Button3, A
+Return
+#IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Android { Win + A } :
 ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2918,7 +2970,7 @@ APP_AndroidMouseTimer() {
 	STA_LastCheck := A_TickCount
 	MouseGetPos, , , LOC_WindowID
 	If (LOC_WindowID != Abs(STA_LastWindowID)) {
-		If (WinExist("Nox App Player ahk_class Qt5QWindowIcon ahk_id " . LOC_WindowID)) {
+		If (WinExist("NoxPlayer ahk_class Qt5QWindowIcon ahk_id " . LOC_WindowID)) {
 			AHK_SetCursor("Hand")
 			SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
 			STA_LastWindowID := LOC_WindowID
@@ -2927,7 +2979,7 @@ APP_AndroidMouseTimer() {
 				AHK_ResetCursor()
 			}
 			STA_LastWindowID := -LOC_WindowID
-			If (WinExist("Nox App Player ahk_class Qt5QWindowIcon")) {
+			If (WinExist("NoxPlayer ahk_class Qt5QWindowIcon")) {
 				SetTimer, APP_AndroidMouseTimer, %ZZZ_AndroidMouseTimer%
 			}
 		}
@@ -2935,7 +2987,7 @@ APP_AndroidMouseTimer() {
 	}
 }
 
-#IfWinActive, Nox App Player ahk_class Qt5QWindowIcon
+#IfWinActive, NoxPlayer ahk_class Qt5QWindowIcon
 RAlt::LAlt
 
 ; Back :
@@ -2971,6 +3023,9 @@ Return
 Down::
 SendInput, s
 APP_AndroidActivity(, true)
+Return
+~^WheelUp::
+~^WheelDown::
 Return
 
 ^+s::

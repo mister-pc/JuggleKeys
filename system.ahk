@@ -333,6 +333,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	; RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        DisableCAD, 1 ; disable Ctrl-Alt-Delete !
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        AllowMultipleTSSessions, 0 ; disable Fast User Switching
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        AutoRestartShell, 1 ; auto restart Explorer after crash
+	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        ScreenSaverGracePeriod, 900 ; number of seconds after which the screensaver locks the computer
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer,           ShowDriveLettersFirst, 1 ; show drive letters first
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer,           AlwaysUnloadDll, 1 ; unload no more used DLLs
 	RegWrite, REG_SZ,     HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer,           Max Cached Icons, 8192 ; icon cache file size (C:\Users\User-Name\AppData\Local\IconCache.db)

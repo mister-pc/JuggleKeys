@@ -369,8 +369,7 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 AHK_RunLockManager(PRM_Active = true) {
-	Global AHK_ScriptName
-	LOC_File := A_Temp . "\" . AHK_ScriptName . ".lock"
+	LOC_File := A_Temp . "\" . A_Username . ".lock"
 	
 	If (PRM_Active) {
 		If (FileExist(LOC_File)) {
@@ -783,7 +782,7 @@ Return
 
 AHK_SaveIniFile() {
 	Global
-	Local LOC_LogFile := A_ScriptDir . "\conf\" . AHK_ScriptName . ".log", LOC_Exception := false
+	Local LOC_LogFile := A_ScriptDir . "\conf\" . A_Username . ".log", LOC_Exception := false
 	SetTimer, AHK_CheckModificationsTimer, Off
 	
 	IniWrite, %AHK_Admin%, %AHK_IniFile%, Main, Admin
@@ -879,10 +878,8 @@ Return
 
 AHK_CheckModifications() {
 
-	Global AHK_ScriptName
-	
 	; Close current script if bad PID :
-	LOC_LockFile := A_Temp . "\" . AHK_ScriptName . ".lock"
+	LOC_LockFile := A_Temp . "\" . A_Username . ".lock"
 	If (FileExist(LOC_LockFile)) {
 		FileRead, LOC_ScriptID, %LOC_LockFile%
 		If (LOC_ScriptID != A_ScriptHwnd) {
@@ -898,10 +895,10 @@ AHK_CheckModifications() {
 
 	; Reload ini file if modified :
 	Try {
-		FileGetAttrib, LOC_Attributes, %A_ScriptDir%\conf\%AHK_ScriptName%.ini
+		FileGetAttrib, LOC_Attributes, %A_ScriptDir%\conf\%A_Username%.ini
 		If (InStr(LOC_Attributes, "A")) {
 			AHK_LoadIniFile()
-			FileSetAttrib, -A, %A_ScriptDir%\conf\%AHK_ScriptName%.ini
+			FileSetAttrib, -A, %A_ScriptDir%\conf\%A_Username%.ini
 		}
 	} Catch LOC_Exception {
 		AHK_Catch(LOC_Exception, "AHK_CheckModifications")
@@ -951,7 +948,7 @@ AHK_SetPeriodicCkeckTimers(PRM_Active = true) {
 	SetTimer, SYS_TaskbarCalendarPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_TaskbarCalendarPeriodicTimer)
 	SetTimer, SYS_GetCPUAndMemoryInfosPeriodicTimer, % (A_IsSuspended ? "Off" : SYS_CPURefreshTime)
 	SetTimer, SYS_StartButtonTooltipPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_StartButtonTooltipPeriodicTimer)
-	SetTimer, SYS_TaskbarClockPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_TaskbarClockPeriodicTimer)
+	SetTimer, SYS_TaskbarClockPeriodicTimer, % ZZZ_TaskbarClockPeriodicTimer
 	SetTimer, WIN_TransparencyPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_TransparencyPeriodicTimer)
 	SetTimer, SYS_StartMenuDisplayTimer, % (A_IsSuspended ? "Off" : ZZZ_StartMenuDisplayTimer)
 	SetTimer, WIN_OpenSaveDialogsPeriodicTimer, % (A_IsSuspended ? "Off" : ZZZ_OpenSaveDialogsPeriodicTimer)
@@ -974,7 +971,7 @@ Return
 
 AHK_Exit() {
 
-	Global AHK_ScriptName, AHK_ScriptInfo, ZZZ_ClosePreviousAHKInstanceTimer
+	Global AHK_ScriptInfo, ZZZ_ClosePreviousAHKInstanceTimer
 	AHK_Log("> AHK_Exit()")
 	Gui, 10:Destroy
 	Gui, 10:Font, s16

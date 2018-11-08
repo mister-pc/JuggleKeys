@@ -644,7 +644,7 @@ Return
 TXT_ExtendedCopyCutManager(PRM_ThisHotKey) {
 
 	Critical, On
-	Global TXT_ClipBoard, ZZZ_ClipBoardInitialized, AHK_ScriptName
+	Global TXT_ClipBoard, ZZZ_ClipBoardInitialized
 
 	LOC_ClipBoardAll := ClipBoardAll
 	LOC_ClipBoard := ClipBoard
@@ -1034,7 +1034,7 @@ Return
 TXT_PasteManager(PRM_ThisHotKey = "", PRM_Text = "") {
 
 	Critical, On
-	Global TXT_ClipBoard, AHK_ScriptName
+	Global TXT_ClipBoard
 	LOC_Alternate := LOC_Reload := false
 	LOC_ClipBoard := ClipBoardAll
 	If (PRM_Text != "") {
@@ -1279,7 +1279,7 @@ TXT_SetClipBoard(PRM_Value = "") {
 
 TXT_SaveAlternateClipBoard() {
 
-	Global TXT_ClipBoard, AHK_ScriptName, ZZZ_ClipBoardInitialized
+	Global TXT_ClipBoard, ZZZ_ClipBoardInitialized
 	Static STA_Writing := false
 	If (!TXT_ClipBoard) {
 		Return
@@ -1332,7 +1332,7 @@ TXT_ClipBoardHistoryManager(PRM_Operation = 1, PRM_AlternateClipBoard = false, P
 	; PRM_SelectedIndex       > 0    : set history index value into clipboard
 
 	Static STA_DataHistory := false, STA_TextHistory := false, STA_IsTextableHistory := false, STA_DateHistory := false, STA_LengthHistory := false, STA_Count := 50, STA_GuiID := 0, STA_InitDone := false
-	Global TXT_ClipBoard, AHK_ScriptName, AHK_ScriptInfo, AHK_LogsEnabled, AHK_DebugEnabled, ZZZ_HistorySelectedIndex := false
+	Global TXT_ClipBoard, AHK_ScriptInfo, AHK_LogsEnabled, AHK_DebugEnabled, ZZZ_HistorySelectedIndex := false
 
 	AHK_Log("> TXT_ClipBoardHistoryManager(" . PRM_Operation . ", " . PRM_AlternateClipBoard . ", " . PRM_AppendMode . ", " . PRM_RawTextMode . ", " . PRM_SelectedIndex . ")")
 	

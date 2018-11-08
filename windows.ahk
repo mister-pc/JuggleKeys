@@ -326,31 +326,33 @@ WIN_MiddleButton() {
 	; Thunderbird :
 	If (LOC_WindowClass == "MozillaWindowClass"
 		&& LOC_ProcessName == "thunderbird.exe") {
-		If (LOC_WindowTitle == "Agenda - Mozilla Thunderbird") { ; calendar
+		If (LOC_WindowTitle == "Agenda - Mozilla Thunderbird") { ; Calendar Lightning
 			Return
 		}
+		
 		If (RegExMatch(LOC_WindowTitle, "^[0-9]{1,} rappels?$")) { ; Thunderbird meeting recall
 			WinClose
 			AUD_Beep()
+			AHK_Debug("MButton on Thunderbird with ^[0-9]{1,} rappels?$")
 			WinActivate, ahk_id %LOC_ActiveWindowID%
 			Return
 		}
 		If (RegExMatch(LOC_WindowTitle, "^Rédaction")) { ; mail edition to close
 			SendInput, ^w
 			AUD_Beep()
+			AHK_Debug("MButton on Thunderbird with ^Rédaction")
 			WinActivate, ahk_id %LOC_ActiveWindowID%
 			Return
 		}
 		
-		SendInput, {Esc}^{F4}
-		Sleep, 500
-		WinGet, LOC_NewProcessName, ProcessName, A
-		WinGetTitle, LOC_NewWindowTitle, A
-		If (LOC_NewProcessName == LOC_ProcessName
-			&& LOC_NewWindowTitle == LOC_WindowTitle) { ; Still the same panel open ? Then it's not a single mail window => delete mail
+		If (RegExMatch(LOC_WindowTitle, "^.* - Dossiers locaux$")
+			|| RegExMatch(LOC_WindowTitle, "^Courrier entrant - .*$")) { ;
 			SendInput, {Esc}{Delete}
 			AHK_ShowToolTip("Mail deleted")
+			Return
 		}
+		
+		SendInput, {Esc}^{F4}
 		AUD_Beep()
 		WinActivate, ahk_id %LOC_ActiveWindowID%
 		Return
@@ -447,7 +449,7 @@ WIN_MiddleButton() {
 	}
 	
 	; Nox :
-	If (LOC_WindowTitle == "Nox App Player" 
+	If (LOC_WindowTitle == "NoxPlayer" 
 		&& LOC_WindowClass == "Qt5QWindowIcon") {
 		SetTimer, APP_AndroidActivityTimer, Off
 		Loop, 5 { ; GUI_AndroidActivity*
@@ -3495,7 +3497,7 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_SchoolCalendarCount := 0
 	If (WIN_IfWinActive(STA_SchoolCalendarCount, PRM_ParentTitle := "Pale Moon ahk_class MozillaWindowClass", PRM_WindowTitle := "Cahier de textes ahk_class MozillaWindowClass", PRM_WindowText := "", PRM_SecondsWaitingForParent := 5, PRM_SecondsWaitingAfterSuccess := 15)) {
 		Sleep, 500
-		SendInput, !d{Tab 6}5{Down}{Enter}
+		SendInput, !d{Tab 6}4{Down}{Enter}
 		Return
 	}
 	
@@ -3505,6 +3507,11 @@ WIN_BoringPopUpsPeriodicTimer() {
 		Return
 	}
 	
+	Static STA_BESCount := 0
+	If (WIN_IfWinActive(STA_BESCount, PRM_ParentTitle := "Quel processus (Target) souhaitez-vous limiter ahk_class #32770", PRM_WindowTitle := "Confirmation ahk_class #32770", PRM_WindowText := "BES limitera l'utilisation du CPU pour le processus suivant", PRM_SecondsWaitingForParent := 5, PRM_SecondsWaitingAfterSuccess := 1)) {
+		ControlClick, Button1 
+	}
+
 	Static STA_ActiveXCount := 0
 	If (WIN_IfWinActive(STA_ActiveXCount, PRM_ParentTitle := "Internet Explorer ahk_class IEFrame", PRM_WindowTitle := "Windows Internet Explorer", PRM_WindowText := "Au moins un contrôle ActiveX n’a pas pu être affiché", PRM_SecondsWaitingForParent := 5, PRM_SecondsWaitingAfterSuccess := 1)) {
 		WinClose
@@ -3551,7 +3558,12 @@ WIN_BoringPopUpsPeriodicTimer() {
 			;~ Return
 		;~ }
 	;~ }
-
+	
+	Static STA_MaxthonUpCount := 0
+	If (WIN_IfWinExist(STA_MaxthonUpCount, , PRM_WindowTitle := "Set Now ahk_class #32770", PRM_WindowText := "Set Now", , PRM_SecondsWaitingAfterSuccess := 5)) {
+		WinClose, %PRM_WindowTitle%, %PRM_WindowText%
+	}
+	
 	; Security :
 	;;;;;;;;;;;;
 	IfWinActive, Comodo Internet Security Premium ahk_class MainDialog
