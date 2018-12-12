@@ -195,6 +195,7 @@ Return
 SendInput, {Left}ant {Right}ue
 Return
 :*:tq'::{Left}{BackSpace}{Right} ; tant qu' (à partir de tant que')
+:*:tq&::{BackSpace 2}'un ; tant qu'un (à partir de tant que&)
 :*:tqa::{Left}{BackSpace}'{Right} ; tant qu'a (à partir de tant quea)
 :*:tqà::{Left}{BackSpace}'{Right} ; tant qu'à (à partir de tant queà)
 :*:tqe::{Left}{BackSpace}'{Right} ; tant qu'e (à partir de tant quee)
@@ -208,7 +209,8 @@ Return
 :*:bq:: ; bien que
 SendInput, {Left}ien {Right}ue
 Return
-:*:bq'::{Left}{BackSpace}{Right} ; bien qu' (à partir de tant que')
+:*:bq'::{Left}{BackSpace}{Right} ; bien qu' (à partir de bien que')
+:*:bq&::{BackSpace 2}'un ; bien qu'un (à partir de bien que&)
 :*:bqa::{Left}{BackSpace}'{Right} ; bien qu'a (à partir de bien quea)
 :*:bqà::{Left}{BackSpace}'{Right} ; bien qu'à (à partir de bien queà)
 :*:bqe::{Left}{BackSpace}'{Right} ; bien qu'e (à partir de bien quee)
@@ -228,6 +230,7 @@ Return
 SendInput, {Left 2}an{Right}is {Right}ue
 Return
 :*:tdq'::{Left}{BackSpace}{Right} ; tandis qu' (à partir de tandis que')
+:*:tdq&::{BackSpace 2}'un ; tandis qu'un (à partir de tandis que&)
 :*:tdqa::{Left}{BackSpace}'{Right} ; tandis qu'a (à partir de tandis quea)
 :*:tdqà::{Left}{BackSpace}'{Right} ; tandis qu'à (à partir de tandis queà)
 :*:tdqe::{Left}{BackSpace}'{Right} ; tandis qu'e (à partir de tandis quee)
@@ -242,6 +245,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:dpq'::{Left}{BackSpace}{Right} ; depuis qu' (à partir de depuis que')
+:*:dpq&::{BackSpace 2}'un ; depuis qu'un (à partir de depuis que&)
 :*:dpqa::{Left}{BackSpace}'{Right} ; depuis qu'a (à partir de depuis quea)
 :*:dpqà::{Left}{BackSpace}'{Right} ; depuis qu'à (à partir de depuis queà)
 :*:dpqe::{Left}{BackSpace}'{Right} ; depuis qu'e (à partir de depuis quee)
@@ -256,6 +260,7 @@ Return
 SendInput, {Left}ès {Right}ue
 Return
 :*:dq'::{Left}{BackSpace}{Right} ; dès qu' (à partir de dès que')
+:*:dq&::{BackSpace 2}'un ; dès qu'un (à partir de dès que&)
 :*:dqa::{Left}{BackSpace}'{Right} ; dès qu'a (à partir de dès quea)
 :*:dqà::{Left}{BackSpace}'{Right} ; dès qu'à (à partir de dès queà)
 :*:dqe::{Left}{BackSpace}'{Right} ; dès qu'e (à partir de dès quee)
@@ -270,6 +275,7 @@ Return
 SendInput, {Left 2}in{Right}i {Right}ue
 Return
 :*:asq'::{Left}{BackSpace}{Right} ; ainsi qu' (à partir de ainsi que')
+:*:asq&::{BackSpace 2}'un ; ainsi qu'un (à partir de ainsi que&)
 :*:asqa::{Left}{BackSpace}'{Right} ; ainsi qu'a (à partir de ainsi quea)
 :*:asqà::{Left}{BackSpace}'{Right} ; ainsi qu'à (à partir de ainsi queà)
 :*:asqe::{Left}{BackSpace}'{Right} ; ainsi qu'e (à partir de ainsi quee)
@@ -284,6 +290,7 @@ Return
 SendInput, {Left}ors {Right}ue
 Return
 :*:alq'::{Left}{BackSpace}{Right} ; alors qu' (à partir de alors que')
+:*:alq&::{BackSpace 2}'un ; alors qu'un (à partir de alors que&)
 :*:alqa::{Left}{BackSpace}'{Right} ; alors qu'a (à partir de alors quea)
 :*:alqà::{Left}{BackSpace}'{Right} ; alors qu'à (à partir de alors queà)
 :*:alqe::{Left}{BackSpace}'{Right} ; alors qu'e (à partir de alors quee)
@@ -298,6 +305,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:dlq'::{Left}{BackSpace}{Right} ; dès lors qu' (à partir de dès lors que')
+:*:dlq&::{BackSpace 2}'un ; dès lors qu'un (à partir de dès lors que&)
 :*:dlqa::{Left}{BackSpace}'{Right} ; dès lors qu'a (à partir de dès lors quea)
 :*:dlqà::{Left}{BackSpace}'{Right} ; dès lors qu'à (à partir de dès lors queà)
 :*:dlqe::{Left}{BackSpace}'{Right} ; dès lors qu'e (à partir de dès lors quee)
@@ -312,6 +320,7 @@ Return
 SendInput, {Left 2}en{Right}ant {Right}ue
 Return
 :*:pdq'::{Left}{BackSpace}{Right} ; pendant qu' (à partir de pendant que')
+:*:pdq&::{BackSpace 2}'un ; pendant qu'un (à partir de pendant que&)
 :*:pdqa::{Left}{BackSpace}'{Right} ; pendant qu'a (à partir de pendant quea)
 :*:pdqà::{Left}{BackSpace}'{Right} ; pendant qu'à (à partir de pendant queà)
 :*:pdqe::{Left}{BackSpace}'{Right} ; pendant qu'e (à partir de pendant quee)
@@ -326,6 +335,7 @@ Return
 SendInput, {Left}ors{Right}ue
 Return
 :*:lq'::{Left}{BackSpace}{Right} ; lorsqu' (à partir de lorsque')
+:*:lq&::{BackSpace 2}'un ; lorsqu'un (à partir de lorsque&)
 :*:lqa::{Left}{BackSpace}'{Right} ; lorsqu'a (à partir de lorsquea)
 :*:lqà::{Left}{BackSpace}'{Right} ; lorsqu'à (à partir de lorsqueà)
 :*:lqe::{Left}{BackSpace}'{Right} ; lorsqu'e (à partir de lorsquee)
@@ -340,6 +350,7 @@ Return
 SendInput, {Left 3}o{Right 3}ue
 Return
 :*:lrsq'::{Left}{BackSpace}{Right} ; lorsqu' (à partir de lorsque')
+:*:lrsq&::{BackSpace 2}'un ; lorsqu'un (à partir de lorsque&)
 :*:lrsqa::{Left}{BackSpace}'{Right} ; lorsqu'a (à partir de lorsquea)
 :*:lrsqà::{Left}{BackSpace}'{Right} ; lorsqu'à (à partir de lorsqueà)
 :*:lrsqe::{Left}{BackSpace}'{Right} ; lorsqu'e (à partir de lorsquee)
@@ -355,6 +366,7 @@ Return
 SendInput, {Left 2}{BackSpace}'à {Right}e {Right}ue
 Return
 :*:jqcq'::{Left}{BackSpace}{Right} ; jusqu'à ce qu' (à partir de jusqu'à ce que')
+:*:jqcq&::{BackSpace 2}'un ; jusqu'à ce qu'un (à partir de jusqu'à ce que&)
 :*:jqcqa::{Left}{BackSpace}'{Right} ; jusqu'à ce qu'a (à partir de jusqu'à ce quea)
 :*:jqcqà::{Left}{BackSpace}'{Right} ; jusqu'à ce qu'à (à partir de jusqu'à ce queà)
 :*:jqcqe::{Left}{BackSpace}'{Right} ; jusqu'à ce qu'e (à partir de jusqu'à ce quee)
@@ -372,6 +384,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:jsqcq'::{Left}{BackSpace}{Right} ; jusqu'à ce qu' (à partir de jusqu'à ce que')
+:*:jsqcq&::{BackSpace 2}'un ; jusqu'à ce qu'un (à partir de jusqu'à ce que&)
 :*:jsqcqa::{Left}{BackSpace}'{Right} ; jusqu'à ce qu'a (à partir de jusqu'à ce quea)
 :*:jsqcqà::{Left}{BackSpace}'{Right} ; jusqu'à ce qu'à (à partir de jusqu'à ce queà)
 :*:jsqcqe::{Left}{BackSpace}'{Right} ; jusqu'à ce qu'e (à partir de jusqu'à ce quee)
@@ -386,6 +399,7 @@ Return
 SendInput, {Left}rès {Right}ue
 Return
 :*:apq'::{Left}{BackSpace}{Right} ; après qu' (à partir de après que')
+:*:apq&::{BackSpace 2}'un ; après qu'un (à partir de après que&)
 :*:apqa::{Left}{BackSpace}'{Right} ; après qu'a (à partir de après quea)
 :*:apqà::{Left}{BackSpace}'{Right} ; après qu'à (à partir de après queà)
 :*:apqe::{Left}{BackSpace}'{Right} ; après qu'e (à partir de après quee)
@@ -399,7 +413,8 @@ Return
 :*:avq:: ; avant que
 SendInput, {Left}ant {Right}ue
 Return
-:*:avq'::{Left}{BackSpace}{Right} ; avant que' (à partir de avant que')
+:*:avq'::{Left}{BackSpace}{Right} ; avant qu' (à partir de avant que')
+:*:avq&::{BackSpace 2}'un ; avant qu'un (à partir de avant que&)
 :*:avqa::{Left}{BackSpace}'{Right} ; avant qu'a (à partir de avant quea)
 :*:avqà::{Left}{BackSpace}'{Right} ; avant qu'à (à partir de avant queà)
 :*:avqe::{Left}{BackSpace}'{Right} ; avant qu'e (à partir de avant quee)
@@ -414,6 +429,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:avtq'::{Left}{BackSpace}{Right} ; avant qu' (à partir de avant que')
+:*:avtq&::{BackSpace 2}'un ; avant qu'un (à partir de avant que&)
 :*:avtqa::{Left}{BackSpace}'{Right} ; avant qu'a (à partir de avant quea)
 :*:avtqà::{Left}{BackSpace}'{Right} ; avant qu'à (à partir de avant queà)
 :*:avtqe::{Left}{BackSpace}'{Right} ; avant qu'e (à partir de avant quee)
@@ -428,6 +444,7 @@ Return
 SendInput, {Left 2}ou{Right} {Right}ue
 Return
 :*:prq'::{Left}{BackSpace}{Right} ; pour qu' (à partir de pour que')
+:*:prq&::{BackSpace 2}'un ; pour qu'un (à partir de pour que&)
 :*:prqa::{Left}{BackSpace}'{Right} ; pour qu'a (à partir de pour quea)
 :*:prqà::{Left}{BackSpace}'{Right} ; pour qu'à (à partir de pour queà)
 :*:prqe::{Left}{BackSpace}'{Right} ; pour qu'e (à partir de pour quee)
@@ -442,6 +459,7 @@ Return
 SendInput, {Left}in {Right}ue
 Return
 :*:afq'::{Left}{BackSpace}{Right} ; afin qu' (à partir de afin que')
+:*:afq&::{BackSpace 2}'un ; afin qu'un (à partir de afin que&)
 :*:afqa::{Left}{BackSpace}'{Right} ; afin qu'a (à partir de afin quea)
 :*:afqà::{Left}{BackSpace}'{Right} ; afin qu'à (à partir de afin queà)
 :*:afqe::{Left}{BackSpace}'{Right} ; afin qu'e (à partir de afin quee)
@@ -456,6 +474,7 @@ Return
 SendInput, {Left 2}e{Right}on {Right}ue
 Return
 :*:slq'::{Left}{BackSpace}{Right} ; selon qu' (à partir de selon que')
+:*:slq&::{BackSpace 2}'un ; selon qu'un (à partir de selon que&)
 :*:slqa::{Left}{BackSpace}'{Right} ; selon qu'a (à partir de selon quea)
 :*:slqà::{Left}{BackSpace}'{Right} ; selon qu'à (à partir de selon queà)
 :*:slqe::{Left}{BackSpace}'{Right} ; selon qu'e (à partir de selon quee)
@@ -470,6 +489,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:mgq'::{Left}{BackSpace}{Right} ; malgré qu' (à partir de malgré que')
+:*:mgq&::{BackSpace 2}'un ; malgré qu'un (à partir de malgré que&)
 :*:mgqa::{Left}{BackSpace}'{Right} ; malgré qu'a (à partir de malgré quea)
 :*:mgqà::{Left}{BackSpace}'{Right} ; malgré qu'à (à partir de malgré queà)
 :*:mgqe::{Left}{BackSpace}'{Right} ; malgré qu'e (à partir de malgré quee)
@@ -484,6 +504,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:sfq'::{Left}{BackSpace}{Right} ; sauf qu' (à partir de sauf que')
+:*:sfq&::{BackSpace 2}'un ; sauf qu'un (à partir de sauf que&)
 :*:sfqa::{Left}{BackSpace}'{Right} ; sauf qu'a (à partir de sauf quea)
 :*:sfqà::{Left}{BackSpace}'{Right} ; sauf qu'à (à partir de sauf queà)
 :*:sfqe::{Left}{BackSpace}'{Right} ; sauf qu'e (à partir de sauf quee)
@@ -503,6 +524,7 @@ Return
 SendInput, ue
 Return
 :*:psq'::{Left}{BackSpace}{Right} ; puisqu' (à partir de puisque')
+:*:psq&::{BackSpace 2}'un ; puisqu'un (à partir de puisque&)
 :*:psqa::{Left}{BackSpace}'{Right} ; puisqu'a (à partir de puisquea)
 :*:psqà::{Left}{BackSpace}'{Right} ; puisqu'à (à partir de puisqueà)
 :*:psqe::{Left}{BackSpace}'{Right} ; puisqu'e (à partir de puisquee)
@@ -517,6 +539,7 @@ Return
 SendInput, {Left 2}ar{Right}e {Right}ue
 Return
 :*:pcq'::{Left}{BackSpace}{Right} ; parce qu' (à partir de parce que')
+:*:pcq&::{BackSpace 2}'un ; parce qu'un (à partir de parce que&)
 :*:pcqa::{Left}{BackSpace}'{Right} ; parce qu'a (à partir de parce quea)
 :*:pcqà::{Left}{BackSpace}'{Right} ; parce qu'à (à partir de parce queà)
 :*:pcqe::{Left}{BackSpace}'{Right} ; parce qu'e (à partir de parce quee)
@@ -531,6 +554,7 @@ Return
 SendInput, {Left} {Right}ue
 Return
 :*:ssq'::{Left}{BackSpace}{Right} ; sans qu' (à partir de sans que')
+:*:ssq&::{BackSpace 2}'un ; sans qu'un (à partir de sans que&)
 :*:ssqa::{Left}{BackSpace}'{Right} ; sans qu'a (à partir de sans quea)
 :*:ssqà::{Left}{BackSpace}'{Right} ; sans qu'à (à partir de sans queà)
 :*:ssqe::{Left}{BackSpace}'{Right} ; sans qu'e (à partir de sans quee)
@@ -577,6 +601,7 @@ Return
 :C*:Sq:: ; Est-ce que
 SendInput, {Left}{BackSpace}Est-ce {Right}ue
 Return
+:*:sq&::{BackSpace 2}'un ; est-ce qu'un (à partir de est-ce que&)
 :*:sq'::{Left}{BackSpace}{Right} ; est-ce qu' (à partir de est-ce que')
 :*:sqa::{Left}{BackSpace}'{Right} ; est-ce qu'a (à partir de est-ce quea)
 :*:sqà::{Left}{BackSpace}'{Right} ; est-ce qu'à (à partir de est-ce queà)
@@ -598,6 +623,7 @@ Return
 :C*:Scq:: ; Est-ce que
 SendInput, {Left 2}{BackSpace}Est-{Right}e {Right}ue
 Return
+:*:scq&::{BackSpace 2}'un ; est-ce qu'un (à partir de est-ce que&)
 :*:scq'::{Left}{BackSpace}{Right} ; est-ce qu' (à partir de est-ce que')
 :*:scqa::{Left}{BackSpace}'{Right} ; est-ce qu'a (à partir de est-ce quea)
 :*:scqà::{Left}{BackSpace}'{Right} ; est-ce qu'à (à partir de est-ce queà)
@@ -611,6 +637,7 @@ Return
 :*:scqy::{Left}{BackSpace}'{Right} ; est-ce qu'y (à partir de est-ce quey):*:ecq:: ; est-ce que
 SendInput, {Left 2}st-{Right}e {Right}ue
 Return
+:*:ecq&::{BackSpace 2}'un ; est-ce qu'un (à partir de est-ce que&)
 :*:ecq'::{Left}{BackSpace}{Right} ; est-ce qu' (à partir de est-ce que')
 :*:ecqa::{Left}{BackSpace}'{Right} ; est-ce qu'a (à partir de est-ce quea)
 :*:ecqà::{Left}{BackSpace}'{Right} ; est-ce qu'à (à partir de est-ce queà)
@@ -625,7 +652,8 @@ Return
 :*:qcq:: ; qu'est-ce que (à partir de quelque choseq)
 SendInput, {Left 2}{BackSpace 3}{Left}{BackSpace 5}{Left}'{right}st-{Right 2} {Right}ue
 Return
-:*:qcq'::{Left}{BackSpace}{Right} ; qu'est-ce que (à partir de qu'est-ce que')
+:*:qcq&::{BackSpace 2}'un ; qu'est-ce qu'un (à partir de qu'est-ce que&)
+:*:qcq'::{Left}{BackSpace}{Right} ; qu'est-ce qu' (à partir de qu'est-ce que')
 :*:qcqa::{Left}{BackSpace}'{Right} ; qu'est-ce qu'a (à partir de qu'est-ce quea)
 :*:qcqà::{Left}{BackSpace}'{Right} ; qu'est-ce qu'à (à partir de qu'est-ce queà)
 :*:qcqe::{Left}{BackSpace}'{Right} ; qu'est-ce qu'e (à partir de qu'est-ce quee)
