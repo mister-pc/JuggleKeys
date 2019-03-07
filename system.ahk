@@ -360,32 +360,32 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	; Set logon background from media\logon*.jpg :
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background, OEMBackground, 1 ; change logon background
-	LOC_BackgroundA := Array()
-	, LOC_FullBackgroundA := Array()
-	, LOC_LogonCount := 0
-	Loop, Files, %A_ScriptDir%\media\logon*.jpg
-	{
-		LOC_BackgroundA[A_Index] := A_LoopFileName
-		, LOC_FullBackgroundA[A_Index] := A_LoopFileLongPath
-		, LOC_LogonCount++
-	}
-	If (LOC_LogonCount) {
-		Random, LOC_LogonIndex, 1, LOC_LogonCount
-		LOC_File := LOC_BackgroundA[LOC_LogonIndex]
-		, LOC_FullFile := LOC_FullBackgroundA[LOC_LogonIndex]
-		APP_RunAs()
-		FileCreateDir, %A_WinDir%\System32\oobe\info\backgrounds
-		Try {
-			;MsgBox, xcopy /r /h /y /i "%LOC_FullFile%" "%A_WinDir%\System32\oobe\info\backgrounds"
-			RunWait, xcopy /r /h /y /i "%LOC_FullFile%" "%A_WinDir%\System32\oobe\info\backgrounds", , Hide ; TODO : ne marche pas
-			;MsgBox, ren "%A_WinDir%\System32\oobe\info\backgrounds\%LOC_File%" "backgroundDefault.jpg"
-			Run, ren "%A_WinDir%\System32\oobe\info\backgrounds\%LOC_File%" "backgroundDefault.jpg", , Hide ; TODO : ne marche pas
-		} Catch LOC_Exception {
-			AHK_Catch(LOC_Exception, "SYS_WriteRegistryOptions", PRM_KillRegServer)
-		}
-		RunAs
-	}
+	;~ RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background, OEMBackground, 1 ; change logon background
+	;~ LOC_BackgroundA := Array()
+	;~ , LOC_FullBackgroundA := Array()
+	;~ , LOC_LogonCount := 0
+	;~ Loop, Files, %A_ScriptDir%\media\logon*.jpg
+	;~ {
+		;~ LOC_BackgroundA[A_Index] := A_LoopFileName
+		;~ , LOC_FullBackgroundA[A_Index] := A_LoopFileLongPath
+		;~ , LOC_LogonCount++
+	;~ }
+	;~ If (LOC_LogonCount) {
+		;~ Random, LOC_LogonIndex, 1, LOC_LogonCount
+		;~ LOC_File := LOC_BackgroundA[LOC_LogonIndex]
+		;~ , LOC_FullFile := LOC_FullBackgroundA[LOC_LogonIndex]
+		;~ APP_RunAs()
+		;~ FileCreateDir, %A_WinDir%\System32\oobe\info\backgrounds
+		;~ Try {
+			;~ ;MsgBox, xcopy /r /h /y /i "%LOC_FullFile%" "%A_WinDir%\System32\oobe\info\backgrounds"
+			;~ RunWait, xcopy /r /h /y /i "%LOC_FullFile%" "%A_WinDir%\System32\oobe\info\backgrounds", , Hide ; TODO : ne marche pas
+			;~ ;MsgBox, ren "%A_WinDir%\System32\oobe\info\backgrounds\%LOC_File%" "backgroundDefault.jpg"
+			;~ Run, ren "%A_WinDir%\System32\oobe\info\backgrounds\%LOC_File%" "backgroundDefault.jpg", , Hide ; TODO : ne marche pas
+		;~ } Catch LOC_Exception {
+			;~ AHK_Catch(LOC_Exception, "SYS_WriteRegistryOptions", PRM_KillRegServer)
+		;~ }
+		;~ RunAs
+	;~ }
 
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
