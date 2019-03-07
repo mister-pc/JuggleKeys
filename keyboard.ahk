@@ -10,7 +10,7 @@ KBD_Init() {
 	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Mouse, MouseSpeed, 1
 	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Mouse, MouseTrails, 2
 	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Mouse, SnapToDefaultButton, 1
-	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Keyboard, InitialKeyboardIndicators, 2
+	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Keyboard, InitialKeyboardIndicators, 2 ; NumLock on
 	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Keyboard, KeyboardDelay, 1
 	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Keyboard, KeyboardSpeed, 31
 	RegWrite, REG_SZ, HKEY_CURRENT_USER, Control Panel\Keyboard, KeyboardDataQueueSize, 65536

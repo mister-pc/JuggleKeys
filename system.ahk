@@ -254,7 +254,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoSMMyPictures, 1 ; no image menu
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoSMConfigurePrograms, 1 ; no program configuration menu
 	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoStartMenuMorePrograms, 1 ; no programs in start menu
-	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoLogoff, 1 ; no log-off menu
+	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoLogoff, 1 ; no log-off menu
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoInstrumentation, 1 ; disable user tracking
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoRecentDocsMenu, 1 ; no start menu recent documents
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoStartBanner, 1 ; no message 'click here to start' on start button
@@ -264,8 +264,8 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoRun, % (A_Is64BitOS ? 0 : 1) ; no run menu
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoSMHelp, 1 ; no help in start menu
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           MemCheckBoxInRunDlg, 1 ; checkbox in exexute dialog for separated memory execution
-	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           ForceStartMenuLogOff, 0 ; no log-off in start menu
-	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           StartMenuLogOff, 1 ; no log-off in start menu
+	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           ForceStartMenuLogOff, 0 ; no log-off in start menu
+	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           StartMenuLogOff, 1 ; no log-off in start menu
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoAutoTrayNotify, 1 ; no systray auto-hiding
 	RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,           NoTaskGrouping, 0 ; taskbar grouping
 	; RegWrite, REG_DWORD,  HKEY_CURRENT_USER,  Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,         NoToolbarsOnTaskbar, 1 ; no toolbars on taskbar
@@ -333,7 +333,7 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	; RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        DisableCAD, 1 ; disable Ctrl-Alt-Delete !
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        AllowMultipleTSSessions, 0 ; disable Fast User Switching
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        AutoRestartShell, 1 ; auto restart Explorer after crash
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        ScreenSaverGracePeriod, 900 ; number of seconds after which the screensaver locks the computer
+	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon,        ScreenSaverGracePeriod, 15 ; number of seconds after which the screensaver locks the computer
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer,           ShowDriveLettersFirst, 1 ; show drive letters first
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer,           AlwaysUnloadDll, 1 ; unload no more used DLLs
 	RegWrite, REG_SZ,     HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Explorer,           Max Cached Icons, 8192 ; icon cache file size (C:\Users\User-Name\AppData\Local\IconCache.db)
@@ -352,8 +352,8 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  ForceClassicControlPanel, 1 ; classic control panel
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  NoSetActiveDesktop, 1 ; no active desktop
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  NoShellSearchButton, 1 ; no start menu search
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  StartMenuLogOff, 1 ; no log-off in start menu
-	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  ForceStartMenuLogOff, 0 ; no log-off in start menu
+	; RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  StartMenuLogOff, 1 ; no log-off in start menu
+	; RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, Software\Microsoft\Windows\CurrentVersion\Policies\Explorer,  ForceStartMenuLogOff, 0 ; no log-off in start menu
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Policies\Microsoft\Messenger\Client,                 PreventAutoRun, 1 ; prevent messenger from being run
 	RegWrite, REG_DWORD,  HKEY_LOCAL_MACHINE, SOFTWARE\Policies\Microsoft\Messenger\Client,                 PreventRun, 1 ; prevent messenger from being run
 
@@ -882,6 +882,7 @@ SYS_StartButtonTooltipPeriodicTimer(PRM_TotalMemory = -1, PRM_MemoryRatio = -1, 
 					|| !A_Is64bitOS && LOC_ControlClass == "Button1")
 			|| LOC_WindowClass == "ClassicShell.CStartButton"
 			|| LOC_WindowClass == "ClassicShell.CMenuContainer"
+			|| SubStr(LOC_WindowClass, 1, 20) == "DFTaskbarStartButton"
 			|| A_Is64bitOS
 				&& LOC_WindowClass == "DV2ControlHost"
 				&& LOC_WindowTitle != "Liste de raccourcis"

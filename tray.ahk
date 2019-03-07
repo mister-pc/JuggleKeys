@@ -809,7 +809,7 @@ TRY_InitMenus() {
 	}
 	TRY_AddMenuItem("Applications", "           Win +           C`t&Calculator", "APP_Calculator", "system32\calc.exe")
 	If (APP_DirectoryOpusPath) {
-		TRY_AddMenuItem("Applications", "           Win +           E`tDirectory &Opus", "APP_DOpus", APP_DirectoryOpusPath)
+		TRY_AddMenuItem("Applications", " Alt + Win +           E`tDirectory &Opus", "APP_DOpus", APP_DirectoryOpusPath)
 	} Else {
 		TRY_AddMenuItem("Applications", "           Win +           E`t&Explorer", "APP_DOpus", "explorer.exe")
 	}

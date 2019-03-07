@@ -153,6 +153,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "SnagIt9Editor" && LOC_WindowTitle != "Editeur Snagit" ; Snag-It document
 		|| LOC_WindowClass == "SciTEWindow" ; SCiTE editor
 		|| LOC_WindowClass == "SunAwtFrame" && InStr(LOC_WindowTitle, "SQL Developer") ; SQL Developer
+		|| LOC_WindowClass == "SWT_Window0" ; Eclipse
 		|| LOC_WindowClass == "Maxthon3Cls_MainFrm") { ; Maxthon
 		SendInput, ^{F4}
 		AUD_Beep()
@@ -206,7 +207,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "TAIDA64" ; Aida 64
 		|| LOC_WindowClass == "rctrl_renwnd32" ; Outlook message view
 		|| LOC_WindowClass == "IMWindowClass" ; Lync chat window
-		|| LOC_WindowClass == "SWT_Window0" && InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect") ; Sametime
+		; || LOC_WindowClass == "SWT_Window0" && InStr(LOC_WindowTitle, "IBM Lotus Sametime Connect") ; Sametime
 		|| LOC_WindowClass == "tSkMainForm" ; Skype
 		|| LOC_WindowClass == "TConversationForm") { ; Skype
 		SendInput, !{F4}
@@ -345,8 +346,8 @@ WIN_MiddleButton() {
 			Return
 		}
 		
-		If (RegExMatch(LOC_WindowTitle, "^.* - Dossiers locaux$")
-			|| RegExMatch(LOC_WindowTitle, "^Courrier entrant - .*$")) { ;
+		If (InStr(LOC_WindowTitle, " - Dossiers locaux")
+			|| InStr(LOC_WindowTitle, "Courrier entrant - ")) { ;
 			SendInput, {Esc}{Delete}
 			AHK_ShowToolTip("Mail deleted")
 			Return

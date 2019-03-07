@@ -58,7 +58,7 @@ SYS_WheelAccelerate() {
 
 SYS_WheelUp(PRM_Cancel = false) {
 	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
+	Static STA_Cancel := false, STA_Windows10 := (SubStr(A_OSVersion, 1, 3) != "WIN")
 	STA_Cancel := PRM_Cancel
 	If (PRM_Cancel) {
 		Return
@@ -74,7 +74,9 @@ SYS_WheelUp(PRM_Cancel = false) {
 		If (STA_Cancel) {
 			Return
 		}
-		If (LOC_UltraEdit) {
+		If (STA_Windows10) {
+			SendInput, {WheelUp}
+		} Else If (LOC_UltraEdit) {
 			ControlSend, %LOC_ControlClass%, {WheelUp}, ahk_id %LOC_HoveredWindowID%
 		} Else {
 			PostMessage, 0x20A, 120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
@@ -87,7 +89,7 @@ SYS_WheelUp(PRM_Cancel = false) {
 
 SYS_WheelDown(PRM_Cancel = false) {
 	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
+	Static STA_Cancel := false, STA_Windows10 := (SubStr(A_OSVersion, 1, 3) != "WIN")
 	STA_Cancel := PRM_Cancel
 	If (PRM_Cancel) {
 		Return
@@ -103,7 +105,9 @@ SYS_WheelDown(PRM_Cancel = false) {
 		If (STA_Cancel) {
 			Return
 		}
-		If (LOC_UltraEdit) {
+		If (STA_Windows10) {
+			SendInput, {WheelDown}
+		} Else If (LOC_UltraEdit) {
 			ControlSend, %LOC_ControlClass%, {WheelDown}, ahk_id %LOC_HoveredWindowID%
 		} Else {
 			PostMessage, 0x20A, -120 << 16, (LOC_MouseY << 16) | (LOC_MouseX & 0xFFFF), %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
@@ -115,13 +119,13 @@ SYS_WheelDown(PRM_Cancel = false) {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 WheelLeft::
-^WheelUp::
++WheelUp::
 SYS_WheelLeft()
 Return
 
 SYS_WheelLeft(PRM_Cancel = false) {
 	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
+	Static STA_Cancel := false, STA_Windows10 := (SubStr(A_OSVersion, 1, 3) != "WIN")
 	STA_Cancel := PRM_Cancel
 	If (PRM_Cancel) {
 		Return
@@ -134,20 +138,28 @@ SYS_WheelLeft(PRM_Cancel = false) {
 		If (STA_Cancel) {
 			Return
 		}
-		SendMessage, 0x114, 0, 0, %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
+		If (STA_Windows10) {
+			If (A_ThisHotKey == "WheelLeft") {
+				SendInput, {WheelLeft}
+			} Else {
+				SendInput, +{WheelUp}
+			}
+		} Else {
+			SendMessage, 0x114, 0, 0, %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
+		}
 	}
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 WheelRight::
-^WheelDown::
++WheelDown::
 SYS_WheelRight()
 Return
 
 SYS_WheelRight(PRM_Cancel = false) {
 	Global ZZZ_ScrollAcceleration
-	Static STA_Cancel := false
+	Static STA_Cancel := false, STA_Windows10 := (SubStr(A_OSVersion, 1, 3) != "WIN")
 	STA_Cancel := PRM_Cancel
 	If (PRM_Cancel) {
 		Return
@@ -160,7 +172,15 @@ SYS_WheelRight(PRM_Cancel = false) {
 		If (STA_Cancel) {
 			Return
 		}
-		SendMessage, 0x114, 1, 0, %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
+		If (STA_Windows10) {
+			If (A_ThisHotKey == "WheelRight") {
+				SendInput, {WheelRight}
+			} Else {
+				SendInput, +{WheelDown}
+			}
+		} Else {
+			SendMessage, 0x114, 1, 0, %LOC_ControlClass%, ahk_id %LOC_HoveredWindowID%
+		}
 	}
 }
 

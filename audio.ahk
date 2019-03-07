@@ -363,7 +363,9 @@ AUD_Mute(PRM_TrayTip = true) {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 AUD_FadeIn() {
-
+	;; TODO : AUD_FadeIn()
+	Return
+	
 	Global AUD_MasterVolume, AUD_WaveVolume
 	LOC_MuteState := AUD_SoundGet("", "Mute")
 	If (LOC_MuteState == "On") {
@@ -402,7 +404,9 @@ AUD_FadeIn() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 AUD_FadeOut() {
-
+	;; TODO : AUD_FadeOut()
+	Return
+	
 	Global AUD_MasterVolume, AUD_WaveVolume
 	LOC_MuteState := AUD_SoundGet("", "Mute")
 	If (LOC_MuteState == "On") {

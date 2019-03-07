@@ -29,6 +29,7 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, Edit Text ahk_class #32770 ; SnagIt
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class DSUI:PDFXCViewer ; PDF-XChange
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class Sticky_Notes_Note_Window ; Windows 7 Sticky Notes
+	GroupAdd, HOT_HotstringsWindowsGroup, OneNote ahk_class Framework::CFrame ; OneNote
 	GroupAdd, HOT_HotstringsWindowsGroup, KGS ahk_class SunAwtFrame ; KGS
 	GroupAdd, HOT_HotstringsWindowsGroup, NoxPlayer ahk_class Qt5QWindowIcon ; Nox
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class WordPadClass ; WordPad
@@ -42,6 +43,7 @@ HOT_InitGroups() {
 	GroupAdd, HOT_IgnoringWindows, ahk_class Shell_TrayWnd
 	GroupAdd, HOT_IgnoringWindows, ahk_class VistaSwitcher_SwitcherWnd
 	GroupAdd, HOT_IgnoringWindows, ahk_class AutoHotkeyGUI
+	GroupAdd, HOT_IgnoringWindows, TimeCamp ahk_class wxWindowNR ; TimeCamp small bar
 	AHK_CapsLockTickCount := 0
 }
 
@@ -690,6 +692,9 @@ Return
 :C:v::{BackSpace}ais ; vais
 
 ::fre::{BackSpace}{Left 2}ai{Right 2} ; faire
+::défre::{BackSpace}{Left 2}ai{Right 2} ; défaire
+::refre::{BackSpace}{Left 2}ai{Right 2} ; refaire
+::parfre::{BackSpace}{Left 2}ai{Right 2} ; parfaire
 ::fé::{BackSpace 2}ait ; fait
 ::fo::{BackSpace 2}aut ; faut
 :C*:ft:: ; font
@@ -1139,6 +1144,8 @@ Return
 :C*:qc:: ; quelque chose
 SendInput, {Left}uelque {Right}hose
 Return
+:C*:qcs::{Left 7}s{Right 7} ; quelques choses (à partir de quelque choses)
+:C*:Qcs::{Left 7}s{Right 7} ; quelques choses (à partir de quelque choses)
 :C*:Qc:: ; Quelque chose
 SendInput, {Left}uelque {Right}hose
 Return
@@ -1196,7 +1203,9 @@ Return
 :*:mv:: ; mauvais
 SendInput, {Left}au{Right}ais
 Return
-:?*:vulg:: ; vulg (pour éviter vulong)
+:*:vulg:: ; vulg (pour éviter vulong)
+Return
+:*:indulg:: ; indulg (pour éviter indulong)
 Return
 :?*:lg:: ; long
 SendInput, {Left}on{Right}
@@ -1240,7 +1249,10 @@ Return
 ; Things :
 ;;;;;;;;;;
 
-:*:msg::{Left 2}{BackSpace 2}es{Right}a{Right}e ; message (à partir de maisg)
+:*:msg:: ; message (à partir de maisg)
+SendInput, {Left 2}{BackSpace 2}es{Right}a{Right}e
+Return
+:*:msge::{BackSpace} ; message (à partir de messagee)
 :*:pj:: ; pièce jointe
 SendInput, {Left}ièce {Right}ointe
 Return
@@ -1291,7 +1303,7 @@ Return
 :?*:oeur::{Left 2}{BackSpace 2}œ{Right 2} ; œur
 :C?*:oeuvr::{Left 3}{BackSpace 2}œ{Right 3} ; œuvre
 :C?*:Oeuvr::{Left 3}{BackSpace 2}Œ{Right 3} ; Œuvre
-:*:voeu::{Left 2}{BackSpace 2}œ{Right 2} ; vœu
+:*:voeu::{Left}{BackSpace 2}œ{Right} ; vœu
 :C*:oeil::{Left 2}{BackSpace 2}œ{Right 2} ; œil
 :C*:Oeil::{Left 2}{BackSpace 2}Œ{Right 2} ; Œil
 :*:oeno::{Left 2}{BackSpace 2}œ{Right 2} ; œno
@@ -1329,6 +1341,7 @@ Return
 ::prop::{BackSpace}osition ; proposition
 ::props::{BackSpace}{Left}osition{Right} ; propositions
 ::propo::{BackSpace}sition ; proposition
+:*:souah::{BackSpace}{Left}h{Right} ; souha
 ::proba::{BackSpace}bilité ; probabilité
 ::probas::{BackSpace}{Left}bilité{Right} ; probabilités
 :*:tx:: ; taux
@@ -1394,6 +1407,9 @@ Return
 :*:prog:: ; programm
 SendInput, ramm
 Return
+:*:prog ::{Left}e{Right} ; programme (à partir de programm )
+:*:prog,::{Left}e{Right} ; programme, (à partir de programm,)
+:*:progs::{Left}e{Right} ; programmes (à partir de programms)
 :*:progr::{BackSpace 4} ; progr (à partir de programmr)
 :*:progén::{Left 2}{BackSpace 4}{Right 2} ; progén (à partir de programmén)
 :*:cpu::{Left 2}{BackSpace 2}{Right 2} ; cpu (à partir de coupu)
@@ -1605,6 +1621,7 @@ Return
 ; :C*:bb::{Left}Ül{Right}Ül ; bÜlbÜl
 :*:km.org::{Left 5}amea{Right}eahfilms{Right 4} ; kameameahfilms.org
 :*:kmf::{BackSpace 3}Kamea Meah Films ; Kamea Meah Films
+:*:eqds.com::{Left 7}n{Right}uete{Right}e{Right}ens-lefilm{Right 4} ; enquetedesens-lefilm.com
 :*:bàbs::{Left}{BackSpace 3}{Left}{BackSpace}{Left}{BackSpace 5}{Right 3} ; BàBs (à partir de Bande à Balks)
 :C*:alodb:: ; À l'Ouest des Balkans
 SendInput, {BackSpace}{Left}{BackSpace}{Left}{BackSpace}À {Right}'Ouest {Right}es Balkans
