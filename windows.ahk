@@ -174,6 +174,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "TFImage" ; Media Monkey album image
 		|| LOC_WindowClass == "wxWindowNR" ; FileZilla
 		|| LOC_WindowClass == "TkTopLevel" ; GitK
+		|| LOC_WindowClass == "ApplicationFrameWindow" && LOC_WindowTitle == "Films et TV" ; Films & TV
 		|| LOC_WindowClass == "HH Parent" ; Windows CHTML file
 		|| LOC_WindowClass == "AutoHotkeyGUI" ; AHK self windows
 			&& (LOC_WindowTitle == "WindowSpy"
