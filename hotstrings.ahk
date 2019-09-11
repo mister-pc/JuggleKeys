@@ -1633,18 +1633,12 @@ Return
 :C*:wp-::{Left}{BackSpace 9}wp{Right} ; wp- (‡ partir de WordPress-)
 :C*:WP-::{Left}{BackSpace 4}{Left}{BackSpace 3}{Right 2} ; WP- (‡ partir de WordPress-)
 :*:mkw::{BackSpace} WYBORSKA ; Miuka WYBORSKA (‡ partir de Miukaw)
-:*:b‡b:: ; Bande ‡ Balk
-SendInput, {BackSpace}{Left}{BackSpace}Bande {Right} Balk
 Return
-; :C*:bb::{Left}‹l{Right}‹l ; b‹lb‹l
 :*:km.org::{Left 5}amea{Right}eahfilms{Right 4} ; kameameahfilms.org
 :*:kmf::{BackSpace 3}Kamea Meah Films ; Kamea Meah Films
 :*:eqds.com::{Left 7}n{Right}uete{Right}e{Right}ens-lefilm{Right 4} ; enquetedesens-lefilm.com
-:*:b‡bs::{Left}{BackSpace 3}{Left}{BackSpace}{Left}{BackSpace 5}{Right 3} ; B‡Bs (‡ partir de Bande ‡ Balks)
-:C*:alodb:: ; ¿ l'Ouest des Balkans
-SendInput, {BackSpace}{Left}{BackSpace}{Left}{BackSpace}¿ {Right}'Ouest {Right}es Balkans
-Return
-:C*:alodb.org::{Left 4}{BackSpace 21}alodb{Right 4} ; alodb.org (‡ partir de ¿ l'Ouest des Balkans.org)
+:C*:LTdS::{Left 3}es {Right}errasses {Right}e {Right}aillans ; Les Terrasses de Saillans
+:C*:ltds::{Left 3}es-{Right}errasses-{Right}e-{Right}aillans.fr ; les-terrasses-de-saillans.fr
 :*:slt::{Left 2}a{Right}u{Right} ; salut
 :*:‡b::{Left}{BackSpace}¿ {Right}ientÙt ; ¿ bientÙt
 :*:bs:: ; bises

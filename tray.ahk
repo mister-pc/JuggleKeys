@@ -444,10 +444,7 @@ TRY_InitMenus() {
 
 	Menu, Various, Add, ab`tArnaud BeLO., TRY_TrayMenuHotstring
 	Menu, Various, Add, AB`tArnaud BELONOSCHKIN, TRY_TrayMenuHotstring
-	Menu, Various, Add, mkw`tMiuka WYBORSKA, TRY_TrayMenuHotstring
-	Menu, Various, Add, b‡b`tBande ‡ Balk, TRY_TrayMenuHotstring
-	Menu, Various, Add, alodb`t¿ l'Ouest des Balkans, TRY_TrayMenuHotstring
-	Menu, Various, Add, bb`tb‹lb‹l, TRY_TrayMenuHotstring
+	Menu, Various, Add, MW`tMiuka WYBORSKA, TRY_TrayMenuHotstring
 	Menu, Various, Add, slt`tsalut, TRY_TrayMenuHotstring
 	Menu, Various, Add, bjr`tbonjour, TRY_TrayMenuHotstring
 	Menu, Various, Add, ‡b`t¿ bientÙt, TRY_TrayMenuHotstring
