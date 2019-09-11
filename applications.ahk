@@ -416,11 +416,25 @@ MsgBox, Launched ?
 Return
 
 #IfWinActive, ahk_class mintty
-RButton::
 ^v::
 ^+v::
 SendInput, +{Insert}
 Return
+
+RButton::
+APP_BashRButton()
+Return
+
+APP_BashRButton() {
+	MouseGetPos, , , LOC_WindowID, LOC_Control
+	WinActivate, ahk_id %LOC_WindowID%
+	WinGetClass, LOC_WindowClass
+	If (LOC_WindowClass == "mintty") {
+		SendInput, +{Insert}
+	} Else {
+		MouseClick, Right
+	}
+}
 #IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -432,7 +446,7 @@ Return
 
 APP_Calculator:
 #c::
-APP_Run("Calculator", A_WinDir . "\system32\calc.exe", , , , false)
+APP_Run("Calculator", APP_CalculatorPath, , , false, false)
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -637,8 +651,8 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Firefox { Win + I } [ Ctrl : Safe mode ] [ Shift : Full rights ] :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Firefox { Win + I } [ Alt | Shit : Safe mode ] :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 APP_TrayMenuFirefox:
 APP_TrayMenuFirefox()
@@ -653,8 +667,8 @@ APP_TrayMenuFirefox() {
 
 #i::
 +#i::
-^#i::
-^+#i::
+!#i::
+!+#i::
 APP_Firefox()
 Return
 
@@ -666,7 +680,7 @@ APP_Firefox() {
 
 APP_FirefoxManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedWarning = true) {
 
-	Global APP_FirefoxPath
+	Global APP_FirefoxPath, APP_FirefoxName
 	LOC_Selection := Trim(PRM_Selection, " `t`r`n`v`f")
 	
 	; MediaMonkey treatment :
@@ -779,53 +793,36 @@ APP_FirefoxManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunch
 		}
 	}
 	
-	If (WinExist("Pale Moon ahk_class MozillaWindowClass")
-		|| WinExist("Mozilla Firefox ahk_class MozillaWindowClass")) {
+	If (WinExist(APP_FirefoxName . " ahk_class MozillaWindowClass")) {
 		WinActivate
 		WinWaitActive, , , 0
 		WinShow
 		If (PRM_AlreadyLaunchedWarning) {
-			TRY_ShowTrayTip("Firefox already launched", 2)
+			TRY_ShowTrayTip(APP_FirefoxName . " already launched", 2)
 		}
 	} Else {
+		LOC_Modifiers := ""
 		If (PRM_ThisHotKey) {
 			StringReplace, LOC_Modifiers, PRM_ThisHotKey, % "#i"
 			StringReplace, LOC_Modifiers, LOC_Modifiers, % "Browser_Home"
-		} Else {
-			LOC_Modifiers := ""
 		}
 
-		If (FileExist(A_WinDir . "\system32\StripMyRights.exe")) {
-			LOC_StripMyRights := """" . A_WinDir . "\system32\StripMyRights.exe"""
-		} Else {
-			If (!InStr(LOC_Modifiers, "+")) {
-				LOC_Modifiers .= "+"
-			}
-		}
-		
 		APP_RunAs()
 		If (LOC_Modifiers == "") {
-			Run, %LOC_StripMyRights% "%APP_FirefoxPath%", %A_Desktop%, Max UseErrorLevel
-			TRY_ShowTrayTip("Firefox launched with restricted rights")
-		} Else If (LOC_Modifiers == "+") {
 			Run, "%APP_FirefoxPath%", %A_Desktop%, Max UseErrorLevel
-			TRY_ShowTrayTip("Firefox launched with full rights")
-		} Else If (LOC_Modifiers == "^") {
-			Run, %LOC_StripMyRights% "%APP_FirefoxPath%" "-safe-mode", %A_Desktop%, Max UseErrorLevel
-			TRY_ShowTrayTip("Firefox launched in safe mode with restricted rights")
-		} Else If (LOC_Modifiers == "^+") {
+			TRY_ShowTrayTip(APP_FirefoxName . " launched")
+		} Else If (LOC_Modifiers == "!" || LOC_Modifiers == "+" || LOC_Modifiers == "!+") {
 			Run, "%APP_FirefoxPath%" "-safe-mode", %A_Desktop%, Max UseErrorLevel
-			TRY_ShowTrayTip("Firefox launched in safe mode with full rights")
+			TRY_ShowTrayTip(APP_FirefoxName . " launched in safe mode")
 		}
 		RunAs
 		If (LOC_Selection != "") {
-			WinWaitActive, % (InStr(APP_FirefoxPath, "palemoon") ? "Pale Moon" : "Mozilla Firefox") . " ahk_class MozillaWindowClass", , 10
+			WinWaitActive, % APP_FirefoxName . " ahk_class MozillaWindowClass", , 10
 			WinShow
 		}
 	}
 	If (LOC_Selection != ""
-		&& (WinExist("Pale Moon ahk_class MozillaWindowClass")
-			|| WinExist("Mozilla Firefox ahk_class MozillaWindowClass"))) {
+		&& (WinExist(APP_FirefoxName . " ahk_class MozillaWindowClass"))) {
 		WinActivate
 		WinWaitActive, , , 0
 		WinShow
@@ -2059,7 +2056,6 @@ APP_ConsoleRButton()
 Return
 
 APP_ConsoleRButton() {
-	MouseGetPos, , , , LOC_Control
 	If (Substr(LOC_Control, 1, 14) == "Console_2_View") {
 		APP_ConsolePaste()
 	} Else {
@@ -2221,8 +2217,8 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Thunderbird { Win + T } [ Ctrl : Safe-mode ] [ Shift : Full rights ] :
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Thunderbird { Win + T } [ Alt | Shift : Safe-mode ] :
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 APP_TrayMenuMail:
 APP_TrayMenuMail()
@@ -2236,14 +2232,14 @@ APP_TrayMenuMail() {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #t::
+!#t::
 +#t::
-; ^#t:: ; already used by Planned tasks
-; ^+#t:: ; already used by Tooltips option
+!+#t::
 APP_Mail()
 Return
 
 APP_Mail() {
-	AHK_KeyWait("#^+")
+	AHK_KeyWait("#^")
 	, APP_MailManager(A_ThisHotKey, PRM_Selection := TXT_GetSelectedText())
 }
 
@@ -2299,8 +2295,6 @@ APP_NewMailComposerTimer(PRM_Body = "") {
 APP_MailManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedWarning = true) {
 
 	Global APP_MailApplicationPath, LOG_DomainEncryptedPassword
-	; APP_MailApplicationPath == Mozilla Thunderbird\thunderbird.exe
-	; APP_MailApplicationPath == Microsoft Office\OFFICE11\OUTLOOK.EXE
 	If (APP_MailApplicationPath == "") {
 		TRY_ShowTrayTip("No mail application found", 3)
 		Return
@@ -2328,27 +2322,21 @@ APP_MailManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunchedW
 			}
 		}
 	} Else {
+		LOC_Modifiers := ""
 		If (PRM_ThisHotKey) {
 			StringReplace, LOC_Modifiers, A_ThisHotKey, % "#t"
 			StringReplace, LOC_Modifiers, LOC_Modifiers, % "Launch_Mail"
-		} Else {
-			LOC_Modifiers := ""
 		}
 		If (LOC_Modifiers == "") {
 			APP_RunAs()
-			Run, "%A_WinDir%\system32\StripMyRights.exe" "%APP_MailApplicationPath%", %A_Desktop%, Max UseErrorLevel
-		} Else If (LOC_Modifiers == "+") {
 			Run, "%APP_MailApplicationPath%", %A_Desktop%, Max UseErrorLevel
-		} Else If (LOC_Modifiers == "^") {
-			APP_RunAs()
-			Run, "%A_WinDir%\system32\StripMyRights.exe" "%APP_MailApplicationPath%" "-safe-mode", %A_Desktop%, Max UseErrorLevel
-		} Else If (LOC_Modifiers == "^+") {
+		} Else If (LOC_Modifiers == "!" || LOC_Modifiers == "+" || LOC_Modifiers == "!+") {
 			Run, "%APP_MailApplicationPath%" "-safe-mode", %A_Desktop%, Max UseErrorLevel
 		}
 		If (ErrorLevel == "ERROR") {
 			TRY_ShowTrayTip(LOC_MailApplicationName . " not launched", 3)
 		} Else {
-			TRY_ShowTrayTip(LOC_MailApplicationName . " launched" . (InStr(LOC_Modifiers, "^") ? " in safe mode" : "") . (InStr(LOC_Modifiers, "+") ? " with full rights" : " with restricted rights"))
+			TRY_ShowTrayTip(LOC_MailApplicationName . " launched" . (InStr(LOC_Modifiers, "^") ? " in safe mode" : ""))
 			If (PRM_Selection) {
 				Sleep, 5000
 				Run, "mailto:?subject=NewAHKMailComposer"

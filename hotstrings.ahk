@@ -41,6 +41,9 @@ HOT_InitGroups() {
 	
 	GroupAdd, HOT_IgnoringWindows, ahk_class Progman
 	GroupAdd, HOT_IgnoringWindows, ahk_class Shell_TrayWnd
+	GroupAdd, HOT_IgnoringWindows, ahk_class CisMainWizard ; Comodo alerts
+	GroupAdd, HOT_IgnoringWindows, ahk_class ClassicShell.CStartButton ; Bouton Démarrer
+	GroupAdd, HOT_IgnoringWindows, ahk_class ClassicShell.CMenuContainer ; Menu Démarrer
 	GroupAdd, HOT_IgnoringWindows, ahk_class VistaSwitcher_SwitcherWnd
 	GroupAdd, HOT_IgnoringWindows, ahk_class AutoHotkeyGUI
 	GroupAdd, HOT_IgnoringWindows, TimeCamp ahk_class wxWindowNR ; TimeCamp small bar
@@ -714,7 +717,11 @@ Return
 :*:cmc:: ; commence (à partir de commec)
 SendInput, {Left}n{Right}e
 Return
-:*:cmç::{Left}n{Right}a ; commença (à partir de commeç)
+:*:cmç:: ; commença (à partir de commeç)
+SendInput, {Left}n{Right}a
+Return
+:*:cmçnt::
+Return
 :*:dvl:: ; dvl (à partir de diversl)
 SendInput, {Left}{BackSpace 3}{Left}{BackSpace}{Right 2}
 Return
@@ -973,6 +980,9 @@ Return
 :*:vàvd'::{Left}{BackSpace}Right} ; vis-à-vis de (à partir de vis-à-vis de')
 :*:sf:: ; sauf
 SendInput, {Left}au{Right}
+Return
+:*:sft:: ; sft (à partir de sauft)
+SendInput, {Left 2}{BackSpace 2}{Right 2}
 Return
 :*:ss:: ; sans
 SendInput, {Left}an{Right}
@@ -1257,7 +1267,10 @@ Return
 SendInput, {Left}ièce {Right}ointe
 Return
 :*:pjs::{Left 8}s{Right 8} ; pièces jointes (à partir de pièce jointes)
-:*:txt::{Left 2}{BackSpace 2}e{Right 2}e ; texte (à partir de tauxt)
+:*:txt:: ; texte (à partir de tauxt)
+SendInput, {Left 2}{BackSpace 2}e{Right 2}e
+Return
+:*:txte::{BackSpace} ; texte (à partir de textee)
 ::doc::{BackSpace}ument ; document
 ::docs::{BackSpace}{Left}ument{Right} ; documents
 :*:chp::{Left}am{Right} ; champ
@@ -1427,6 +1440,7 @@ Return
 SendInput, {Left}an{Right}
 Return
 :*:rgb::{Left 2}{BackSpace 2}{Right 2} ; rgb (à partir de rangb)
+:*:rgp::{Left 2}{BackSpace 2}{Right 2} ; rgp (à partir de rangp)
 :C*:agt::{Left}en{Right} ; agent
 :C*:Agt::{Left}en{Right} ; Agent
 :*:prodr::{Left}ucteu{Right} ; production
@@ -1537,7 +1551,11 @@ Return
 :*:sdk::{Left}{BackSpace 3}{Left}{BackSpace 2}{Right 2} ; sdk (à partir de soudaink)
 :*:tàc::{Left 2}out {Right} {Right}oup ; tout à coup
 ::ast::{BackSpace}{Left 2}us{Right}itô{Right} ; aussitôt
-:*:bto::{BackSpace}{Left}{BackSpace 2}ien{Right}ôt ; bientôt (à partir de bouto)
+:*:bto:: ; bientôt (à partir de bouto)
+SendInput, {BackSpace}{Left}{BackSpace 2}ien{Right}ôt
+Return
+:*:bton::{Left}{BackSpace 2}{Left}{BackSpace 3}ou{Right}o{Right} ; bouton (à partir de bientôtn)
+:*:btn::{Left}o{Right} ; bouton (à partir de boutn)
 :C*:auj::ourd'hui ; aujourd'hui
 :C*:Auj::ourd'hui ; Aujourd'hui
 :*:qauj::{Left 3}u'{Right 3}ourd'hui ; qu'aujourd'hui

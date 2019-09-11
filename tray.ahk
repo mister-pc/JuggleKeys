@@ -362,6 +362,7 @@ TRY_InitMenus() {
 	Menu, Computing, Add, cmde`tcommande, TRY_TrayMenuHotstring
 	Menu, Computing, Add, fic`tfichier, TRY_TrayMenuHotstring
 	Menu, Computing, Add, enreg`tenregistrement, TRY_TrayMenuHotstring
+	Menu, Computing, Add, btn`tbouton, TRY_TrayMenuHotstring
 	Menu, Computing, Add, dim`tdimension, TRY_TrayMenuHotstring
 	Menu, Computing, Add, rg`trang, TRY_TrayMenuHotstring
 	Menu, Computing, Add
