@@ -1163,6 +1163,7 @@ Return
 SendInput, {Left}i{Right}ers
 Return
 :*:dvd::{BackSpace 7}DVD ; DVD (à partir de diversd)
+:*:dvi::{BackSpace 7}DVI ; DVI (à partir de diversi)
 :*:dx::{Left}eu{Right} ; deux
 :*:trs::{Left}oi{Right} ; trois
 :*:cq::{Left}in{Right} ; cinq
