@@ -190,6 +190,8 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "MMCMainFrame" ; Management console
 		|| LOC_WindowClass == "mintty" ; Git-bash
 		|| LOC_WindowClass == "TAppForm" && InStr(LOC_WindowTitle, "Registrar Registry Manager") ; Registry Manager
+		|| LOC_WindowClass == "QWidget" && LOC_WindowTitle == "SpeedCrunch"
+		|| LOC_WindowClass == "ApplicationFrameWindow" && LOC_WindowTitle = "Films et TV"
 		|| LOC_WindowClass == "MozillaWindowClass" && (LOC_WindowTitle == "Enregistrement des mots de passe" || LOC_WindowTitle == "Carnet d'adresses" || SubStr(LOC_WindowTitle, 1, 12) == "Diaporama - " || SubStr(LOC_WindowTitle, 1, 12) == "Source de : " || SubStr(LOC_WindowTitle, 1, 11) == "Source of: ")
 		|| LOC_WindowClass == "OpusApp" && (LOC_WindowTitle == "Word" || LOC_WindowTitle == "Microsoft Word" || LOC_WindowTitle == "Microsoft Word (Échec de l’activation du produit)" || LOC_WindowTitle == "Word (Échec de l’activation du produit)") ; Word
 		|| LOC_WindowClass == "XLMAIN" && (LOC_WindowTitle == "Excel" || LOC_WindowTitle == "Excel (Utilisation non commerciale)" || LOC_WindowTitle == "Microsoft Excel" || LOC_WindowTitle == "Microsoft Excel (Échec de l’activation du produit)" || LOC_WindowTitle == "Excel (Échec de l’activation du produit)") ; Excel
@@ -3536,6 +3538,13 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_MozillaCrashCount := 0
 	If (WIN_IfWinExist(STA_MozillaCrashCount, PRM_ParentTitles := "Pale Moon ahk_class MozillaWindowClass|Firefox ahk_class MozillaWindowClass", PRM_WindowTitle := "Gestionnaire de sessions - Restaurer après un crash ahk_class MozillaDialogClass", , PRM_SecondsWaitingForParent := 3, PRM_SecondsWaitingAfterSuccess := 15)) {
 		ControlSend, ahk_parent, {Enter}
+	}
+	
+	Static STA_MaxthonSetNowCount := 0, STA_AbnormalMaxthonCount := 0
+	If (WIN_IfWinExist(STA_MaxthonSetNowCount, PRM_ParentTitles := "", PRM_WindowTitle := "Set Now ahk_class #32770", , PRM_SecondsWaitingForParent := 0, PRM_SecondsWaitingAfterSuccess := 60)
+		|| WIN_IfWinExist(STA_AbnormalMaxthonCount, PRM_ParentTitles := "", PRM_WindowTitle := "The desktop icon of Maxthon browser is abnormal ahk_class #32770", , PRM_SecondsWaitingForParent := 0, PRM_SecondsWaitingAfterSuccess := 60)) {
+		WinClose, Set Now ahk_class #32770
+		WinClose, The desktop icon of Maxthon browser is abnormal ahk_class #32770
 	}
 	
 	; Thunderbird error popup :

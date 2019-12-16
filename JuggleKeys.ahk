@@ -603,11 +603,12 @@ AHK_FreeMemory() {
 AHK_LoadIniFile(PRM_FirstLoad = false) {
 
 	Global
-	Static STA_DefaultValuesA := { "WIN_Brightness": 128, "WIN_MenusTransparency": 230, "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_Admin": 1, "AHK_Experimental": 0, "AHK_SSD": 1, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AUD_Step": 5, "AUD_BigStep": 10, "SYS_CPURefreshTime": 1000, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_ChangeWallPaperTimer": 3600, "SCR_PixelsPerMillimeter": 3.5, "APP_AndroidActivityEnabled": 0, "SCR_MouseRings": 20 }
+	Static STA_DefaultValuesA := { "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_Admin": 1, "AHK_Experimental": 0, "AHK_SSD": 1, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_CPURefreshTime": 1000, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_PixelsPerMillimeter": 3.5, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "SCR_MouseRings": 20, "SCR_ChangeWallPaperTimer": 3600, "WIN_Brightness": 128, "WIN_MenusTransparency": 230, "APP_AndroidActivityEnabled": 0, "APP_FirefoxName": "Firefox", "AUD_Step": 5, "AUD_BigStep": 10 }
 	Static STA_ApplicationDefaultPathA := { "Apache": "G:\xamp\apache\bin\httpd.exe" ; APP_ApachePath
 		, "AutoScriptWriter": "AutoHotkey\AutoScriptWriter\AutoScriptWriter.exe" ; APP_AutoScriptWriterPath
 		, "Android": "Nox\bin\Nox.exe" ; APP_AndroidPath
-		, "Bash": "G:\git\git-bash.exe" ; APP_BashPath
+		, "Bash": "git\git-bash.exe" ; APP_BashPath
+		, "Calculator": "calc.exe" ; Calculator
 		, "CDBurner": "CDBurnerXP\cdbxpp.exe" ; APP_CDBurnerPath
 		, "ClassicStartMenu": "Classic Shell\ClassicStartMenu.exe" ; APP_ClassicStartMenuPath
 		, "CygWin": "CygWin\Cygwin.bat" ; APP_CygWinPath
@@ -615,13 +616,13 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 		, "DirectoryOpusRT": "GPSoftware\Directory Opus\dopusrt.exe" ; APP_DirectoryOpusRTPath
 		, "DisplayFusion": "DisplayFusion\DisplayFusion.exe" ; APP_DisplayFusionPath
 		, "Eclipse": "Eclipse\eclipse.exe" ; APP_EclipsePath
-		, "Firefox": "Pale Moon\palemoon.exe" ; APP_FirefoxPath
+		, "Firefox": "Mozilla Firefox\firefox.exe" ; APP_FirefoxPath
 		, "InternetExplorer": "Internet Explorer\iexplore.exe" ; APP_InternetExplorerPath
 		, "JavaWebStart": "Java\jre\bin\javaws.exe" ; APP_JavaWebStartPath
 		, "MP3Editor": "Mp3 Editor Pro\Mp3EditorPro.exe"
 		, "MailApplication": "Mozilla Thunderbird\thunderbird.exe" ; APP_MailApplicationPath
 		, "MediaMonkey": "MediaMonkey\MediaMonkey.exe" ; APP_MediaMonkeyPath
-		, "MySQL": "G:\xamp\mysql\bin\mysqld.exe" ; APP_MySQLPath ; APP_MySQLPath
+		, "MySQL": "xamp\mysql\bin\mysqld.exe" ; APP_MySQLPath ; APP_MySQLPath
 		, "Photoshop": "Adobe\Adobe Photoshop CS2\Photoshop.exe" ; APP_PhotoshopPath
 		, "Quintessential": "Quintessential Media Player\QMPlayer.exe" ; APP_QuintessentialPath
 		, "RegistryManager": "Registrar Registry Manager\rr.exe" ; APP_RegistryManagerPath
@@ -687,6 +688,7 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 	IniRead, AHK_BackupDays, %AHK_IniFile%, Main, BackupDays, % STA_DefaultValuesA["AHK_BackupDays"]
 	IniRead, AUD_Step, %AHK_IniFile%, Main, AudioStep, % STA_DefaultValuesA["AUD_Step"]
 	IniRead, AUD_BigStep, %AHK_IniFile%, Main, AudioBigStep, % STA_DefaultValuesA["AUD_BigStep"]
+	IniRead, APP_FirefoxName, %AHK_IniFile%, Applications, FirefoxName, % STA_DefaultValuesA["APP_FirefoxName"]
 	IniRead, SYS_CPURefreshTime, %AHK_IniFile%, Main, CPURefreshTime, % STA_DefaultValuesA["SYS_CPURefreshTime"]
 	IniRead, SCR_WallpaperRotationEnabled, %AHK_IniFile%, Main, WallpaperRotationEnabled, % STA_DefaultValuesA["SCR_WallpaperRotationEnabled"]
 	IniRead, SCR_ChangeWallPaperTimer, %AHK_IniFile%, Main, WallpaperTimer, % STA_DefaultValuesA["SCR_ChangeWallPaperTimer"]
@@ -728,6 +730,8 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 					APP_%LOC_ApplicationName%Path := ZZZ_ProgramFiles32 . "\" . APP_%LOC_ApplicationName%Path
 				} Else If (FileExist(ZZZ_ProgramFiles64 . "\" . APP_%LOC_ApplicationName%Path)) {
 					APP_%LOC_ApplicationName%Path := ZZZ_ProgramFiles64 . "\" . APP_%LOC_ApplicationName%Path
+				} Else If (FileExist(A_WinDir . "\system32\" . APP_%LOC_ApplicationName%Path)) {
+					APP_%LOC_ApplicationName%Path := A_WinDir . "\system32\" . APP_%LOC_ApplicationName%Path
 				} Else {
 					APP_%LOC_ApplicationName%Path := ""
 				}
@@ -804,6 +808,7 @@ AHK_SaveIniFile() {
 	IniWrite, %SCR_PixelsPerMillimeter%, %AHK_IniFile%, Main, PixelsPerMillimeter
 	IniWrite, %AHK_BackupDays%, %AHK_IniFile%, Main, BackupDays
 	IniWrite, %APP_AndroidActivityEnabled%, %AHK_IniFile%, Applications, AndroidActivityEnabled
+	IniWrite, %APP_FirefoxName%, %AHK_IniFile%, Applications, FirefoxName
 
 	IniWrite, %SCR_MouseTracesEnabled%, %AHK_IniFile%, Mouse, TracesEnabled
 	IniWrite, %SCR_MouseRings%, %AHK_IniFile%, Mouse, Rings
