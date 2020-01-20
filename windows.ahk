@@ -207,6 +207,7 @@ WIN_MiddleButton() {
 		|| LOC_WindowClass == "CalcFrame"
 		|| LOC_WindowClass == "PuTTY" ; PuTTY
 		|| LOC_WindowClass == "AU3Reveal" ; Window Spy
+		|| LOC_WindowClass == "Qt5QWindowIcon" ; VLC
 		|| LOC_WindowClass == "TAIDA64" ; Aida 64
 		|| LOC_WindowClass == "rctrl_renwnd32" ; Outlook message view
 		|| LOC_WindowClass == "IMWindowClass" ; Lync chat window

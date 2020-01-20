@@ -212,7 +212,7 @@ Return
 #MaxThreads, 255
 #MaxThreadsPerHotkey, 20
 #MaxThreadsBuffer, On
-; #KeyHistory, 0 ; TODO : réactiver
+#KeyHistory, 0 ; TODO : réactiver
 #InstallKeybdHook
 #InstallMouseHook
 #UseHook, On

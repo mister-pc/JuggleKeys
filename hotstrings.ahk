@@ -792,15 +792,15 @@ Return
 :*:ptot::{BackSpace} ; plutôt (à partir de plutôtt)
 ::+-::{BackSpace 3}± ; ±
 ::pl::{BackSpace}us ; plus
-:*:++ ::{Left}{BackSpace 2}plus{Right} ; plus 
-:*:++.::{Left}{BackSpace 2}plus{Right} ; plus.
-:*:++,::{Left}{BackSpace 2}plus{Right} ; plus,
-:*:++)::{Left}{BackSpace 2}plus{Right} ; plus)
+:*:+++ ::{Left}{BackSpace 2}plus{Right} ; plus 
+:*:+++.::{Left}{BackSpace 2}plus{Right} ; plus.
+:*:+++,::{Left}{BackSpace 2}plus{Right} ; plus,
+:*:+++)::{Left}{BackSpace 2}plus{Right} ; plus)
 :*:+ou-::{BackSpace}{Left 2}{BackSpace}plus {Right 2} moins ; plus ou moins
-:*:-- ::{Left}{BackSpace 2}moins{Right} ; moins 
-:*:--.::{Left}{BackSpace 2}moins{Right} ; moins.
-:*:--,::{Left}{BackSpace 2}moins{Right} ; moins,
-:*:--)::{Left}{BackSpace 2}moins{Right} ; moins)
+:*:--- ::{Left}{BackSpace 2}moins{Right} ; moins 
+:*:---.::{Left}{BackSpace 2}moins{Right} ; moins.
+:*:---,::{Left}{BackSpace 2}moins{Right} ; moins,
+:*:---)::{Left}{BackSpace 2}moins{Right} ; moins)
 :*:àpp::{Left 2} {Right}eu {Right}rès ; à peu près
 :*:qàpp::{Left 3}u'{Right} {Right}eu {Right}rès ; qu'à peu près
 :C*:vm::{Left}rai{Right}ent ; vraiment

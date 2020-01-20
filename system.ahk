@@ -396,6 +396,11 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
 	}
 	Try {
+		FileSetAttrib, +H, %A_StartMenu%\Programs\Navigateur Opera.lnk
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+	}
+	Try {
 		FileSetAttrib, +SH, %A_Startup%, 2
 	} Catch LOC_Exception {
 		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
