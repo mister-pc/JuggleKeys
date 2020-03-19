@@ -603,7 +603,7 @@ AHK_FreeMemory() {
 AHK_LoadIniFile(PRM_FirstLoad = false) {
 
 	Global
-	Static STA_DefaultValuesA := { "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_Admin": 1, "AHK_Experimental": 0, "AHK_SSD": 1, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_CPURefreshTime": 1000, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_PixelsPerMillimeter": 3.5, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "SCR_MouseRings": 20, "SCR_ChangeWallPaperTimer": 3600, "WIN_Brightness": 128, "WIN_MenusTransparency": 230, "APP_AndroidActivityEnabled": 0, "APP_FirefoxName": "Firefox", "AUD_Step": 5, "AUD_BigStep": 10 }
+	Static STA_DefaultValuesA := { "AHK_Suspended": 0, "AHK_LogsEnabled": 0, "AHK_DebugEnabled": 0, "AHK_Admin": 1, "AHK_Experimental": 0, "AHK_WindowsUpdate": 0, "AHK_SSD": 1, "AHK_ToolTipsEnabled": 1, "AHK_AudioEnabled": 1, "AHK_BackupDays": 60, "AHK_LeftMouseButtonHookEnabled": 1, "AHK_MiddleMouseButtonHookEnabled": 1, "AHK_RightMouseButtonHookEnabled": 1, "AHK_FourthMouseButtonHookEnabled": 1, "AHK_FifthMouseButtonHookEnabled": 1, "SYS_CPURefreshTime": 1000, "SYS_ScrollTimeOut": 400, "SYS_ScroolBoost": 20, "SYS_ScrollLimit": 60, "SCR_PixelsPerMillimeter": 3.5, "SCR_WallpaperRotationEnabled": 1, "SCR_WallpaperFolder": 0, "WIN_FocusFollowsMouseEnabled": 0, "SCR_MouseTracesEnabled": 1, "SCR_MouseRings": 20, "SCR_ChangeWallPaperTimer": 3600, "WIN_Brightness": 128, "WIN_MenusTransparency": 230, "APP_AndroidActivityEnabled": 0, "APP_FirefoxName": "Firefox", "AUD_Step": 5, "AUD_BigStep": 10 }
 	Static STA_ApplicationDefaultPathA := { "Apache": "G:\xamp\apache\bin\httpd.exe" ; APP_ApachePath
 		, "AutoScriptWriter": "AutoHotkey\AutoScriptWriter\AutoScriptWriter.exe" ; APP_AutoScriptWriterPath
 		, "Android": "Nox\bin\Nox.exe" ; APP_AndroidPath
@@ -678,6 +678,7 @@ AHK_LoadIniFile(PRM_FirstLoad = false) {
 	; Load general variables :
 	IniRead, AHK_Experimental, %AHK_IniFile%, Main, Experimental, % STA_DefaultValuesA["AHK_Experimental"]
 	IniRead, AHK_Admin, %AHK_IniFile%, Main, Admin, % STA_DefaultValuesA["AHK_Admin"]
+	IniRead, AHK_WindowsUpdate, %AHK_IniFile%, Main, WindowsUpdate, % STA_DefaultValuesA["AHK_WindowsUpdate"]
 	IniRead, AHK_SSD, %AHK_IniFile%, Main, SSD, % STA_DefaultValuesA["AHK_SSD"]
 	IniRead, WIN_Brightness, %AHK_IniFile%, Main, Brightness, % STA_DefaultValuesA["WIN_Brightness"]
 	IniRead, WIN_MenusTransparency, %AHK_IniFile%, Main, MenusTransparency, % STA_DefaultValuesA["WIN_MenusTransparency"]
@@ -791,6 +792,7 @@ AHK_SaveIniFile() {
 	
 	IniWrite, %AHK_Admin%, %AHK_IniFile%, Main, Admin
 	IniWrite, %AHK_Experimental%, %AHK_IniFile%, Main, Experimental
+	IniWrite, %AHK_WindowsUpdate%, %AHK_IniFile%, Main, WindowsUpdate
 	IniWrite, %AHK_SSD%, %AHK_IniFile%, Main, SSD
 	IniWrite, %AHK_LogsEnabled%, %AHK_IniFile%, Main, LogsEnabled
 	IniWrite, %AHK_DebugEnabled%, %AHK_IniFile%, Main, DebugEnabled

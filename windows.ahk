@@ -3544,8 +3544,11 @@ WIN_BoringPopUpsPeriodicTimer() {
 	Static STA_MaxthonSetNowCount := 0, STA_AbnormalMaxthonCount := 0
 	If (WIN_IfWinExist(STA_MaxthonSetNowCount, PRM_ParentTitles := "", PRM_WindowTitle := "Set Now ahk_class #32770", , PRM_SecondsWaitingForParent := 0, PRM_SecondsWaitingAfterSuccess := 60)
 		|| WIN_IfWinExist(STA_AbnormalMaxthonCount, PRM_ParentTitles := "", PRM_WindowTitle := "The desktop icon of Maxthon browser is abnormal ahk_class #32770", , PRM_SecondsWaitingForParent := 0, PRM_SecondsWaitingAfterSuccess := 60)) {
-		WinClose, Set Now ahk_class #32770
-		WinClose, The desktop icon of Maxthon browser is abnormal ahk_class #32770
+		WinKill, Set Now ahk_class #32770 ; Ne marche pas
+		Process, Close, MxUp.exe ; Ne marche pas
+		ControlSend, ahk_parent, !{F4}, Set Now ahk_class #32770 ; Ne marche pas
+		WinKill, The desktop icon of Maxthon browser is abnormal ahk_class #32770
+		; MsgBox, Maxton closed !
 	}
 	
 	; Thunderbird error popup :
