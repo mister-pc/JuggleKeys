@@ -12,6 +12,7 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, UltraEdit ; UltraEdit
 	GroupAdd, HOT_HotstringsWindowsGroup, Notepad++ ahk_class Notepad++ ; Notepad++
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class OpusApp ; Office
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class SALFRAME ; Libre Office
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class XLMAIN ; Excel
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
