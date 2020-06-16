@@ -77,51 +77,53 @@ SYS_ProcessPriority(PRM_Direction = 0, PRM_ActiveWindow = true) {
 ; Suspend / resume process { Ctrl + [ Shift + ] Pause } :
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SYS_TrayMenuSuspendProcess:
-If (WIN_FocusLastWindow()) {
-	SYS_SuspendProcess(-1, true)
-}
-Return
-
-SYS_TrayMenuResumeProcess:
-If (WIN_FocusLastWindow()) {
-	SYS_SuspendProcess(-1, false)
-}
-Return
-
-#Pause::
-SYS_SuspendProcess(-1, true)
-Return
-
-+#Pause::
-SYS_SuspendProcess(-1, false)
-Return
-
-^#Pause::
-^#CtrlBreak::
-AHK_KeyWait("Pause", "^#")
-SendInput, {LWin Down}{Pause}{LWin Up}
-Return
+/* SYS_TrayMenuSuspendProcess:
+ * If (WIN_FocusLastWindow()) {
+ * 	SYS_SuspendProcess(-1, true)
+ * }
+ * Return
+ * 
+ * SYS_TrayMenuResumeProcess:
+ * If (WIN_FocusLastWindow()) {
+ * 	SYS_SuspendProcess(-1, false)
+ * }
+ * Return
+ * 
+ * #Pause::
+ * SYS_SuspendProcess(-1, true)
+ * Return
+ * 
+ * +#Pause::
+ * SYS_SuspendProcess(-1, false)
+ * Return
+ * 
+ * ^#Pause::
+ * ^#CtrlBreak::
+ * AHK_KeyWait("Pause", "^#")
+ * SendInput, {LWin Down}{Pause}{LWin Up}
+ * Return
+ */
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SYS_SuspendProcess(PRM_PID, PRM_Suspend = true, PRM_Tooltip = true) {
-	Global ZZZ_CloseHandleFunction
-	Static STA_OpenProcessFunction := AHK_GetFunction("kernel32", "OpenProcess"), STA_NtSuspendProcessFunction := AHK_GetFunction("ntdll", "NtSuspendProcess"), STA_NtResumeProcessFunction := AHK_GetFunction("ntdll", "NtResumeProcess")
-    If (PRM_PID > 0) {
-		LOC_PID := PRM_PID
-	} Else {
-		WinGet, LOC_PID, PID, A
-	}
-	LOC_ProcessHandler := DllCall(STA_OpenProcessFunction, "UInt", 0x1F0FFF, "Int", 0, "Int", LOC_PID)
-    If (LOC_ProcessHandler) {
-		DllCall(PRM_Suspend ? STA_NtSuspendProcessFunction : STA_NtResumeProcessFunction, "Int", LOC_ProcessHandler)
-		DllCall(ZZZ_CloseHandleFunction, "Int", LOC_ProcessHandler)
-		If (PRM_Tooltip) {
-			AHK_ShowTooltip("Process " . (PRM_Suspend ? "suspended" : "resumed"), 1)
-		}
-	}
-}
+/* SYS_SuspendProcess(PRM_PID, PRM_Suspend = true, PRM_Tooltip = true) {
+ * 	Global ZZZ_CloseHandleFunction
+ * 	Static STA_OpenProcessFunction := AHK_GetFunction("kernel32", "OpenProcess"), STA_NtSuspendProcessFunction := AHK_GetFunction("ntdll", "NtSuspendProcess"), STA_NtResumeProcessFunction := AHK_GetFunction("ntdll", "NtResumeProcess")
+ *     If (PRM_PID > 0) {
+ * 		LOC_PID := PRM_PID
+ * 	} Else {
+ * 		WinGet, LOC_PID, PID, A
+ * 	}
+ * 	LOC_ProcessHandler := DllCall(STA_OpenProcessFunction, "UInt", 0x1F0FFF, "Int", 0, "Int", LOC_PID)
+ *     If (LOC_ProcessHandler) {
+ * 		DllCall(PRM_Suspend ? STA_NtSuspendProcessFunction : STA_NtResumeProcessFunction, "Int", LOC_ProcessHandler)
+ * 		DllCall(ZZZ_CloseHandleFunction, "Int", LOC_ProcessHandler)
+ * 		If (PRM_Tooltip) {
+ * 			AHK_ShowTooltip("Process " . (PRM_Suspend ? "suspended" : "resumed"), 1)
+ * 		}
+ * 	}
+ * }
+ */
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
