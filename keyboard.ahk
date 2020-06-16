@@ -1149,7 +1149,7 @@ SC029::SendInput, {Raw}¹        ;                              ² => ¹
 <^>!+&::SendInput, {Raw}¾       ;              AltGr + Shift + 1 => 3/4
 +#&::SendInput, {Raw}¾          ;        Win +         Shift + 1 => 3/4
 
-#é::SendInput, {Raw}É           ;        Win +                 é => É
+#é::SendInput, É                ;        Win +                 é => É
 <!é::SendInput, {Raw}~%A_Space% ;              Alt   +         é => ~
 <^<!é::SendInput, {Raw}~        ; Ctrl +       Alt   +         é => ~
 <!+é::SendInput, {Raw}½         ;              Alt   + Shift + 2 => 1/2

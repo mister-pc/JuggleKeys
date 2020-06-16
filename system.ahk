@@ -398,6 +398,11 @@ SYS_WriteRegistryOptions(PRM_KillRegServer = false) {
 		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
 	}
 	Try {
+		FileSetAttrib, +H, %A_StartMenu%\Programs\Navigateur Opera.lnk
+	} Catch LOC_Exception {
+		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
+	}
+	Try {
 		FileSetAttrib, +SH, %A_Startup%, 2
 	} Catch LOC_Exception {
 		AHK_Catch(LOC_Exception, "AHK_SaveIniFile")
@@ -500,22 +505,26 @@ SYS_WindowsUpdate()
 Return
 
 SYS_WindowsUpdate() {
-	TRY_ShowTrayTip("Launching Windows Update...")
-	APP_RunAs()
-	/*
-		sc.exe config trustedinstaller start= demand
-		sc.exe start trustedinstaller
-		sc.exe config wuauserv start= demand
-		sc.exe start wuauserv
-		wuapp.exe startmenu
-	*/
-	RunWait, %A_WinDir%\system32\sc.exe config trustedinstaller start= demand, , Hide UseErrorLevel
-	RunWait, %A_WinDir%\system32\sc.exe start trustedinstaller, , Hide UseErrorLevel
-	RunWait, %A_WinDir%\system32\sc.exe config wuauserv start= demand, , Hide UseErrorLevel
-	RunWait, %A_WinDir%\system32\sc.exe start wuauserv, , Hide UseErrorLevel
-	Run, %A_WinDir%\system32\wuapp.exe startmenu, , Maximize UseErrorLevel
-	TRY_ShowTrayTip("Windows Update launched")
-	RunAs
+	
+	Global AHK_WindowsUpdate
+	If (AHK_WindowsUpdate) {
+		TRY_ShowTrayTip("Launching Windows Update...")
+		APP_RunAs()
+		/*
+			sc.exe config trustedinstaller start= demand
+			sc.exe start trustedinstaller
+			sc.exe config wuauserv start= demand
+			sc.exe start wuauserv
+			wuapp.exe startmenu
+		*/
+		RunWait, %A_WinDir%\system32\sc.exe config trustedinstaller start= demand, , Hide UseErrorLevel
+		RunWait, %A_WinDir%\system32\sc.exe start trustedinstaller, , Hide UseErrorLevel
+		RunWait, %A_WinDir%\system32\sc.exe config wuauserv start= demand, , Hide UseErrorLevel
+		RunWait, %A_WinDir%\system32\sc.exe start wuauserv, , Hide UseErrorLevel
+		Run, %A_WinDir%\system32\wuapp.exe startmenu, , Maximize UseErrorLevel
+		TRY_ShowTrayTip("Windows Update launched")
+		RunAs
+	}
 }
 
 #IfWinActive, Windows Update ahk_class #32770, &Redémarrer maintenant

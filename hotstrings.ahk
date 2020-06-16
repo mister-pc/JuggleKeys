@@ -12,6 +12,7 @@ HOT_InitGroups() {
 	GroupAdd, HOT_HotstringsWindowsGroup, UltraEdit ; UltraEdit
 	GroupAdd, HOT_HotstringsWindowsGroup, Notepad++ ahk_class Notepad++ ; Notepad++
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class OpusApp ; Office
+	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class SALFRAME ; Libre Office
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class XLMAIN ; Excel
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
 	GroupAdd, HOT_HotstringsWindowsGroup, ahk_class rctrl_renwnd32 ; Outlook
@@ -616,7 +617,10 @@ Return
 :*:sqê::{Left}{BackSpace}'{Right} ; est-ce qu'ê (à partir de est-ce queê)
 :*:sqi::{Left}{BackSpace}'{Right} ; est-ce qu'i (à partir de est-ce quei)
 :*:sqo::{Left}{BackSpace}'{Right} ; est-ce qu'o (à partir de est-ce queo)
-:*:squ::{Left}{BackSpace}'{Right} ; est-ce qu'u (à partir de est-ce queu)
+:*:squ::  ; est-ce qu'u (à partir de est-ce queu)
+SendInput, {Left}{BackSpace}'{Right}
+Return
+:*:sque::{Left 2}{BackSpace 2}{Left}{BackSpace 5}{Left}{BackSpace}{Right 4} ; sque (à partir de est-ce q'ue)
 :*:sqy::{Left}{BackSpace}'{Right} ; est-ce qu'y (à partir de est-ce quey)
 :C*:sql::{Left}{BackSpace 2}{Left}{BackSpace 5}{Left}{BackSpace}{Right 3} ; sql (à partir de est-ce quel)
 :C*:squ::{Left}{BackSpace 2}{Left}{BackSpace 5}{Left}{BackSpace}{Right 3} ; squ (à partir de est-ce queu)
@@ -792,15 +796,15 @@ Return
 :*:ptot::{BackSpace} ; plutôt (à partir de plutôtt)
 ::+-::{BackSpace 3}± ; ±
 ::pl::{BackSpace}us ; plus
-:*:++ ::{Left}{BackSpace 2}plus{Right} ; plus 
-:*:++.::{Left}{BackSpace 2}plus{Right} ; plus.
-:*:++,::{Left}{BackSpace 2}plus{Right} ; plus,
-:*:++)::{Left}{BackSpace 2}plus{Right} ; plus)
+:*:+++ ::{Left}{BackSpace 3}plus{Right} ; plus 
+:*:+++.::{Left}{BackSpace 3}plus{Right} ; plus.
+:*:+++,::{Left}{BackSpace 3}plus{Right} ; plus,
+:*:+++)::{Left}{BackSpace 3}plus{Right} ; plus)
 :*:+ou-::{BackSpace}{Left 2}{BackSpace}plus {Right 2} moins ; plus ou moins
-:*:-- ::{Left}{BackSpace 2}moins{Right} ; moins 
-:*:--.::{Left}{BackSpace 2}moins{Right} ; moins.
-:*:--,::{Left}{BackSpace 2}moins{Right} ; moins,
-:*:--)::{Left}{BackSpace 2}moins{Right} ; moins)
+:*:--- ::{Left}{BackSpace 3}moins{Right} ; moins 
+:*:---.::{Left}{BackSpace 3}moins{Right} ; moins.
+:*:---,::{Left}{BackSpace 3}moins{Right} ; moins,
+:*:---)::{Left}{BackSpace 3}moins{Right} ; moins)
 :*:àpp::{Left 2} {Right}eu {Right}rès ; à peu près
 :*:qàpp::{Left 3}u'{Right} {Right}eu {Right}rès ; qu'à peu près
 :C*:vm::{Left}rai{Right}ent ; vraiment
@@ -1173,6 +1177,7 @@ Return
 SendInput, {Left}i{Right}ers
 Return
 :*:dvd::{BackSpace 7}DVD ; DVD (à partir de diversd)
+:*:dvi::{BackSpace 7}DVI ; DVI (à partir de diversi)
 :*:dx::{Left}eu{Right} ; deux
 :*:trs::{Left}oi{Right} ; trois
 :*:cq::{Left}in{Right} ; cinq
@@ -1346,8 +1351,9 @@ Return
 :*:pbma::{Left}{BackSpace}{Left}{BackSpace}é{Right 2} ; probléma (à partir de problèmea)
 :*:pba::{Left}{BackSpace}{Left}{BackSpace}é{Right 2} ; probléma (à partir de problèmea)
 :*:fd::{Left}on{Right} ; fond
-:C*:rv::{Left}endez-{Right}ous ; rendez-vous
-:C*:Rv::{Left}endez-{Right}ous ; Rendez-vous
+:*:rv:: ; rendez-vous
+SendInput, {Left}endez-{Right}ous
+Return
 :C*:rdv::{Left 3}{BackSpace}e{Right 2}ez-{Right}ous ; rendez-vous (à partir de rondv)
 :C*:Rdv::{Left 3}{BackSpace}e{Right 2}ez-{Right}ous ; Rendez-vous (à partir de Rondv)
 :C*:RDV::{Left 2}{BackSpace 2}{Right 2} ; RDV (à partir de RonDV)
@@ -1496,6 +1502,8 @@ Return
 SendInput, {Left 2}ise {Right}n {Right}roduction
 Return
 :C*:Meps::{BackSpace}{Left 14}s{Right 14} ; Mises en production (à partir de Mise en productions)
+:*:rvb::{BackSpace 12}RVB ; RVB (à partir de rendez-vousb)
+:*:cmjn::{BackSpace 7}CMJN ; CMJN (à partir de commejn)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
