@@ -729,8 +729,8 @@ TRY_InitMenus() {
 	TRY_AddMenuItem("Windows", "           Win +                       Wheel`tTransparency")
 	TRY_AddMenuItem("Windows", "           Win + AltGr +         Wheel`tBrightness")
 	TRY_AddMenuItem("Windows", "Ctrl + Win +                       Wheel`tPriority")
-	;TRY_AddMenuItem("Windows", "           Win +                       Pause`tSuspend", "SYS_TrayMenuSuspendProcess")
-	;TRY_AddMenuItem("Windows", "           Win + Shift +          Pause`tResume", "SYS_TrayMenuResumeProcess")
+	TRY_AddMenuItem("Windows", "           Win +                       Pause`tSuspend", "SYS_TrayMenuSuspendProcess")
+	TRY_AddMenuItem("Windows", "           Win + Shift +          Pause`tResume", "SYS_TrayMenuResumeProcess")
 	TRY_AddMenuItem("Windows", "           RightClick +            Wheel`tAlt-Tab Switch")
 	TRY_AddMenuItem("Windows", "           RightClick +            LeftClick`tRoll / Minimize", "WIN_TrayMenuRollToggle")
 	TRY_AddMenuItem("Windows")
@@ -824,7 +824,6 @@ TRY_InitMenus() {
 	If (APP_MediaMonkeyPath) {
 		TRY_AddMenuItem("Applications", "           Win +           M`t&Media Monkey", "APP_MediaMonkey", APP_MediaMonkeyPath)
 	}
-	TRY_AddMenuItem("Applications", "           Win +           N`tSticky &Notes", "APP_Notes", "StikyNot.exe")
 	If (FileExist(ZZZ_ProgramFiles32 . "\PuTTY Connection Manager\puttycm.exe")) {
 		TRY_AddMenuItem("Applications", "           Win +           P`t&PuTTY", "APP_PuTTY", "PuTTY Connection Manager\puttycm.exe")
 	}
