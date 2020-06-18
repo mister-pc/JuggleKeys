@@ -166,6 +166,7 @@ WIN_MiddleButton() {
 	If (LOC_WindowClass == "SunAwtFrame" && ((LOC_KGSTitle := SubStr(LOC_WindowTitle, 1, 6)) == "KGS : " || LOC_KGSTitle == "CGoban") ; KGS
 		|| LOC_WindowClass == "PlayerCanvas" && (InStr(LOC_WindowTitle, "QMP") || LOC_WindowTitle == "Quintessential Media Player") ; Quintessential
 		|| LOC_WindowClass == "ExtPlayerCanvas" ; Quintessential
+		|| LOC_WindowClass == "ApplicationFrameWindow" && LOC_WindowTitle == "Calculatrice" ; Calculatrice
 		|| LOC_WindowClass == "PROCEXPL" ; Process Explorer
 		|| LOC_WindowClass == "ProcessHacker" ; Process Hacker
 		|| LOC_WindowClass == "#32770" && LOC_WindowTitle == "Find Handles or DLLs"
@@ -350,14 +351,14 @@ WIN_MiddleButton() {
 			Return
 		}
 		
-		If (InStr(LOC_WindowTitle, " - Dossiers locaux")
-			|| InStr(LOC_WindowTitle, "Courrier entrant - ")) { ;
-			SendInput, {Esc}{Delete}
-			AHK_ShowToolTip("Mail deleted")
+		If (RegExMatch(LOC_WindowTitle, "^.* \- .* - .* - Mozilla Thunderbird$")) { ; mail open in another tab (otherwise title like Folder - Account - Mozilla Thunderbird)
+			SendInput, {Esc}^{F4}
+			AUD_Beep()
 			Return
 		}
 		
-		SendInput, {Esc}^{F4}
+		SendInput, {Esc}{Delete}
+		AHK_ShowToolTip("Mail deleted")
 		AUD_Beep()
 		WinActivate, ahk_id %LOC_ActiveWindowID%
 		Return
@@ -864,7 +865,11 @@ WIN_InitGroups() {
 	GroupAdd, WIN_NoDialogWindows, %AHK_ScriptInfo% ahk_class AutoHotkeyGUI
 	GroupAdd, WIN_NoDialogWindows, AutoIt v3 ahk_class AutoIt v3
 
+
 	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class TSSHELLWND ; Terminal Server
+	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class Photoshop ; Photoshop
+	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class PSFloatC ; Photoshop
+	GroupAdd, WIN_SuspendingWindowsGroup, Adobe Photoshop ahk_class #32770 ; Photoshop
 	GroupAdd, WIN_SuspendingWindowsGroup, ahk_class RaymanOrigins ; Rayman Origins
 	GroupAdd, WIN_SuspendingWindowsGroup, Rayman Legends ahk_class Rayman Legends ; Rayman Legends
 	GroupAdd, WIN_SuspendingWindowsGroup, Mount&Blade Warband ahk_class ahk_class MB Window ; Mount & Blade Warband
