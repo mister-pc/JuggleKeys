@@ -1030,7 +1030,11 @@ SendInput, =
 Return
 
 KBD_NumPadOpenParenthesis: ; { NumpadOpenParenthesis }
-SendInput, (){Left}
+If WinActive("Calculatrice ahk_class ApplicationFrameWindow") {
+	SendInput, (
+} Else {
+	SendInput, (){Left}
+}
 Return
 
 KBD_NumPadLookOpeningParenthesis: ; { Alt + NumPadOpenParenthesis }
