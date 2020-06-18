@@ -449,6 +449,12 @@ APP_Calculator:
 APP_Run("Calculator", APP_CalculatorPath, , , false, false)
 Return
 
+#IfWinActive, Calculatrice ahk_class ApplicationFrameWindow
+NumPadEnter::SendInput, =
+NumpadDot::SendInput, `,
+
+#IfWinActive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -821,6 +827,7 @@ APP_FirefoxManager(PRM_ThisHotKey = false, PRM_Selection = "", PRM_AlreadyLaunch
 			WinShow
 		}
 	}
+
 	If (LOC_Selection != ""
 		&& (WinExist(APP_FirefoxName . " ahk_class MozillaWindowClass"))) {
 		WinActivate
@@ -1512,8 +1519,9 @@ APP_MonkeyImage() {
 	}
 	
 	; Display file selection dialog :
+	Sleep, 100
 	ControlFocus, TButtonPlus2, A
-	Sleep, 50
+	Sleep, 100
 	SendInput, {Space}
 	WinWaitActive, Sélectionner les fichiers image ahk_class #32770, , 5
 	If (ErrorLevel) {
@@ -1524,7 +1532,7 @@ APP_MonkeyImage() {
 	ControlFocus, Edit1
 	Sleep, 50
 	SendInput, ^a
-	Sleep, 150
+	Sleep, 200
 	SendInput, {Raw}Folder.jpg
 	Sleep, 50
 	ControlFocus, Button2
@@ -1670,21 +1678,6 @@ SendInput, {Alt Down}p{Alt Up}{Alt Down}b{Alt Up}
 ControlFocus, TEditPlus7
 Return
 #IfWinActive
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Notes { Win + N } :
-;;;;;;;;;;;;;;;;;;;;;
-
-APP_Notes:
-#n::
-; APP_Run("Notes", A_WinDir . "\system32\StikyNot.exe")
-APP_RunAs()
-Run, %A_WinDir%\system32\StikyNot.exe
-RunAs
-Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
